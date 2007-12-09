@@ -1,0 +1,91 @@
+Database Name	Friendly Name
+BS_1250009 	Navigational aid
+BS_1370009 	Residential area
+BS_2000009 	Parabolic antenna
+BS_2010009 	Building
+BS_2060009 	Chimney
+BS_2080009 	Tank
+BS_2120009 	Cross
+BS_2230009 	Transmission line
+BS_2240009 	Wall/fence
+BS_2310009 	Pipeline (Sewage/liquid waste)
+BS_2350009 	Well
+BS_2380009 	Underground reservoir
+BS_2440009 	Silo
+BS_2530009 	Tower
+EN_1120009 	Power transmission line
+EN_1180009 	Pipeline
+EN_1340009 	Valve
+EN_1360049 	Gas and oil facilities
+EN_1360059 	Transformer station
+EN_2170009 	Wind-operated device
+FO_1030009 	Contour
+FO_1080019 	Landform
+FO_1080029 	Esker
+FO_1080039 	Glacial debris undifferentiated
+FO_1080049 	Moraine
+FO_1080059 	Sand
+FO_1080069 	Tundra polygon
+FO_1080079 	Pingo
+FO_1200009 	Elevation point
+FO_2570009 	Contour imperial
+FO_2610009 	Elevation point imperial
+HD_1140009 	Permanent snow and ice
+HD_1150009 	Coastal water
+HD_1450009 	Manmade hydrographic entity
+HD_1460009 	Hydrographic obstacle entity
+HD_1470009 	Single line watercourse
+HD_1480009 	Waterbody
+HD_1490009 	Island
+IC_1350019 	Pit
+IC_1350029 	Quarry
+IC_1350039 	Extraction area
+IC_1350049 	Mine
+IC_1350059 	Peat cutting
+IC_1360019 	Domestic waste
+IC_1360029 	Industrial solid waste
+IC_1360039 	Industrial and commercial area
+IC_2110009 	Lumber yard
+IC_2360009 	Auto wrecker
+IC_2600009 	Mining area
+LI_1210009 	NTS50K boundary polygon
+LX_1000019 	Lookout
+LX_1000029 	Ski centre
+LX_1000039 	Cemetery
+LX_1000049 	Fort
+LX_1000059 	Designated area
+LX_1000069 	Marina
+LX_1000079 	Sports track/Race track
+LX_1000089 	Golf course
+LX_2030009 	Camp
+LX_2070009 	Drive-in theatre
+LX_2200009 	Botanical garden
+LX_2210009 	Shrine
+LX_2220009 	Historical site/Point of interest
+LX_2260009 	Amusement park
+LX_2270009 	Park/sports field
+LX_2280009 	Footbridge
+LX_2400009 	Ruins
+LX_2420009 	Trail
+LX_2460009 	Stadium
+LX_2480009 	Campground
+LX_2490009 	Picnic site
+LX_2500009 	Golf drining range
+LX_2510009 	Exhibition ground
+LX_2560009 	Zoo
+SS_1320019 	Tundra pond
+SS_1320029 	Palsa bog
+SS_1320039 	Saturated soil
+SS_1320049 	Wetland
+SS_1320059 	String bog
+TO_2520009 	Toponym
+TR_1020009 	Railway
+TR_1190009 	Runway
+TR_1750009 	Ferry connection segment [GeoBase]
+TR_1760009 	Road segment [GeoBase]
+TR_1770009 	Junction [GeoBase]
+TR_1780009 	Blocked passage [GeoBase]
+TR_1790009 	Toll point [GeoBase]
+TR_2320009 	Turntable
+VE_1240009 	Wooded area
+VE_2290009 	Cut line
