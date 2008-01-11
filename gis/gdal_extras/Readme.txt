@@ -14,11 +14,14 @@ Optionally, create an NTFS Junction of c:\local\fwtools to c:\program files\fwto
 	
 The following components were written by others. There may be newer/better versions than what I have here.
 
+.\bin\
 	fusion.py			- Mario Beauchamp 
 	gdalcopyproj.py	- Schuyler Erle
 	gdal_vrtmerge.py	- Gabriel Ebner 
 
-
+.\gdal_plugins\
+	gdal_SDE_9x.dll	- Howard Butler
+	
 
 
 
