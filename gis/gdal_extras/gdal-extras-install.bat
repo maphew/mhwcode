@@ -25,7 +25,22 @@ cd /d %gd-extras%\data
 for %%a in (*) do (
 	if not exist "%FWTOOLS_DIR%\data\%%~nxa" copy "%%a" "%FWTOOLS_DIR%\data\%%~nxa"
 	)
+:Tools
+cd /d %gd-extras%\tools
+for %%a in (*) do (
+	if not exist "%FWTOOLS_DIR%\tools\%%~nxa" copy "%%a" "%FWTOOLS_DIR%\tools\%%~nxa"
+	)
+goto skip
 
+:Combined
+for %%b in (bin, data, tools, pics) do (
+	cd /d %gd-extras%\%%b
+	for %%a in (*) do (
+		if not exist "%FWTOOLS_DIR%\%%b\%%~nxa" copy "%%a" "%FWTOOLS_DIR%\%%b\%%~nxa"
+		)
+	)
+
+:skip
 :: for fwtools on a portable device
 copy /-y %gd-extras%\setfw_portable.cmd %FWTOOLS_DIR%\
 
