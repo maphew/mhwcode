@@ -12,6 +12,9 @@
 
 '''
 
+## FIXME: figure out what "DeprecationWarning: raising a string exception is deprecated" 
+## means and what to do about it.
+
 import __main__
 import getopt
 import os
@@ -21,6 +24,7 @@ import string
 import sys
 import urllib
 import gzip, tarfile
+import hashlib
 
 # The abi change.
 ABI = ''
@@ -236,30 +240,32 @@ def ball ():
 	'''print tarball name'''
 	print get_ball ()
 	
+def down_stat(*a):
+	'''report urllib download progress'''
+	# FIXME: change this to a progress bar, it's too noisy
+	print a
+
 def do_download ():
-	print '\n'
 	url, md5 = get_url ()
-	os.chdir (downloads)
-	#dir = '%s/%s' % (downloads, os.path.split (url)[0])
-	dir, file = os.path.split (url)
-	savePath = downloads + dir
-	#print savePath
+	dir = '%s/%s' % (downloads, os.path.split (url)[0])
+	srcFile = os.path.join (mirror + '/' + url)
+	dstFile = os.path.join (downloads + '/' + url)
 
 	if not os.path.exists (get_ball ()): #or not check_md5 ():
 		if not os.path.exists (dir):
 			os.makedirs (dir)
 		## FIXME: use urllib instead, was:
 		#status = os.system ('cd %s && wget -c %s/%s' % (dir, mirror, url))
-		status = urllib.urlretrieve(mirror + url, dir + '/' + file)
-
-		# successful pipe close returns 'None'
-		if not status:
-			status = 0
-
-		signal = 0x0f & status
-		## exit_status = status >> 8
-		if status:
-			raise 'urg'
+		status = urllib.urlretrieve(srcFile, dstFile, down_stat)
+		
+		### the following is broken because of urllib change
+		## successful pipe close returns 'None'
+		#if not status:
+		#   status = 0
+		#signal = 0x0f + status
+		### exit_status = status >> 8
+		#if status:
+		#   raise 'urg'
 
 def download ():
 	'''download package'''
@@ -361,8 +367,7 @@ def update ():
 
 	# FIXME: use urllib instead, was:
 	#os.system ('cd %s && wget -c %s/%s' % (downloads, mirror, 'setup.ini'))
-	def reporthook(*a): print a
-	f = urllib.urlretrieve(mirror + '/setup.ini', downloads + 'setup.ini', reporthook)
+	f = urllib.urlretrieve(mirror + '/setup.ini', downloads + 'setup.ini', down_stat)
 	
 	if os.path.exists (setup_ini):
 		## backup existing setup config, was:
@@ -422,17 +427,25 @@ def new ():
 		print '%-20s%-12s' % (packagename,
 				      version_to_string (get_version ()))
 		
-		
+# FIXME: pythonize 'md5sum'
 def md5 ():
 	'''check md5 sum'''
 	url, md5 = get_url ()
 	ball = os.path.basename (url)
 	print '%s  %s' % (md5, ball)
-	pipe = os.popen ('md5sum %s/%s' % (downloads, url), 'r')
-	my_md5 = string.split (pipe.read ())[0]
+	## was:
+	#pipe = os.popen ('md5sum %s/%s' % (downloads, url), 'r')
+	localFile = downloads + url
+	pipe = hashlib.md5 (localFile).hexdigest()
+
+	## was:
+	#my_md5 = string.split (pipe.read ())[0]
+	my_md5 = pipe
+
 	print '%s  %s' % (my_md5, ball)
 	if md5 != my_md5:
-		raise 'URG'
+		#raise 'URG'
+		print 'MD5 does not match, but carrying on anyway (which is probably a dumb idea).'
 	
 def search ():
 	'''search package list'''
@@ -519,19 +532,26 @@ def get_filelist ():
 	lst = map (string.strip, pipe.readlines ())
 	if pipe.close ():
 		raise 'urg'
+	
+	print '\tlst: ', lst
+	
 	return lst
 
 #FIXME: make gzip platform independant
 def write_filelist (lst):
 	## was:
 	#pipe = os.popen ('gzip -c > %s/%s.lst.gz' % (config, packagename), 'w')
-	pipe = gzip.open (config + packagename + '.lst.gz', 'w')
+	
+	# doesn't work, writes path to pkg list instead of contents
+	#pipe = gzip.open (config + packagename + '.lst.gz', 'w')
+	pipe = GzipFile (config + packagename + '.lst.gz', 'w', '9',lst)
+	print '\twrite filelist .lst.gz pipe: ', pipe
 
-	for i in lst:
-		pipe.write (i)
-		pipe.write ('\n')
-	if pipe.close ():
-		raise 'urg'
+	#for i in lst:
+	#   pipe.write (i)
+	#   pipe.write ('\n')
+	#if pipe.close ():
+	#   raise 'urg'
 
 def do_uninstall ():
 	# find list
