@@ -1,11 +1,15 @@
 #!/usr/bin/python
 
 '''
-  cyg-apt - Cygwin installer to keep cygwin root up to date
+  o4w-apt - Cygwin installer to keep cygwin root up to date
   
   (c) 2002--2003  Jan Nieuwenhuizen <janneke@gnu.org>
   
   License: GNU GPL
+
+
+  Modified 2008-Jun-27 Matt.Wilkie@gov.yk.ca for OSGeo4W
+
 '''
 
 import __main__
@@ -16,13 +20,21 @@ import shutil
 import string
 import sys
 import urllib
+import gzip, tarfile
 
 # The abi change.
 ABI = ''
 if 'ABI' in os.environ.keys ():
 	ABI = os.environ['ABI']
 
-root = '/cygwin'
+OSGEO4W_ROOT = ''
+if 'OSGEO4W_ROOT' in os.environ.keys ():
+	OSGEO4W_ROOT = os.environ['OSGEO4W_ROOT']
+	OSGEO4W_ROOT = string.replace(OSGEO4W_ROOT, '\\', '/') # convert backslash to foreslash
+
+#root = '/cygwin'
+root = OSGEO4W_ROOT
+
 NETREL = '/netrel'
 EXTRA = NETREL + '/extra'
 # PATCH = NETREL + '/patch'
@@ -31,14 +43,15 @@ CWD = os.getcwd ()
 
 os.environ['PATH'] = NETREL + '/bin:' + os.environ['PATH']
 
-mirror = 'ftp://mirrors.rcn.net/mirrors/sources.redhat.com/cygwin'
-mirror = 'http://mirrors.rcn.net/pub/sourceware/cygwin'
-
+#mirror = 'ftp://mirrors.rcn.net/mirrors/sources.redhat.com/cygwin'
+#mirror = 'http://mirrors.rcn.net/pub/sourceware/cygwin'
+mirror = 'http://download.osgeo.org/osgeo4w'
 
 downloads = root + '/var/cache/setup/' + urllib.quote (mirror, '').lower ()
 
-config = root + '/etc/setup'
+config = root + '/etc/setup/'
 setup_ini = config + '/setup.ini'
+setup_bak = config + '/setup.bak'
 installed_db = config + '/installed.db'
 installed_db_magic = 'INSTALLED.DB 2\n'
 
@@ -224,14 +237,21 @@ def ball ():
 	print get_ball ()
 	
 def do_download ():
+	print '\n'
 	url, md5 = get_url ()
-	dir = '%s/%s' % (downloads, os.path.split (url)[0])
+	os.chdir (downloads)
+	#dir = '%s/%s' % (downloads, os.path.split (url)[0])
+	dir, file = os.path.split (url)
+	savePath = downloads + dir
+	#print savePath
+
 	if not os.path.exists (get_ball ()): #or not check_md5 ():
 		if not os.path.exists (dir):
 			os.makedirs (dir)
-		# urllib
-		status = os.system ('cd %s && wget -c %s/%s' % (dir, mirror,
-								url))
+		## FIXME: use urllib instead, was:
+		#status = os.system ('cd %s && wget -c %s/%s' % (dir, mirror, url))
+		status = urllib.urlretrieve(mirror + url, dir + '/' + file)
+
 		# successful pipe close returns 'None'
 		if not status:
 			status = 0
@@ -328,16 +348,32 @@ def list ():
 			s += '(%s)' % version_to_string (new)
 		print s
 
+# FIXME: make portable (rm, mv, wget not exist on windows)
 def update ():
 	'''setup.ini'''
 	if not os.path.exists (downloads):
 		os.makedirs (downloads)
-	os.system ('rm -f %s/%s' % (downloads, 'setup.ini'))
-	# urllib
-	os.system ('cd %s && wget -c %s/%s' % (downloads, mirror, 'setup.ini'))
+
+	## remove cached ini, was:
+	#os.system ('rm -f %s/%s' % (downloads, 'setup.ini'))
+	if os.path.exists (downloads + 'setup.ini'):
+		os.remove (downloads + 'setup.ini')
+
+	# FIXME: use urllib instead, was:
+	#os.system ('cd %s && wget -c %s/%s' % (downloads, mirror, 'setup.ini'))
+	def reporthook(*a): print a
+	f = urllib.urlretrieve(mirror + '/setup.ini', downloads + 'setup.ini', reporthook)
+	
 	if os.path.exists (setup_ini):
-		os.system ('cd %s && mv -f setup.ini setup.bak' % config)
-	os.system ('mv -f %s/setup.ini %s' % (downloads, config))
+		## backup existing setup config, was:
+		#os.system ('cd %s && mv -f setup.ini setup.bak' % config)
+		if os.path.exists (setup_bak):
+				os.remove (setup_bak)
+		os.rename (setup_ini, setup_bak)
+
+	## move new setup to config, was:
+	#os.system ('mv -f %s/setup.ini %s' % (downloads, config))
+	os.rename(downloads + 'setup.ini', setup_ini)
 
 def get_version ():
 	if not dists[distname].has_key (packagename) \
@@ -447,12 +483,18 @@ def missing ():
 	'''print missing dependencies'''
 	print string.join (get_missing (), '\n')
 
+#FIXME: make tar platform independant
 def do_install ():
 	# find ball
 	ball = get_ball ()
 	# untar capture list
 	# tarfile
-	pipe = os.popen ('tar -C %s -xjvf %s' % (root, ball), 'r')
+	## was:
+	#pipe = os.popen ('tar -C %s -xjvf %s' % (root, ball), 'r')
+	os.chgdir (root)
+	# -j == use bzip2
+	pipe = tarfile.open (root + ball, 'r:bz2')
+
 	lst = map (string.strip, pipe.readlines ())
 	if pipe.close ():
 		raise 'urg'
@@ -468,15 +510,23 @@ def do_install ():
 	# write installed.db
 	write_installed ()
 
+#FIXME: make gzip platform independant
 def get_filelist ():
-	pipe = os.popen ('gzip -dc %s/%s.lst.gz' % (config, packagename), 'r')
+	## was:
+	#pipe = os.popen ('gzip -dc %s/%s.lst.gz' % (config, packagename), 'r')
+	#pipe = gzip.decompress (config + packagename + '.lst.gz', 'r')
+	pipe = gzip.open (config + packagename + '.lst.gz', 'r')
 	lst = map (string.strip, pipe.readlines ())
 	if pipe.close ():
 		raise 'urg'
 	return lst
 
+#FIXME: make gzip platform independant
 def write_filelist (lst):
-	pipe = os.popen ('gzip -c > %s/%s.lst.gz' % (config, packagename), 'w')
+	## was:
+	#pipe = os.popen ('gzip -c > %s/%s.lst.gz' % (config, packagename), 'w')
+	pipe = gzip.open (config + packagename + '.lst.gz', 'w')
+
 	for i in lst:
 		pipe.write (i)
 		pipe.write ('\n')
@@ -562,6 +612,7 @@ def setup ():
 		sys.stderr.write ('getting %s\n' % setup_ini)
 		update ()
 
+#FIXME: pythonize gzip, tar, etc.
 def do_unpack ():
 	# find ball
 	ball = get_ball ()
