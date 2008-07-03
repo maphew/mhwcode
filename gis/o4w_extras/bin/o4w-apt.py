@@ -526,7 +526,6 @@ def do_install ():
 	# write installed.db
 	write_installed ()
 
-#FIXME: make gzip platform independant
 def get_filelist ():
 	## was:
 	#pipe = os.popen ('gzip -dc %s/%s.lst.gz' % (config, packagename), 'r')
@@ -535,31 +534,19 @@ def get_filelist ():
 	lst = map (string.strip, pipe.readlines ())
 	if pipe.close ():
 		raise 'urg'
-	
-	print '\tlst: ', lst
-	
 	return lst
 
-#FIXME: make gzip platform independant
 def write_filelist (lst):
 	## was:
 	#pipe = os.popen ('gzip -c > %s/%s.lst.gz' % (config, packagename), 'w')
-	
-	## YOU ARE HERE MATT >>>>
-	
-	# doesn't work, writes path to pkg list instead of contents
-	#pipe = gzip.open (config + packagename + '.lst.gz', 'w')
-	pipe = GzipFile (config + packagename + '.lst.gz', 'w', '9',lst)
-	print '\twrite filelist .lst.gz pipe: ', pipe
-	
-	## <<<< YOU ARE HERE MATT
+	os.chdir(config)
+	pipe = gzip.open (packagename + '.lst.gz','w')
 
-
-	#for i in lst:
-	#   pipe.write (i)
-	#   pipe.write ('\n')
-	#if pipe.close ():
-	#   raise 'urg'
+	for i in lst:
+		pipe.write (i)
+		pipe.write ('\n')
+	if pipe.close ():
+		raise 'urg'
 
 def do_uninstall ():
 	# find list
