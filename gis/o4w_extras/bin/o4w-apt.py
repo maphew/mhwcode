@@ -1,14 +1,14 @@
 #!/usr/bin/python
 
 '''
-  o4w-apt - Cygwin installer to keep cygwin root up to date
+  cyg-apt - Cygwin installer to keep cygwin root up to date
   
   (c) 2002--2003  Jan Nieuwenhuizen <janneke@gnu.org>
   
   License: GNU GPL
 
 
-  Modified 2008-Jun-27 Matt.Wilkie@gov.yk.ca for OSGeo4W
+  Modified July 2008 by Matt.Wilkie@gov.yk.ca for OSGeo4W
 
 '''
 
@@ -18,6 +18,7 @@
 import __main__
 import getopt
 import os
+import glob
 import re
 import shutil
 import string
@@ -26,10 +27,11 @@ import urllib
 import gzip, tarfile
 import hashlib
 
-# The abi change.
-ABI = ''
-if 'ABI' in os.environ.keys ():
-	ABI = os.environ['ABI']
+### TODO: remove, unused with osgeo4w
+## The abi change.
+#ABI = ''
+#if 'ABI' in os.environ.keys ():
+#	ABI = os.environ['ABI']
 
 OSGEO4W_ROOT = ''
 if 'OSGEO4W_ROOT' in os.environ.keys ():
@@ -255,11 +257,12 @@ def do_download ():
 	if not os.path.exists (get_ball ()): #or not check_md5 ():
 		if not os.path.exists (dir):
 			os.makedirs (dir)
-		## FIXME: use urllib instead, was:
+		## CHANGED: use urllib instead of wget, was:
 		#status = os.system ('cd %s && wget -c %s/%s' % (dir, mirror, url))
 		status = urllib.urlretrieve(srcFile, dstFile, down_stat)
 		
-		### the following is broken because of urllib change
+		### The following is broken because of urllib change,
+		### maybe not needed?
 		## successful pipe close returns 'None'
 		#if not status:
 		#   status = 0
@@ -429,6 +432,7 @@ def new ():
 				      version_to_string (get_version ()))
 		
 # FIXME: pythonize 'md5sum'
+# BUG: why does this not work??
 def md5 ():
 	'''check md5 sum'''
 	url, md5 = get_url ()
@@ -442,11 +446,11 @@ def md5 ():
 	## was:
 	#my_md5 = string.split (pipe.read ())[0]
 	my_md5 = pipe
-
+	
 	print '%s  %s' % (my_md5, ball)
 	if md5 != my_md5:
 		#raise 'URG'
-		print 'MD5 does not match, but carrying on anyway (which is probably dumb).'
+		print "MD5 does't match, carrying on anyway (probably a dumb idea).\n"
 	
 def search ():
 	'''search package list'''
@@ -497,45 +501,67 @@ def missing ():
 	'''print missing dependencies'''
 	print string.join (get_missing (), '\n')
 
-#FIXME: pythonize tar
+# CHANGED: pythonized tar
 def do_install ():
 	# find ball
 	ball = get_ball ()
-	# untar capture list
-	# tarfile
 	## was:
 	#pipe = os.popen ('tar -C %s -xjvf %s' % (root, ball), 'r')
 	os.chdir (root)
 	pipe = tarfile.open (ball,'r:bz2')
+	## was:
+	#lst = map (string.strip, pipe.readlines ())
 	lst = pipe.getnames()
 	pipe.extractall()
 	pipe.close()
-	
-	#lst = map (string.strip, pipe.readlines ())
+
 	if pipe.close ():
 		raise 'urg'
 	# write list
 	write_filelist (lst)
+	
 	# configure...
 	if os.path.isdir ('%s/etc/postinstall' % root):
-		post = os.listdir ('%s/etc/postinstall' % root)
+		## was:
+		#post = os.listdir ('%s/etc/postinstall' % root)
+		post = glob.glob ('%s/etc/postinstall/*.bat' % root)
 		if post:
-			sys.stderr.write ('warning: please see after: %s\n' % string.join (map (lambda x: 'etc/postinstall/%s' % x, post)))
+			#print '\nThe tasks below are unfinished, please follow up manually:'
+			#sys.stderr.write ('not run:\t%s' % string.join (map (lambda x: '%s' % x, post)))
+			#print
+			post_install () # CHANGED: run postinstall .bat automatically
 	#update installed[]
 	installed[0][packagename] = os.path.basename (ball)
 	# write installed.db
 	write_installed ()
 
+def post_install ():
+	# for postinstall *.bat: run x.bat, rename x.bat x.bat.done
+	# adapted from "17.1.3.3 Replacing os.system()"
+	# http://www.python.org/doc/2.5.2/lib/node536.html
+	for bat in glob.glob ('%s/etc/postinstall/*.bat' % root):
+		try:
+			retcode = call (bat, shell=True)
+			if retcode < 0:
+			  print >>sys.stderr, "Child was terminated by signal", -retcode
+			else:
+			  print >>sys.stderr, "Child returned", retcode
+			  os.rename (bat, bat + '.done')
+		except OSError, e:
+			print >>sys.stderr, "Execution failed:", e
+
+# CHANGED: pythonized gzip
 def get_filelist ():
 	## was:
 	#pipe = os.popen ('gzip -dc %s/%s.lst.gz' % (config, packagename), 'r')
-	#pipe = gzip.decompress (config + packagename + '.lst.gz', 'r')
+	os.chdir (config)
 	pipe = gzip.open (config + packagename + '.lst.gz', 'r')
 	lst = map (string.strip, pipe.readlines ())
 	if pipe.close ():
 		raise 'urg'
 	return lst
 
+# CHANGED: pythonized gzip
 def write_filelist (lst):
 	## was:
 	#pipe = os.popen ('gzip -c > %s/%s.lst.gz' % (config, packagename), 'w')
@@ -561,8 +587,8 @@ def do_uninstall ():
 			if os.remove (file):
 				raise 'urg'
 
-	# remove empty dirs?
-	# clear list?
+	# TODO: remove empty dirs?
+	# TODO: clear list?
 	write_filelist ([])
 	# update installed[]
 	del (installed[0][packagename])
@@ -627,6 +653,10 @@ def setup ():
 		sys.stderr.write ('getting %s\n' % setup_ini)
 		update ()
 
+##TODO: remove do_unpack, do_build, build, source ??
+## osgeo4w does not provide a build environment
+## but maybe will later?
+
 #FIXME: pythonize gzip, tar, etc.
 def do_unpack ():
 	# find ball
@@ -649,7 +679,7 @@ def do_unpack ():
 	print ('%s/%s' % (SRC, packagename))
 	if not os.path.exists ('%s/%s' % (SRC, packagename)):
 		raise 'urg2'
-	
+
 def do_build ():
 	src = '%s/%s' % (SRC, packagename)
 	if not os.path.exists (src):
@@ -718,7 +748,7 @@ if command == 'update':
 for i in (installed_db, setup_ini):
 	if not os.path.isfile (i):
 		sys.stderr.write ('error: %s no such file\n' % i)
-		sys.stderr.write ('error: set ABI and run cyg-apt setup\n')
+		sys.stderr.write ('error: set OSGEO4W_ROOT and run cyg-apt setup\n')
 		sys.exit (2)
 	
 get_setup_ini ()
