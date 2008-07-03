@@ -243,7 +243,8 @@ def ball ():
 def down_stat(*a):
 	'''report urllib download progress'''
 	# FIXME: change this to a progress bar, it's too noisy
-	print a
+	#print a
+	print '.',
 
 def do_download ():
 	url, md5 = get_url ()
@@ -354,7 +355,7 @@ def list ():
 			s += '(%s)' % version_to_string (new)
 		print s
 
-# FIXME: make portable (rm, mv, wget not exist on windows)
+# CHANGED: pythonized rm,mv,wget which do not always exist on windows
 def update ():
 	'''setup.ini'''
 	if not os.path.exists (downloads):
@@ -365,7 +366,7 @@ def update ():
 	if os.path.exists (downloads + 'setup.ini'):
 		os.remove (downloads + 'setup.ini')
 
-	# FIXME: use urllib instead, was:
+	## was:
 	#os.system ('cd %s && wget -c %s/%s' % (downloads, mirror, 'setup.ini'))
 	f = urllib.urlretrieve(mirror + '/setup.ini', downloads + 'setup.ini', down_stat)
 	
@@ -445,7 +446,7 @@ def md5 ():
 	print '%s  %s' % (my_md5, ball)
 	if md5 != my_md5:
 		#raise 'URG'
-		print 'MD5 does not match, but carrying on anyway (which is probably a dumb idea).'
+		print 'MD5 does not match, but carrying on anyway (which is probably dumb).'
 	
 def search ():
 	'''search package list'''
@@ -496,7 +497,7 @@ def missing ():
 	'''print missing dependencies'''
 	print string.join (get_missing (), '\n')
 
-#FIXME: make tar platform independant
+#FIXME: pythonize tar
 def do_install ():
 	# find ball
 	ball = get_ball ()
@@ -504,11 +505,13 @@ def do_install ():
 	# tarfile
 	## was:
 	#pipe = os.popen ('tar -C %s -xjvf %s' % (root, ball), 'r')
-	os.chgdir (root)
-	# -j == use bzip2
-	pipe = tarfile.open (root + ball, 'r:bz2')
-
-	lst = map (string.strip, pipe.readlines ())
+	os.chdir (root)
+	pipe = tarfile.open (ball,'r:bz2')
+	lst = pipe.getnames()
+	pipe.extractall()
+	pipe.close()
+	
+	#lst = map (string.strip, pipe.readlines ())
 	if pipe.close ():
 		raise 'urg'
 	# write list
@@ -542,10 +545,15 @@ def write_filelist (lst):
 	## was:
 	#pipe = os.popen ('gzip -c > %s/%s.lst.gz' % (config, packagename), 'w')
 	
+	## YOU ARE HERE MATT >>>>
+	
 	# doesn't work, writes path to pkg list instead of contents
 	#pipe = gzip.open (config + packagename + '.lst.gz', 'w')
 	pipe = GzipFile (config + packagename + '.lst.gz', 'w', '9',lst)
 	print '\twrite filelist .lst.gz pipe: ', pipe
+	
+	## <<<< YOU ARE HERE MATT
+
 
 	#for i in lst:
 	#   pipe.write (i)
