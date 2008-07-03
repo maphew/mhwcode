@@ -26,6 +26,7 @@ import sys
 import urllib
 import gzip, tarfile
 import hashlib
+import subprocess
 
 ### TODO: remove, unused with osgeo4w
 ## The abi change.
@@ -65,7 +66,8 @@ INSTALL = 'install'
 
 
 def usage ():
-	sys.stdout.write ('''cyg-apt [OPTION]... COMMAND [PACKAGE]...
+	# FIXME: list only usable command line parameters, not all functions
+	sys.stdout.write ('''o4w-apt [OPTION]... COMMAND [PACKAGE]...
 
 Commands:
 ''')
@@ -535,13 +537,14 @@ def do_install ():
 	# write installed.db
 	write_installed ()
 
+# NEW
 def post_install ():
 	# for postinstall *.bat: run x.bat, rename x.bat x.bat.done
 	# adapted from "17.1.3.3 Replacing os.system()"
 	# http://www.python.org/doc/2.5.2/lib/node536.html
 	for bat in glob.glob ('%s/etc/postinstall/*.bat' % root):
 		try:
-			retcode = call (bat, shell=True)
+			retcode = subprocess.call (bat, shell=True, env=None)
 			if retcode < 0:
 			  print >>sys.stderr, "Child was terminated by signal", -retcode
 			else:
@@ -748,7 +751,7 @@ if command == 'update':
 for i in (installed_db, setup_ini):
 	if not os.path.isfile (i):
 		sys.stderr.write ('error: %s no such file\n' % i)
-		sys.stderr.write ('error: set OSGEO4W_ROOT and run cyg-apt setup\n')
+		sys.stderr.write ('error: set OSGEO4W_ROOT and run o4w-apt setup\n')
 		sys.exit (2)
 	
 get_setup_ini ()
