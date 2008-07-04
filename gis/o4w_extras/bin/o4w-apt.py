@@ -37,6 +37,7 @@ import subprocess
 OSGEO4W_ROOT = ''
 if 'OSGEO4W_ROOT' in os.environ.keys ():
 	OSGEO4W_ROOT = os.environ['OSGEO4W_ROOT']
+	os.putenv('OSGEO4W_ROOT_MSYS', OSGEO4W_ROOT) # textreplace.exe needs this (post_install)
 	OSGEO4W_ROOT = string.replace(OSGEO4W_ROOT, '\\', '/') # convert backslash to foreslash
 
 #root = '/cygwin'
@@ -542,13 +543,20 @@ def post_install ():
 	# for postinstall *.bat: run x.bat, rename x.bat x.bat.done
 	# adapted from "17.1.3.3 Replacing os.system()"
 	# http://www.python.org/doc/2.5.2/lib/node536.html
+	
+	os.chdir(root)
+	
+	# necessary for textreplace, xmklink
+	os.putenv('PATH', '%s\\bin' % os.path.normpath(OSGEO4W_ROOT))
+
 	for bat in glob.glob ('%s/etc/postinstall/*.bat' % root):
 		try:
-			retcode = subprocess.call (bat, shell=True, env=None)
+			retcode = subprocess.call (bat, shell=True)
 			if retcode < 0:
 			  print >>sys.stderr, "Child was terminated by signal", -retcode
 			else:
-			  print >>sys.stderr, "Child returned", retcode
+			  #print >>sys.stderr, "Child returned", retcode
+			  print >>sys.stderr, "Post_install complete, return code", retcode
 			  os.rename (bat, bat + '.done')
 		except OSError, e:
 			print >>sys.stderr, "Execution failed:", e
