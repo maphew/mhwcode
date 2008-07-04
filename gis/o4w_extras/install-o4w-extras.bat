@@ -5,12 +5,14 @@ echo.
 
 :: Environment settings
 if [%OSGEO4W_ROOT%]==[] goto :EnvNotSet
+set homedir=%cd%
 
 :xcopy
 	cd /d %~dp0
 	if not exist xcopy_exclude.txt echo .svn > xcopy_exclude.txt
 	xcopy /s /exclude:xcopy_exclude.txt /d /y .\* %OSGEO4W_ROOT%\
 	call :MakeBats
+	cd %homedir%
 	goto :Done
 
 :MakeBats
