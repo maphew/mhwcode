@@ -49,6 +49,7 @@ EXTRA = NETREL + '/extra'
 SRC = NETREL + '/src'
 CWD = os.getcwd ()
 
+# FIXME: this path no good on Windows.
 os.environ['PATH'] = NETREL + '/bin:' + os.environ['PATH']
 
 #mirror = 'ftp://mirrors.rcn.net/mirrors/sources.redhat.com/cygwin'

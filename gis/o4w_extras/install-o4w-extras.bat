@@ -9,7 +9,7 @@ set homedir=%cd%
 
 :xcopy
 	cd /d %~dp0
-	if not exist xcopy_exclude.txt echo .svn > xcopy_exclude.txt
+	call :Excludes
 	xcopy /s /exclude:xcopy_exclude.txt /d /y .\* %OSGEO4W_ROOT%\
 	call :MakeBats
 	cd %homedir%
@@ -31,6 +31,13 @@ set homedir=%cd%
 	ping localhost -n 5 >nul
 	goto :EOF	
 
+:Excludes
+	del xcopy_exclude.txt
+	for %%g in (.svn tests xcopy_exclude.txt install-o4w-extras.bat) do (
+		echo %%g >> xcopy_exclude.txt
+		)
+	goto :eof
+	
 :Done
 	echo.
 	echo.	Finished.
