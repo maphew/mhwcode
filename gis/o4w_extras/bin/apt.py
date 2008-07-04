@@ -68,7 +68,7 @@ INSTALL = 'install'
 
 def usage ():
 	# FIXME: list only usable command line parameters, not all functions
-	sys.stdout.write ('''o4w-apt [OPTION]... COMMAND [PACKAGE]...
+	sys.stdout.write ('''apt [OPTION]... COMMAND [PACKAGE]...
 
 Commands:
 ''')
@@ -759,7 +759,7 @@ if command == 'update':
 for i in (installed_db, setup_ini):
 	if not os.path.isfile (i):
 		sys.stderr.write ('error: %s no such file\n' % i)
-		sys.stderr.write ('error: set OSGEO4W_ROOT and run o4w-apt setup\n')
+		sys.stderr.write ('error: set OSGEO4W_ROOT and run "apt setup"\n')
 		sys.exit (2)
 	
 get_setup_ini ()
