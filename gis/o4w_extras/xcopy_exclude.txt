@@ -1,1 +1,4 @@
 .svn 
+tests 
+xcopy_exclude.txt 
+install-o4w-extras.bat 
