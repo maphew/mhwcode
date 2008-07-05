@@ -28,12 +28,6 @@ import gzip, tarfile
 import hashlib
 import subprocess
 
-### TODO: remove, unused with osgeo4w
-## The abi change.
-#ABI = ''
-#if 'ABI' in os.environ.keys ():
-#	ABI = os.environ['ABI']
-
 OSGEO4W_ROOT = ''
 if 'OSGEO4W_ROOT' in os.environ.keys ():
 	OSGEO4W_ROOT = os.environ['OSGEO4W_ROOT']
@@ -43,19 +37,20 @@ if 'OSGEO4W_ROOT' in os.environ.keys ():
 #root = '/cygwin'
 root = OSGEO4W_ROOT
 
-NETREL = '/netrel'
-EXTRA = NETREL + '/extra'
+#NETREL = '/netrel'
+#EXTRA = NETREL + '/extra'
 # PATCH = NETREL + '/patch'
-SRC = NETREL + '/src'
+#SRC = NETREL + '/src'
 CWD = os.getcwd ()
 
 # FIXME: this path no good on Windows.
-os.environ['PATH'] = NETREL + '/bin:' + os.environ['PATH']
+#os.environ['PATH'] = NETREL + '/bin:' + os.environ['PATH']
 
 #mirror = 'ftp://mirrors.rcn.net/mirrors/sources.redhat.com/cygwin'
 #mirror = 'http://mirrors.rcn.net/pub/sourceware/cygwin'
 mirror = 'http://download.osgeo.org/osgeo4w'
 
+#TODO: use same default cache as osgeo4w-setup.exe
 downloads = root + '/var/cache/setup/' + urllib.quote (mirror, '').lower ()
 
 config = root + '/etc/setup/'
