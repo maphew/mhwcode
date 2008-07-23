@@ -254,6 +254,8 @@ def do_download ():
 	dstFile = os.path.join (downloads + '/' + url)
 
 	if not os.path.exists (get_ball ()): #or not check_md5 ():
+		print '\nFetching %s' % srcFile
+
 		if not os.path.exists (dir):
 			os.makedirs (dir)
 		## CHANGED: use urllib instead of wget, was:
