@@ -12,9 +12,10 @@ if not [%1]==[yes] goto :Usage
 	set pythonpath=
 	set osgeo4w_root=C:\OSGeo4W
 	set osgeo4w_root_msys=%osgeo4w_root%
-	set o4w-apt=c:\OSGeo4W.extras\bin\o4w-apt.py
-	set python=d:\PortablePython1.0\python.exe
-	echo %python% %o4w-apt% %%* > apt.bat
+	::set o4w-apt=c:\OSGeo4W.extras\bin\o4w-apt.py
+	::set python=d:\PortablePython1.0\python.exe
+	::echo %python% %o4w-apt% %%* > apt.bat
+	echo @apt-r43.exe %%*> apt.bat
 
 :CleanSlate
 	if exist %osgeo4w_root% rd /s/q %osgeo4w_root%
