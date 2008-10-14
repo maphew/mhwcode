@@ -13,8 +13,6 @@ if [%1]==[] goto Usage
 set srcDir=%1
 if not exist %srcDir% goto :NotFound
 
-setlocal enabledelayedexpansion
-
 set dupes=%temp%\dupes.txt
 set no-dupes=%temp%\no-dupes.txt
 
@@ -32,9 +30,6 @@ goto :End
 ::  instance a leading semi-colon in PATH means the script will *always* 
 ::  report dupes, even if there are none. 
    pushd %srcDir%
-   REM echo.
-   REM echo. Path before edit
-   REM path
    :: Strip current dir
    call set PATH=%%PATH:%cd%=%%
    :: Replace double path delimiters with single 
@@ -42,9 +37,6 @@ goto :End
    :: strip leading delimeter
    set _1=%PATH:~0,1%
    if "%_1%"==";" call set PATH=%%PATH:~1%%
-   REM echo.
-   REM echo. Path after edit
-   REM path
    popd
    goto :eof
 
