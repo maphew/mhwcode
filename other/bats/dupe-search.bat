@@ -14,7 +14,7 @@ set srcDir=%1
 if not exist %srcDir% goto :NotFound
 
 set dupes=%temp%\dupes.txt
-set no-dupes=%temp%\no-dupes.txt
+if exist %dupes% del %dupes%
 
 call :EditPath
 call :Search
@@ -44,18 +44,28 @@ goto :End
    pushd %srcDir%
    echo.
    echo --- Searching PATH for duplicates of %cd%\*
-   echo.
-   echo Duplicates found:
-   echo.
    for %%f in (*) do if not "%%~dp$PATH:f" =="" call :FoundDupe %%f
+   if exist %dupes% (call :Report) else (
+      echo.
+      echo.     No dupes found :^)
+      )
    popd
    goto :eof
 
 :FoundDupe
   ::  Parse PATH, adapted from http://www.ss64.com/nt/path.html
   for %%p in ("%path:;=" "%") do (
-      if exist %%p\%1 dir /s/b %%p\%1
+      if exist %%p\%1 dir /s/b %%p\%1 >> %dupes%
    )
+   goto :eof
+
+:Report
+   echo.
+   echo. Duplicates:
+   echo.
+   type %dupes%
+   echo.
+   echo. List saved in %dupes%
    goto :eof
 
 :Usage
