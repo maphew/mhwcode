@@ -4,11 +4,16 @@
 :: (c) 2008 Yukon Department of Environment 
 :: License: MIT  - http://www.opensource.org/licenses/mit-license.php
 ::
-:: Initial version Matt.wilkie@gov.yk.ca, 2008-Oct-10
+:: Initial version Matt.wilkie@gov.yk.ca, (mhw) 2008-Oct-10 
+:: http://code.google.com/p/maphew/source/browse/trunk/other/bats/dupe-search.bat
+::
+:: 2008-Oct-14 mhw - report location of dupe
 ::
 if [%1]==[] goto Usage
 set srcDir=%1
 if not exist %srcDir% goto :NotFound
+
+setlocal enabledelayedexpansion
 
 set dupes=%temp%\dupes.txt
 set no-dupes=%temp%\no-dupes.txt
@@ -48,8 +53,17 @@ goto :End
    echo.
    echo --- Searching PATH for duplicates of %cd%\*
    echo.
-   for %%f in (*) do if not "%%~dp$PATH:f" =="" echo.    Found duplicate %%f
+   echo Duplicates found:
+   echo.
+   for %%f in (*) do if not "%%~dp$PATH:f" =="" call :FoundDupe %%f
    popd
+   goto :eof
+
+:FoundDupe
+  ::  Parse PATH, adapted from http://www.ss64.com/nt/path.html
+  for %%p in ("%path:;=" "%") do (
+      if exist %%p\%1 dir /s/b %%p\%1
+   )
    goto :eof
 
 :Usage
