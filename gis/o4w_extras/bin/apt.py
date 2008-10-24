@@ -241,11 +241,12 @@ def ball ():
 	'''print tarball name'''
 	print get_ball ()
 	
-def down_stat(*a):
+def down_stat(count, blockSize, totalSize):
 	'''report urllib download progress'''
-	# FIXME: change this to a progress bar, it's too noisy
-	#print a
-	print '.',
+	#courtesy of http://stackoverflow.com/questions/51212/how-to-write-a-download-progress-indicator-in-python
+	percent = int(count*blockSize*100/totalSize)
+	sys.stdout.write("\r...%d%%" % percent)
+	sys.stdout.flush()
 
 def do_download ():
 	url, md5 = get_url ()
@@ -648,8 +649,11 @@ def upgrade ():
 def setup ():
 	'''cygwin environment'''
 	if not os.path.isdir (root):
-		sys.stderr.write ('error: %s no root dir\n' % root)
-		sys.exit (2)
+		sys.stderr.write ('Root dir not found, creating %s\n' % root)
+		os.makedirs (root)
+		## mhw: if root doesn't exist create it. Old approach to just quit is below:
+		#sys.stderr.write ('error: %s no root dir\n' % root)
+		#sys.exit (2)
 	if not os.path.isdir (config):
 		sys.stderr.write ('creating %s\n' % config)
 		os.makedirs (config)
