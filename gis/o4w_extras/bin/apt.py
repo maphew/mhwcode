@@ -64,6 +64,7 @@ INSTALL = 'install'
 
 def usage ():
 	# FIXME: list only usable command line parameters, not all functions
+    # SOLVED: omit '''comment''' after function name, only those are listed 
 	sys.stdout.write ('''apt [OPTION]... COMMAND [PACKAGE]...
 
 Commands:
@@ -242,8 +243,9 @@ def ball ():
 	print get_ball ()
 	
 def down_stat(count, blockSize, totalSize):
-	'''report urllib download progress'''
+	# report download progress
 	#courtesy of http://stackoverflow.com/questions/51212/how-to-write-a-download-progress-indicator-in-python
+    #FIXME: sometmes percent goes over 100!
 	percent = int(count*blockSize*100/totalSize)
 	sys.stdout.write("\r...%d%%" % percent)
 	sys.stdout.flush()
