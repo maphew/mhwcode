@@ -27,6 +27,7 @@ import urllib
 import gzip, tarfile
 import hashlib
 import subprocess
+import md5 as mold
 
 OSGEO4W_ROOT = ''
 if 'OSGEO4W_ROOT' in os.environ.keys ():
@@ -435,26 +436,19 @@ def new ():
 		print '%-20s%-12s' % (packagename,
 				      version_to_string (get_version ()))
 		
-# FIXME: pythonize 'md5sum'
-# BUG: why does this not work??
 def md5 ():
 	'''check md5 sum'''
 	url, md5 = get_url ()
 	ball = os.path.basename (url)
 	print '%s  %s' % (md5, ball)
-	## was:
-	#pipe = os.popen ('md5sum %s/%s' % (downloads, url), 'r')
-	localFile = downloads + url
-	pipe = hashlib.md5 (localFile).hexdigest()
 
-	## was:
-	#my_md5 = string.split (pipe.read ())[0]
-	my_md5 = pipe
+	# make sure we md5 the *file* not the *filename*
+	localFile = file(os.path.join(downloads + url), 'rb')
+	my_md5 = hashlib.md5(localFile.read()).hexdigest()
 	
 	print '%s  %s' % (my_md5, ball)
 	if md5 != my_md5:
-		#raise 'URG'
-		print "MD5 does't match, carrying on anyway (probably a dumb idea).\n"
+		raise 'URG'
 	
 def search ():
 	'''search package list'''
