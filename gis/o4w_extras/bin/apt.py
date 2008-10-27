@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 '''
   cyg-apt - Cygwin installer to keep cygwin root up to date
@@ -27,14 +27,17 @@ import urllib
 import gzip, tarfile
 import hashlib
 import subprocess
-import md5 as mold
+#import md5 as mold
 
 OSGEO4W_ROOT = ''
 if 'OSGEO4W_ROOT' in os.environ.keys ():
 	OSGEO4W_ROOT = os.environ['OSGEO4W_ROOT']
 	os.putenv('OSGEO4W_ROOT_MSYS', OSGEO4W_ROOT) # textreplace.exe needs this (post_install)
 	OSGEO4W_ROOT = string.replace(OSGEO4W_ROOT, '\\', '/') # convert backslash to foreslash
-
+else:
+   sys.stderr.write ('error: Please set OSGEO4W_ROOT\n')
+   sys.exit (2)
+      
 #root = '/cygwin'
 root = OSGEO4W_ROOT
 
