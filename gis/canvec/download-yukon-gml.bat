@@ -12,9 +12,9 @@ goto :EOF
 
 :ChkReqs
 	:: test for wget, if it is in path we can carry on.
-	if exist “%~$PATH:1″ (
+	if exist "%~$PATH:1" (
 	call :Download ) else (
-	echo %1 not found! can’t continue
+	echo %1 not found! can't continue
 	)
 	goto :EOF
 
@@ -25,6 +25,6 @@ goto :EOF
 	set QuadList=115 105 095 106 116 117 114 094 104
 
 	for %%a in (%QuadList%) do (
-	wget –recursive –continue –level=3 –no-host-directories –cut-dirs=2  %urlRoot%/%%a/*
+	wget -recursive -continue -level=3 -no-host-directories -cut-dirs=2  %urlRoot%/%%a/*
 	)
 	goto :EOF
