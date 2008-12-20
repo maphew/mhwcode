@@ -7,8 +7,8 @@ BS_2060009 	Chimney
 BS_2080009 	Tank
 BS_2120009 	Cross
 BS_2230009 	Transmission line
-BS_2240009 	Wall/fence
-BS_2310009 	Pipeline (Sewage/liquid waste)
+BS_2240009 	Wall or fence
+BS_2310009 	Pipeline (Sewage or liquid waste)
 BS_2350009 	Well
 BS_2380009 	Underground reservoir
 BS_2440009 	Silo
@@ -55,15 +55,15 @@ LX_1000039 	Cemetery
 LX_1000049 	Fort
 LX_1000059 	Designated area
 LX_1000069 	Marina
-LX_1000079 	Sports track/Race track
+LX_1000079 	Sports track or Race track
 LX_1000089 	Golf course
 LX_2030009 	Camp
 LX_2070009 	Drive-in theatre
 LX_2200009 	Botanical garden
 LX_2210009 	Shrine
-LX_2220009 	Historical site/Point of interest
+LX_2220009 	Historical site or Point of interest
 LX_2260009 	Amusement park
-LX_2270009 	Park/sports field
+LX_2270009 	Park or sports field
 LX_2280009 	Footbridge
 LX_2400009 	Ruins
 LX_2420009 	Trail
