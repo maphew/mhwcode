@@ -12,9 +12,6 @@
 
 '''
 
-## FIXME: figure out what "DeprecationWarning: raising a string exception is deprecated" 
-## means and what to do about it.
-
 import __main__
 import getopt
 import os
@@ -27,7 +24,6 @@ import urllib
 import gzip, tarfile
 import hashlib
 import subprocess
-#import md5 as mold
 
 OSGEO4W_ROOT = ''
 if 'OSGEO4W_ROOT' in os.environ.keys ():
@@ -38,20 +34,10 @@ else:
    sys.stderr.write ('error: Please set OSGEO4W_ROOT\n')
    sys.exit (2)
       
-#root = '/cygwin'
 root = OSGEO4W_ROOT
 
-#NETREL = '/netrel'
-#EXTRA = NETREL + '/extra'
-# PATCH = NETREL + '/patch'
-#SRC = NETREL + '/src'
 CWD = os.getcwd ()
 
-# FIXME: this path no good on Windows.
-#os.environ['PATH'] = NETREL + '/bin:' + os.environ['PATH']
-
-#mirror = 'ftp://mirrors.rcn.net/mirrors/sources.redhat.com/cygwin'
-#mirror = 'http://mirrors.rcn.net/pub/sourceware/cygwin'
 mirror = 'http://download.osgeo.org/osgeo4w'
 
 #TODO: use same default cache as osgeo4w-setup.exe
@@ -84,7 +70,7 @@ Options:
     -d,--download          download only
     -i,--ini=FILE          use setup.ini [%(setup_ini)s]
     -m,--mirror=URL        use mirror [%(mirror)s]
-    -r,--root=DIR          set cygwin root [%(root)s]
+    -r,--root=DIR          set osgeo4w root [%(root)s]
     -t,--t=NAME            set dist name (*curr*, test, prev)
     -x,--no-deps           ignore dependencies
 ''')
@@ -249,7 +235,7 @@ def ball ():
 def down_stat(count, blockSize, totalSize):
 	# report download progress
 	#courtesy of http://stackoverflow.com/questions/51212/how-to-write-a-download-progress-indicator-in-python
-    #FIXME: sometmes percent goes over 100!
+   #FIXME: sometmes percent goes over 100!
 	percent = int(count*blockSize*100/totalSize)
 	sys.stdout.write("\r...%d%%" % percent)
 	sys.stdout.flush()
@@ -372,24 +358,20 @@ def update ():
 	if not os.path.exists (downloads):
 		os.makedirs (downloads)
 
-	## remove cached ini, was:
-	#os.system ('rm -f %s/%s' % (downloads, 'setup.ini'))
+	# remove cached ini
 	if os.path.exists (downloads + 'setup.ini'):
 		os.remove (downloads + 'setup.ini')
 
-	## was:
-	#os.system ('cd %s && wget -c %s/%s' % (downloads, mirror, 'setup.ini'))
+	# get current ini
 	f = urllib.urlretrieve(mirror + '/setup.ini', downloads + 'setup.ini', down_stat)
 	
 	if os.path.exists (setup_ini):
-		## backup existing setup config, was:
-		#os.system ('cd %s && mv -f setup.ini setup.bak' % config)
+		# backup existing setup config
 		if os.path.exists (setup_bak):
 				os.remove (setup_bak)
 		os.rename (setup_ini, setup_bak)
 
-	## move new setup to config, was:
-	#os.system ('mv -f %s/setup.ini %s' % (downloads, config))
+	# move new setup to config
 	os.rename(downloads + 'setup.ini', setup_ini)
 
 def get_version ():
@@ -562,8 +544,6 @@ def post_install ():
 
 # CHANGED: pythonized gzip
 def get_filelist ():
-	## was:
-	#pipe = os.popen ('gzip -dc %s/%s.lst.gz' % (config, packagename), 'r')
 	os.chdir (config)
 	pipe = gzip.open (config + packagename + '.lst.gz', 'r')
 	lst = map (string.strip, pipe.readlines ())
@@ -573,8 +553,6 @@ def get_filelist ():
 
 # CHANGED: pythonized gzip
 def write_filelist (lst):
-	## was:
-	#pipe = os.popen ('gzip -c > %s/%s.lst.gz' % (config, packagename), 'w')
 	os.chdir(config)
 	pipe = gzip.open (packagename + '.lst.gz','w')
 
