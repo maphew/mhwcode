@@ -11,7 +11,7 @@ set _chrome="%_root%\Application\chrome.exe"
 set _profile="%_root%\User Data\%_user%"
 if not exist %_profile% set _opt=-first-run
 
-%_chrome% --user-data-dir=%_profile% %_opt%
+start /b "%0%" %_chrome% --user-data-dir=%_profile% %_opt%
 
 goto :EOF
 
