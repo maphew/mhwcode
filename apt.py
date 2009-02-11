@@ -33,7 +33,14 @@ if 'OSGEO4W_ROOT' in os.environ.keys ():
 else:
    sys.stderr.write ('error: Please set OSGEO4W_ROOT\n')
    sys.exit (2)
-      
+
+
+#FIXME: should this really be hardcoded?
+#FIXME:  this only works for English, (e.g. called Startmenu with umlaut in a german windows)
+# related: http://trac.osgeo.org/osgeo4w/ticket/21, http://code.google.com/p/maphew/issues/detail?id=13
+OSGEO4W_STARTMENU = os.environ['USERPROFILE'] + '\Start Menu\Programs\OSGeo4W'
+os.putenv('OSGEO4W_STARTMENU', OSGEO4W_STARTMENU)
+
 root = OSGEO4W_ROOT
 
 CWD = os.getcwd ()
