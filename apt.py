@@ -531,6 +531,8 @@ def post_install ():
    # for postinstall *.bat: run x.bat, rename x.bat x.bat.done
    # adapted from "17.1.3.3 Replacing os.system()"
    # http://www.python.org/doc/2.5.2/lib/node536.html
+   
+   # TODO: add Start Menu and Desktop links to installed list.
 
    os.chdir(root)
 
@@ -543,16 +545,23 @@ def post_install ():
          if retcode < 0:
            print >>sys.stderr, "Child was terminated by signal", -retcode
          else:
-           # TODO: add .done to installed file list (etc/setup/pkg-foo.gz)
-           #print '****** saving .done file (I think)'
-           #write_filelist ([bat + '.done'])  #FIXME: overwrites existing list instead of appends
-
            os.rename (bat, bat + '.done')
+
+           # harmonize path to match format in etc/setup/pkg-foo.gz
+           bat = bat.replace (root, '')         # strip C:\osgeo4w
+           bat = bat.replace ('\\','/')         # backslash to foreslash
+           bat = bat.replace ('/etc/', 'etc/')  # strip leading slash
+           
+           # also change foo.bat --> .done in pkg-foo.gz
+           lst = get_filelist()
+           lst.remove(bat)
+           lst.append(bat + '.done')
+           write_filelist (lst)
+
            print >>sys.stderr, "Post_install complete, return code", retcode
 
       except OSError, e:
          print >>sys.stderr, "Execution failed:", e
-
 # CHANGED: pythonized gzip
 def get_filelist ():
    os.chdir (config)
