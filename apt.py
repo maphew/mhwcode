@@ -123,7 +123,7 @@ for i in options:
 
 def version_to_string (t):
    #return '%s-%s' % (string.join (map (lambda x: "%d" % x, t[:-1]), '.'),
-   #		  t[-1])
+   #       t[-1])
    def try_itoa (x):
       if type (x) == int:
          return "%d" % x
@@ -421,13 +421,13 @@ def get_new ():
    return lst
 
 def new ():
-   '''list new packages in distribution'''
-   #print string.join (get_new (), '\n')
+   '''list available upgrades to currently installed packages'''
+   print '\nThe following packages are newer than the installed version:'
    global packagename
    for packagename in psort (get_new ()):
       print '%-20s%-12s' % (packagename,
                   version_to_string (get_version ()))
-      
+
 def md5 ():
    '''check md5 sum'''
    url, md5 = get_url ()
