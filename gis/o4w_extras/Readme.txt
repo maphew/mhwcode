@@ -16,7 +16,7 @@ Other than the ease of adding these improvements to new installs, the utility I 
 The following components were written by others. There may be newer/better versions than what I have here.
 
 .\bin\
-	o4w-apt			- install packages from command line, based on cyg-apt by Jan Nieuwenhuizen
+	apt.py			   - install packages from command line, based on cyg-apt by Jan Nieuwenhuizen
 	gdalcopyproj.py	- copy projection without creating a new image, Schuyler Erle
 
 	
