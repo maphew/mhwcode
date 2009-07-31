@@ -121,7 +121,10 @@ for i in options:
 		command = 'help'
 		break
 	elif o == '--ini' or o == '-i':
-		setup_ini = a
+      # use either local or url file for setup.ini
+	  # setup_ini = a
+      setup_ini = urllib.urlretrieve(a)
+      setup_ini = setup_ini[0]
 	elif o == '--mirror' or o == '-m':
 		mirror = a
 	elif o == '--root' or o == '-r':
@@ -430,8 +433,8 @@ def get_new ():
 	return lst
 
 def new ():
-	'''list new packages in distribution'''
-	#print string.join (get_new (), '\n')
+   '''list available upgrades to currently installed packages'''
+   print '\nThe following packages are newer than the installed version:'
 	global packagename
 	for packagename in psort (get_new ()):
 		print '%-20s%-12s' % (packagename,
