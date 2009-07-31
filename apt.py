@@ -2,9 +2,9 @@
 
 '''
   cyg-apt - Cygwin installer to keep cygwin root up to date
-  
+
   (c) 2002--2003  Jan Nieuwenhuizen <janneke@gnu.org>
-  
+
   License: GNU GPL
 
 
@@ -62,6 +62,7 @@ INSTALL = 'install'
 def usage ():
    # FIXME: list only usable command line parameters, not all functions
     # SOLVED: omit '''comment''' after function name, only those are listed 
+      # better:  use parsopt instead, #53 http://trac.osgeo.org/osgeo4w/ticket/53
    sys.stdout.write ('''apt [OPTION]... COMMAND [PACKAGE]...
 
 Commands:
@@ -81,7 +82,7 @@ Options:
     -t,--t=NAME            set dist name (*curr*, test, prev)
     -x,--no-deps           ignore dependencies
 ''')
-           
+
 (options, files) = getopt.getopt (sys.argv[1:],
               'dhi:m:r:t:x',
               ('download', 'help', 'mirror=', 'root='
@@ -111,7 +112,9 @@ for i in options:
       command = 'help'
       break
    elif o == '--ini' or o == '-i':
-      setup_ini = a
+      # use either local or url file for setup.ini
+      setup_ini = urllib.urlretrieve(a)
+      setup_ini = setup_ini[0]
    elif o == '--mirror' or o == '-m':
       mirror = a
    elif o == '--root' or o == '-r':
@@ -207,7 +210,7 @@ def get_setup_ini ():
          records[key] = value
          j = j + 1
       packages[name] = records
-      
+
 def get_url ():
    if not dists[distname].has_key (packagename) \
       or not dists[distname][packagename].has_key (INSTALL):
@@ -238,7 +241,7 @@ def get_ball ():
 def ball ():
    '''print tarball name'''
    print get_ball ()
-   
+
 def down_stat(count, blockSize, totalSize):
    # report download progress
    #courtesy of http://stackoverflow.com/questions/51212/how-to-write-a-download-progress-indicator-in-python
@@ -261,7 +264,7 @@ def do_download ():
       ## CHANGED: use urllib instead of wget, was:
       #status = os.system ('cd %s && wget -c %s/%s' % (dir, mirror, url))
       status = urllib.urlretrieve(srcFile, dstFile, down_stat)
-      
+
       ### The following is broken because of urllib change,
       ### maybe not needed?
       ## successful pipe close returns 'None'
@@ -278,7 +281,7 @@ def download ():
    ball ()
    print
    md5 ()
-   
+
 def no_package (s='error'):
    sys.stderr.write ("%s: %s not in [%s]\n" % (s, packagename, distname))
 
@@ -371,7 +374,7 @@ def update ():
 
    # get current ini
    f = urllib.urlretrieve(mirror + '/setup.ini', downloads + 'setup.ini', down_stat)
-   
+
    if os.path.exists (setup_ini):
       # backup existing setup config
       if os.path.exists (setup_bak):
@@ -386,14 +389,14 @@ def get_version ():
       or not dists[distname][packagename].has_key (INSTALL):
       no_package ()
       return (0, 0)
-      
+
    package = dists[distname][packagename]
    if not package.has_key ('ver'):
       file = string.split (package[INSTALL])[0]
       ball = os.path.split (file)[1]
       package['ver'] = split_ball (ball)[1]
    return package['ver']
-   
+
 def get_installed_version ():
    return split_ball (installed[0][packagename])[1]
 
@@ -408,7 +411,7 @@ def version ():
          sys.exit (1)
       print '%-20s%-12s' % (packagename,
              version_to_string (get_installed_version ()))
-   
+
 def get_new ():
    global packagename
    lst = []
@@ -438,11 +441,11 @@ def md5 ():
     # kudos to http://www.peterbe.com/plog/using-md5-to-check-equality-between-files
    localFile = file(os.path.join(downloads + url), 'rb')
    my_md5 = hashlib.md5(localFile.read()).hexdigest()
-   
+
    print '%s  %s' % (my_md5, ball)
    if md5 != my_md5:
       raise 'URG'
-   
+
 def search ():
    '''search package list'''
    global packagename
@@ -510,7 +513,7 @@ def do_install ():
       raise 'urg'
    # record list of files installed
    write_filelist (lst)
-   
+
    # configure...
    if os.path.isdir ('%s/etc/postinstall' % root):
       ## was:
@@ -531,7 +534,7 @@ def post_install ():
    # for postinstall *.bat: run x.bat, rename x.bat x.bat.done
    # adapted from "17.1.3.3 Replacing os.system()"
    # http://www.python.org/doc/2.5.2/lib/node536.html
-   
+
    # TODO: add Start Menu and Desktop links to installed list.
 
    os.chdir(root)
@@ -551,7 +554,7 @@ def post_install ():
            bat = bat.replace (root, '')         # strip C:\osgeo4w
            bat = bat.replace ('\\','/')         # backslash to foreslash
            bat = bat.replace ('/etc/', 'etc/')  # strip leading slash
-           
+
            # also change foo.bat --> .done in pkg-foo.gz
            lst = get_filelist()
            lst.remove(bat)
@@ -585,7 +588,7 @@ def write_filelist (lst):
 def do_uninstall ():
    # find list
    lst = get_filelist ()
-   
+
    # remove files
    # FIXME: etc/postinstall/*bat.done files are missed because they are in etc/setup/%pkg%.gz as *.bat
    for i in lst:
@@ -614,7 +617,7 @@ def remove ():
               % (packagename,
                  version_to_string (get_installed_version ())))
       do_uninstall ()
-   
+
 def install ():
    '''download and install packages with dependencies'''
    global packagename
@@ -680,7 +683,7 @@ def do_unpack ():
    global packagename
    basename = os.path.basename (ball)
    packagename = re.sub ('(-src)*\.tar\.(bz2|gz)', '', basename)
-          
+
    if os.path.exists ('%s/%s' % (SRC, packagename)):
       return
 
@@ -713,16 +716,16 @@ def do_build ():
    script = cygwin + '/mknetrel'
    if os.path.exists (script):
       shutil.copy (script, '%s/%s' % (EXTRA, namever))
-      
+
    os.system ('mknetrel %s' % namever)
-   
+
 def build ():
    '''build package from source in CWD'''
    global packagename
    if not packagename:
       packagename = os.path.basename (CWD)
    do_build ()
-   
+
 def source ():
    '''download, build and install'''
    global packagename
@@ -762,7 +765,7 @@ for i in (installed_db, setup_ini):
       sys.stderr.write ('error: %s no such file\n' % i)
       sys.stderr.write ('error: set OSGEO4W_ROOT and run "apt setup"\n')
       sys.exit (2)
-   
+
 get_setup_ini ()
 get_installed ()
 
