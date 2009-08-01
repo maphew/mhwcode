@@ -121,7 +121,7 @@ for i in options:
 		command = 'help'
 		break
 	elif o == '--ini' or o == '-i':
-      # use either local or url file for setup.ini
+      # use either local or url file for setup.ini, was:
 	  # setup_ini = a
       setup_ini = urllib.urlretrieve(a)
       setup_ini = setup_ini[0]
@@ -445,13 +445,13 @@ def md5 ():
 	'''check md5 sum'''
 	url, md5 = get_url ()
 	ball = os.path.basename (url)
-	print '%s  %s - remote md5 sum' % (md5, ball)
+	print '%s  %s - remote' % (md5, ball)
 	# make sure we md5 the *file* not the *filename*
 	# kudos to http://www.peterbe.com/plog/using-md5-to-check-equality-between-files
 	localFile = file(os.path.join(downloads, url), 'rb')
 	my_md5 = hashlib.md5(localFile.read()).hexdigest()
 
-	print '%s  %s - local md5 sum, must match remote to continue' % (my_md5, ball)
+	print '%s  %s - local' % (my_md5, ball)
 	if md5 != my_md5:
 		raise 'URG'
 	
