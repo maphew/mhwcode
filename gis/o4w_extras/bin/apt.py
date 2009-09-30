@@ -550,7 +550,10 @@ def post_install ():
             if retcode < 0:
                 print >>sys.stderr, "Child was terminated by signal", -retcode
             else:
-                os.rename (bat, bat + '.done')
+                done_bat = bat + '.done'
+                if os.path.exists(done_bat):
+                    os.remove(done_bat)
+                os.rename(bat, done_bat)
 
                 # harmonize path to match format in etc/setup/pkg-foo.gz
                 bat = bat.replace (root, '')         # strip C:\osgeo4w
@@ -622,7 +625,7 @@ def remove ():
         do_uninstall ()
 
 def install ():
-    '''download and install packages with dependencies'''
+    '''download and install packages, including dependencies'''
     global packagename
     missing = {}
     for packagename in files[1:]:
