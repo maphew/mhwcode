@@ -12,9 +12,6 @@
 
 '''
 
-## FIXME: figure out what "DeprecationWarning: raising a string exception is deprecated" 
-## means and what to do about it.
-
 import __main__
 import getopt
 import os
@@ -27,7 +24,6 @@ import urllib
 import gzip, tarfile
 import hashlib
 import subprocess
-#import md5 as mold
 
 OSGEO4W_ROOT = ''
 if 'OSGEO4W_ROOT' in os.environ.keys ():
@@ -38,20 +34,17 @@ else:
    sys.stderr.write ('error: Please set OSGEO4W_ROOT\n')
    sys.exit (2)
       
-#root = '/cygwin'
+
+#FIXME: should this really be hardcoded?
+#FIXME:  this only works for English, (e.g. called Startmenu with umlaut in a german windows)
+# related: http://trac.osgeo.org/osgeo4w/ticket/21, http://code.google.com/p/maphew/issues/detail?id=13
+OSGEO4W_STARTMENU = os.environ['USERPROFILE'] + '\Start Menu\Programs\OSGeo4W'
+os.putenv('OSGEO4W_STARTMENU', OSGEO4W_STARTMENU)
+
 root = OSGEO4W_ROOT
 
-#NETREL = '/netrel'
-#EXTRA = NETREL + '/extra'
-# PATCH = NETREL + '/patch'
-#SRC = NETREL + '/src'
 CWD = os.getcwd ()
 
-# FIXME: this path no good on Windows.
-#os.environ['PATH'] = NETREL + '/bin:' + os.environ['PATH']
-
-#mirror = 'ftp://mirrors.rcn.net/mirrors/sources.redhat.com/cygwin'
-#mirror = 'http://mirrors.rcn.net/pub/sourceware/cygwin'
 mirror = 'http://download.osgeo.org/osgeo4w'
 
 #TODO: use same default cache as osgeo4w-setup.exe
@@ -69,6 +62,7 @@ INSTALL = 'install'
 def usage ():
 	# FIXME: list only usable command line parameters, not all functions
     # SOLVED: omit '''comment''' after function name, only those are listed 
+      # better:  use parsopt instead, #53 http://trac.osgeo.org/osgeo4w/ticket/53
 	sys.stdout.write ('''apt [OPTION]... COMMAND [PACKAGE]...
 
 Commands:
@@ -84,7 +78,7 @@ Options:
     -d,--download          download only
     -i,--ini=FILE          use setup.ini [%(setup_ini)s]
     -m,--mirror=URL        use mirror [%(mirror)s]
-    -r,--root=DIR          set cygwin root [%(root)s]
+    -r,--root=DIR          set osgeo4w root [%(root)s]
     -t,--t=NAME            set dist name (*curr*, test, prev)
     -x,--no-deps           ignore dependencies
 ''')
@@ -118,7 +112,10 @@ for i in options:
 		command = 'help'
 		break
 	elif o == '--ini' or o == '-i':
-		setup_ini = a
+      # use either local or url file for setup.ini, was:
+	  # setup_ini = a
+      setup_ini = urllib.urlretrieve(a)
+      setup_ini = setup_ini[0]
 	elif o == '--mirror' or o == '-m':
 		mirror = a
 	elif o == '--root' or o == '-r':
@@ -372,24 +369,20 @@ def update ():
 	if not os.path.exists (downloads):
 		os.makedirs (downloads)
 
-	## remove cached ini, was:
-	#os.system ('rm -f %s/%s' % (downloads, 'setup.ini'))
+   # remove cached ini
 	if os.path.exists (downloads + 'setup.ini'):
 		os.remove (downloads + 'setup.ini')
 
-	## was:
-	#os.system ('cd %s && wget -c %s/%s' % (downloads, mirror, 'setup.ini'))
+   # get current ini
 	f = urllib.urlretrieve(mirror + '/setup.ini', downloads + 'setup.ini', down_stat)
 	
 	if os.path.exists (setup_ini):
-		## backup existing setup config, was:
-		#os.system ('cd %s && mv -f setup.ini setup.bak' % config)
+      # backup existing setup config
 		if os.path.exists (setup_bak):
 				os.remove (setup_bak)
 		os.rename (setup_ini, setup_bak)
 
-	## move new setup to config, was:
-	#os.system ('mv -f %s/setup.ini %s' % (downloads, config))
+   # move new setup to config
 	os.rename(downloads + 'setup.ini', setup_ini)
 
 def get_version ():
@@ -432,8 +425,8 @@ def get_new ():
 	return lst
 
 def new ():
-	'''list new packages in distribution'''
-	#print string.join (get_new (), '\n')
+   '''list available upgrades to currently installed packages'''
+   print '\nThe following packages are newer than the installed version:'
 	global packagename
 	for packagename in psort (get_new ()):
 		print '%-20s%-12s' % (packagename,
@@ -443,14 +436,14 @@ def md5 ():
 	'''check md5 sum'''
 	url, md5 = get_url ()
 	ball = os.path.basename (url)
-	print '%s  %s' % (md5, ball)
+   print '%s  %s - remote' % (md5, ball)
 
 	# make sure we md5 the *file* not the *filename*
     # kudos to http://www.peterbe.com/plog/using-md5-to-check-equality-between-files
 	localFile = file(os.path.join(downloads + url), 'rb')
 	my_md5 = hashlib.md5(localFile.read()).hexdigest()
 	
-	print '%s  %s' % (my_md5, ball)
+   print '%s  %s - local' % (my_md5, ball)
 	if md5 != my_md5:
 		raise 'URG'
 	
@@ -519,7 +512,7 @@ def do_install ():
 
 	if pipe.close ():
 		raise 'urg'
-	# write list
+   # record list of files installed
 	write_filelist (lst)
 	
 	# configure...
@@ -543,6 +536,8 @@ def post_install ():
 	# adapted from "17.1.3.3 Replacing os.system()"
 	# http://www.python.org/doc/2.5.2/lib/node536.html
 	
+   # TODO: add Start Menu and Desktop links to installed list.
+
 	os.chdir(root)
 	
 	# necessary for textreplace, xmklink
@@ -554,16 +549,26 @@ def post_install ():
 			if retcode < 0:
 			  print >>sys.stderr, "Child was terminated by signal", -retcode
 			else:
-			  #print >>sys.stderr, "Child returned", retcode
+           os.rename (bat, bat + '.done')
+
+           # harmonize path to match format in etc/setup/pkg-foo.gz
+           bat = bat.replace (root, '')         # strip C:\osgeo4w
+           bat = bat.replace ('\\','/')         # backslash to foreslash
+           bat = bat.replace ('/etc/', 'etc/')  # strip leading slash
+
+           # also change foo.bat --> .done in pkg-foo.gz
+           lst = get_filelist()
+           lst.remove(bat)
+           lst.append(bat + '.done')
+           write_filelist (lst)
+
 			  print >>sys.stderr, "Post_install complete, return code", retcode
-			  os.rename (bat, bat + '.done')
+
 		except OSError, e:
 			print >>sys.stderr, "Execution failed:", e
 
 # CHANGED: pythonized gzip
 def get_filelist ():
-	## was:
-	#pipe = os.popen ('gzip -dc %s/%s.lst.gz' % (config, packagename), 'r')
 	os.chdir (config)
 	pipe = gzip.open (config + packagename + '.lst.gz', 'r')
 	lst = map (string.strip, pipe.readlines ())
@@ -573,8 +578,6 @@ def get_filelist ():
 
 # CHANGED: pythonized gzip
 def write_filelist (lst):
-	## was:
-	#pipe = os.popen ('gzip -c > %s/%s.lst.gz' % (config, packagename), 'w')
 	os.chdir(config)
 	pipe = gzip.open (packagename + '.lst.gz','w')
 
@@ -589,6 +592,7 @@ def do_uninstall ():
 	lst = get_filelist ()
 	
 	# remove files
+   # FIXME: etc/postinstall/*bat.done files are missed because they are in etc/setup/%pkg%.gz as *.bat
 	for i in lst:
 		file = os.path.join (root, i)
 		if not os.path.exists (file):
