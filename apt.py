@@ -252,7 +252,7 @@ def down_stat(count, blockSize, totalSize):
     if percent > 100:    # filesize usually doesn't correspond to blocksize multiple, so flatten overrun
         percent = 100
 
-    sys.stdout.write("\r...%d%%" % percent)
+    sys.stdout.write("\r...%d%%  " % percent)
     sys.stdout.flush()
 def do_download ():
     url, md5 = get_url ()
