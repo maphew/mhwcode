@@ -247,11 +247,13 @@ def ball ():
 def down_stat(count, blockSize, totalSize):
     # report download progress
     #courtesy of http://stackoverflow.com/questions/51212/how-to-write-a-download-progress-indicator-in-python
-    #FIXME: sometmes percent goes over 100!
-    percent = int(count*blockSize*100/totalSize)
+    percent = count*blockSize*100/totalSize
+
+    if percent > 100:    # filesize usually doesn't correspond to blocksize multiple, so flatten overrun
+        percent = 100
+
     sys.stdout.write("\r...%d%%" % percent)
     sys.stdout.flush()
-
 def do_download ():
     url, md5 = get_url ()
     dir = '%s/%s' % (downloads, os.path.split (url)[0])
