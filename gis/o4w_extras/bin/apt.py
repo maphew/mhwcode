@@ -564,6 +564,13 @@ def post_install ():
                 lst = get_filelist()
                 lst.remove(bat)
                 lst.append(bat + '.done')
+
+                # and bin/bar.bat.tmpl --> bin/bar.bat in pkg-foo.gz
+                for s in lst:
+                    if '.tmpl' in s:
+                         lst.remove(s)
+                         lst.append(s.replace('.tmpl',''))
+
                 write_filelist (lst)
 
                 print >>sys.stderr, "Post_install complete, return code", retcode
@@ -596,7 +603,6 @@ def do_uninstall ():
     lst = get_filelist ()
 
     # remove files
-   # FIXME: etc/postinstall/*bat.done files are missed because they are in etc/setup/%pkg%.gz as *.bat
     for i in lst:
         file = os.path.join (root, i)
         if not os.path.exists (file):
