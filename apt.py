@@ -601,17 +601,19 @@ def write_filelist (lst):
         raise 'urg'
 
 def do_uninstall ():
-    # find list
+    # retrieve list of installed files
     lst = get_filelist ()
 
     # remove files
     for i in lst:
-        file = os.path.join (root, i)
+        file = os.path.abspath (os.path.join(root,i))
         if not os.path.exists (file):
             sys.stderr.write ('warning: %s no such file\n' % file)
         elif not os.path.isdir (file):
             if os.remove (file):
                 raise 'urg'
+            else:
+                sys.stdout.write('removed: %s\n' % file)
 
     # TODO: remove empty dirs?
     # TODO: clear list?
