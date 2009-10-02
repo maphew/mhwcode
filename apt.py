@@ -572,6 +572,11 @@ def post_install ():
                     if '.tmpl' in s:
                          lst.remove(s)
                          lst.append(s.replace('.tmpl',''))
+                    # catch bat's which are made for py's post install
+                    elif '.py' in s:
+                        p =  re.compile(r'^bin/(.*?)\.py$', re.VERBOSE)
+                        out = p.sub(r'bin/\1.bat', s)
+                        lst.append(out)
 
                 write_filelist (lst)
 
