@@ -161,6 +161,7 @@ def join_ball (t):
 
 def debug (s):
     s
+    #print s
 
 def help ():
     '''help COMMAND'''
@@ -387,6 +388,20 @@ def update ():
 
    # move new setup to config
     os.rename(downloads + 'setup.ini', setup_ini)
+
+def available():
+    # stub for ''' - show available packages which are not installed'''
+    # get cached ini
+    # parse
+    # get installed pkgs
+    # subtract installed from available
+    # report to user
+    #print packages
+
+    import pprint
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(dists['curr'].keys())
+
 
 def get_version ():
     if not dists[distname].has_key (packagename) \
