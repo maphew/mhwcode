@@ -390,7 +390,9 @@ def update ():
     os.rename(downloads + 'setup.ini', setup_ini)
 
 def available():
-    ''' - show available packages which are not installed'''
+    ''' show available packages which are not installed'''
+    # courtesy of Aaron Digulla, 
+    # http://stackoverflow.com/questions/1524126/how-to-print-a-list-more-nicely
     list = dists['curr'].keys()
     list = sorted(list)
     split = len(list)/2
