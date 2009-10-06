@@ -390,18 +390,14 @@ def update ():
     os.rename(downloads + 'setup.ini', setup_ini)
 
 def available():
-    # stub for ''' - show available packages which are not installed'''
-    # get cached ini
-    # parse
-    # get installed pkgs
-    # subtract installed from available
-    # report to user
-    #print packages
-
-    import pprint
-    pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(dists['curr'].keys())
-
+    ''' - show available packages which are not installed'''
+    list = dists['curr'].keys()
+    list = sorted(list)
+    split = len(list)/2
+    col1 = list[0:split]
+    col2 = list[split:]
+    for key, value in zip(col1,col2):
+        print '%-20s\t\t%s' % (key, value)
 
 def get_version ():
     if not dists[distname].has_key (packagename) \
