@@ -390,10 +390,22 @@ def update ():
     os.rename(downloads + 'setup.ini', setup_ini)
 
 def available():
-    ''' show available packages which are not installed'''
+    ''' Packages available to be installed'''
     # courtesy of Aaron Digulla, 
     # http://stackoverflow.com/questions/1524126/how-to-print-a-list-more-nicely
+
+    # All packages mentioned in setup.ini
+    # TODO: pass distribution as parameter instead of hardcoding
     list = dists['curr'].keys()
+
+    # mark installed packages
+    for pkg in installed[0].keys():
+        list.remove(pkg)
+        list.append('%s*' % pkg)
+
+    # Report to user
+    print '\n %s (* = already installed)\n' % available.__doc__
+
     list = sorted(list)
     split = len(list)/2
     col1 = list[0:split]
