@@ -161,6 +161,7 @@ def join_ball (t):
 
 def debug (s):
     s
+    #print s
 
 def help ():
     '''help COMMAND'''
@@ -247,11 +248,13 @@ def ball ():
 def down_stat(count, blockSize, totalSize):
     # report download progress
     #courtesy of http://stackoverflow.com/questions/51212/how-to-write-a-download-progress-indicator-in-python
-    #FIXME: sometmes percent goes over 100!
-    percent = int(count*blockSize*100/totalSize)
-    sys.stdout.write("\r...%d%%" % percent)
-    sys.stdout.flush()
+    percent = count*blockSize*100/totalSize
 
+    if percent > 100:    # filesize usually doesn't correspond to blocksize multiple, so flatten overrun
+        percent = 100
+
+    sys.stdout.write("\r...%d%%  " % percent)
+    sys.stdout.flush()
 def do_download ():
     url, md5 = get_url ()
     dir = '%s/%s' % (downloads, os.path.split (url)[0])
@@ -385,6 +388,29 @@ def update ():
 
    # move new setup to config
     os.rename(downloads + 'setup.ini', setup_ini)
+
+def available():
+    ''' show packages available to be installed'''
+    # courtesy of Aaron Digulla, 
+    # http://stackoverflow.com/questions/1524126/how-to-print-a-list-more-nicely
+
+    # All packages mentioned in setup.ini
+    # TODO: pass distribution as parameter instead of hardcoding
+    list = dists['curr'].keys()
+
+    # mark installed packages
+    for pkg in installed[0].keys():
+        list.remove(pkg)
+        list.append('%s*' % pkg)
+
+    # Report to user
+    print '\n Packages available to install (* = already installed)\n'
+    list = sorted(list)
+    split = len(list)/2
+    col1 = list[0:split]
+    col2 = list[split:]
+    for key, value in zip(col1,col2):
+        print '%-20s\t\t%s' % (key, value)
 
 def get_version ():
     if not dists[distname].has_key (packagename) \
@@ -570,6 +596,11 @@ def post_install ():
                     if '.tmpl' in s:
                          lst.remove(s)
                          lst.append(s.replace('.tmpl',''))
+                    # catch bat's which are made for py's post install
+                    elif '.py' in s:
+                        p =  re.compile(r'^bin/(.*?)\.py$', re.VERBOSE)
+                        out = p.sub(r'bin/\1.bat', s)
+                        lst.append(out)
 
                 write_filelist (lst)
 
@@ -599,17 +630,19 @@ def write_filelist (lst):
         raise 'urg'
 
 def do_uninstall ():
-    # find list
+    # retrieve list of installed files
     lst = get_filelist ()
 
     # remove files
     for i in lst:
-        file = os.path.join (root, i)
+        file = os.path.abspath (os.path.join(root,i))
         if not os.path.exists (file):
             sys.stderr.write ('warning: %s no such file\n' % file)
         elif not os.path.isdir (file):
             if os.remove (file):
                 raise 'urg'
+            else:
+                sys.stdout.write('removed: %s\n' % file)
 
     # TODO: remove empty dirs?
     # TODO: clear list?
