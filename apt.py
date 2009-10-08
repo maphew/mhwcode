@@ -390,7 +390,7 @@ def update ():
     os.rename(downloads + 'setup.ini', setup_ini)
 
 def available():
-    ''' Packages available to be installed'''
+    ''' show packages available to be installed'''
     # courtesy of Aaron Digulla, 
     # http://stackoverflow.com/questions/1524126/how-to-print-a-list-more-nicely
 
@@ -404,8 +404,7 @@ def available():
         list.append('%s*' % pkg)
 
     # Report to user
-    print '\n %s (* = already installed)\n' % available.__doc__
-
+    print '\n Packages available to install (* = already installed)\n'
     list = sorted(list)
     split = len(list)/2
     col1 = list[0:split]
