@@ -1,10 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 '''
   cyg-apt - Cygwin installer to keep cygwin root up to date
   
   (c) 2002--2003  Jan Nieuwenhuizen <janneke@gnu.org>
   
+  Port to pure python started July 2008 by Matt Wilkie <maphew@gmail.com>
+
   License: GNU GPL
 '''
 
@@ -45,8 +47,7 @@ CWD = os.getcwd ()
 
 os.environ['PATH'] = NETREL + '/bin:' + os.environ['PATH']
 
-mirror = 'ftp://mirrors.rcn.net/mirrors/sources.redhat.com/cygwin'
-mirror = 'http://mirrors.rcn.net/pub/sourceware/cygwin'
+mirror = 'ftp://mirrors.kernel.org/sourceware/cygwin/'
 mirror = 'http://mirror.cpsc.ucalgary.ca/mirror/cygwin.com/'
 
 downloads = root + '/var/cache/setup/' + urllib.quote (mirror, '').lower ()
