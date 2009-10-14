@@ -37,8 +37,8 @@ import sys
 import os.path
 
 if len(sys.argv) < 2:
-	 print "Usage: gdalsetnull.py raster_file null_value"
-	 sys.exit(1)
+	print "Usage: gdalsetnull.py raster_file null_value {null band2} {null band3} ..."
+	sys.exit(1)
 
 input = sys.argv[1]
 null_value = sys.argv[2]
@@ -51,5 +51,11 @@ if dataset is None:
 for i in range(1, dataset.RasterCount+1):
 	band = dataset.GetRasterBand(i)
 	print 'Initial nodata for band ',i,'\t', band.GetNoDataValue()
-	band.SetNoDataValue( float(null_value) )
-	print 'Output nodata for band ',i,'\t', band.GetNoDataValue()
+   
+   # optionally 
+   if sys.argv[i]:
+      null_value = sys.argv[i]
+   
+   band.SetNoDataValue( float(null_value) )
+   
+	print 'Output  nodata for band ',i,'\t', band.GetNoDataValue()
