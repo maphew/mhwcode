@@ -47,11 +47,6 @@ CWD = os.getcwd ()
 
 os.environ['PATH'] = NETREL + '/bin:' + os.environ['PATH']
 
-mirror = 'ftp://mirrors.kernel.org/sourceware/cygwin/'
-mirror = 'http://mirror.cpsc.ucalgary.ca/mirror/cygwin.com/'
-
-downloads = root + '/var/cache/setup/' + urllib.quote (mirror, '').lower ()
-
 config = root + '/etc/setup/'
 setup_ini = config + '/setup.ini'
 setup_bak = config + '/setup.bak'
@@ -60,6 +55,20 @@ installed_db_magic = 'INSTALLED.DB 2\n'
 
 INSTALL = 'install'
 
+#FIXME: figure out how to use a function before it us defined. We want to keep
+# all the variables together at the top (right?)
+#mirror = 'ftp://mirrors.kernel.org/sourceware/cygwin/'
+#mirror = 'http://mirror.cpsc.ucalgary.ca/mirror/cygwin.com/'
+def get_mirror():
+    mirror = 'unknown'
+    mirrorFile = '%s/%s' % (config, 'last-mirror')
+    if os.path.exists(mirrorFile):
+        mirror = open(mirrorFile).read()
+    print 'Using mirror:', mirror
+    return mirror
+mirror = get_mirror ()
+
+downloads = root + '/var/cache/setup/' + urllib.quote (mirror, '').lower ()
 
 def usage ():
     sys.stdout.write ('''cyg-apt [OPTION]... COMMAND [PACKAGE]...
@@ -799,12 +808,14 @@ if command == 'update':
     update ()
     sys.exit (0)
 
+get_mirror ()
+
 for i in (installed_db, setup_ini):
     if not os.path.isfile (i):
         sys.stderr.write ('error: %s no such file\n' % i)
         sys.stderr.write ('error: set ABI and run cyg-apt setup\n')
         sys.exit (2)
-    
+
 get_setup_ini ()
 get_installed ()
 
