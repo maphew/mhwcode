@@ -23,10 +23,18 @@ pythonpath = "%s;%s\\Lib\\;%s\\DLLs\\" % (
     installpath, installpath, installpath
 )
 
+# http://sebsauvage.net/python/snyppets/#registry
+key = OpenKey(HKEY_CURRENT_USER, regpath, 0, KEY_READ)
+(value, valuetype) = QueryValueEx(key, installkey)
+print value
+print valuetype
+
+
 def RegisterPy():
     try:
         reg = OpenKey(HKEY_LOCAL_MACHINE, regpath)
-
+        regVal = QueryValueEx(reg, installkey)[0]
+        print regVal
     except EnvironmentError:
         try:
             reg = CreateKey(HKEY_LOCAL_MACHINE, regpath)
