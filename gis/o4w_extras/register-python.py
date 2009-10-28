@@ -31,9 +31,15 @@ def get_existing(hkey,regpath):
     ''' retrieve all existing python registrations '''
     #TODO: retrieve install path, to know what program existing reg belong to
     if hkey == 'Current':
-        key = OpenKey(HKEY_CURRENT_USER, regpath)
+        try:
+            key = OpenKey(HKEY_CURRENT_USER, regpath)
+        except:
+            return
     elif hkey == 'All':
-        key = OpenKey(HKEY_LOCAL_MACHINE, regpath)
+        try:
+            key = OpenKey(HKEY_LOCAL_MACHINE, regpath)
+        except:
+            return
 
     subkeys = []
     i = 0
@@ -81,14 +87,15 @@ print 'Existing Current User python version(s):\t', CurrentUser
 print 'Existing All Users python version(s):\t\t', AllUsers
 
 match = False
-if our_version in CurrentUser:
-    match = True
-elif our_version in AllUsers:
-    match = True
-
-if match == False:
-    RegisterPy(regpath,our_version)
-else:
-    print '\nOur version (%s) already belongs to something else. Skipping...' % (our_version)
+try:
+    if our_version in CurrentUser:
+        match = True
+    elif our_version in AllUsers:
+        match = True
+except:
+    if match == False:
+        RegisterPy(regpath,our_version)
+    else:
+        print '\nOur version (%s) already belongs to something else. Skipping...' % (our_version)
 
 #-- the end
