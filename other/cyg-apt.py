@@ -68,6 +68,11 @@ def get_mirror():
     return mirror
 mirror = get_mirror ()
 
+# FIXME: for some reason the above doesn't work, even though to 
+# print it looks exactly the same to me :(
+mirror = 'http://mirror.cpsc.ucalgary.ca/mirror/cygwin.com/'
+
+
 downloads = root + '/var/cache/setup/' + urllib.quote (mirror, '').lower ()
 
 def usage ():
