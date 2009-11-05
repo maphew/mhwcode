@@ -31,15 +31,31 @@ def get_existing(hkey,regpath):
     ''' retrieve all existing python registrations '''
     #TODO: retrieve install path, to know what program existing reg belong to
     if hkey == 'Current':
+<<<<<<< .mine
+		try:
+			key = OpenKey(HKEY_CURRENT_USER, regpath)
+		except WindowsError:
+			#print WindowsError()
+			return
+=======
         try:
             key = OpenKey(HKEY_CURRENT_USER, regpath)
         except:
             return
+>>>>>>> .r103
     elif hkey == 'All':
+<<<<<<< .mine
+		try:
+			key = OpenKey(HKEY_LOCAL_MACHINE, regpath)
+		except WindowsError:
+			#print WindowsError()
+			return
+=======
         try:
             key = OpenKey(HKEY_LOCAL_MACHINE, regpath)
         except:
             return
+>>>>>>> .r103
 
     subkeys = []
     i = 0
@@ -54,7 +70,6 @@ def get_existing(hkey,regpath):
 
 def RegisterPy(pycorepath, version):
     regpath = pycorepath + version
-    print regpath
     try:
         reg = OpenKey(HKEY_LOCAL_MACHINE, regpath)
         regVal = QueryValueEx(reg, installkey)[0]
@@ -68,12 +83,12 @@ def RegisterPy(pycorepath, version):
         except:
             print "*** Unable to register!"
             return
-        print "--- Python", our_version, "is now registered!"
+        print "--- Python %s is now registered to %s!" % (our_version, installpath)
         return
     if (QueryValue(reg, installkey) == installpath and
         QueryValue(reg, pythonkey) == pythonpath):
         CloseKey(reg)
-        print "=== Python", our_version, "is already registered!"
+        print "=== Python %s is already registered!" % (our_version)
         return
     CloseKey(reg)
     print "*** Unable to register!"
@@ -83,9 +98,20 @@ def RegisterPy(pycorepath, version):
 #---
 CurrentUser = get_existing('Current',regpath)
 AllUsers = get_existing('All',regpath)
-print 'Existing Current User python version(s):\t', CurrentUser
-print 'Existing All Users python version(s):\t\t', AllUsers
+print '''
+	Existing Current User python version(s):  %s
+	Existing All Users python version(s):\t  %s
+''' % (CurrentUser, AllUsers)
 
+<<<<<<< .mine
+if CurrentUser:
+	match = True if our_version in CurrentUser else False
+elif AllUsers:
+	match = True if our_version in AllUsers else False
+else:
+	RegisterPy(regpath,our_version)
+
+=======
 match = False
 try:
     if our_version in CurrentUser:
@@ -97,5 +123,12 @@ except:
         RegisterPy(regpath,our_version)
     else:
         print '\nOur version (%s) already belongs to something else. Skipping...' % (our_version)
+
+>>>>>>> .r103
+try:
+	if match:
+		print 'Our version (%s) already registered. Skipping...' % (our_version)
+except:
+	pass
 
 #-- the end
