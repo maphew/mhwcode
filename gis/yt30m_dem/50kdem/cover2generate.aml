@@ -1,0 +1,42 @@
+&severity &error &routine bail
+/* -------------------------------------------------------------------------
+&args feature elev cover_list:rest
+/* -------------------------------------------------------------------------
+&if [null %feature%] | [null %elev%] | [null %cover_list%] &then
+   &return /&...USAGE: &r %aml$file% {feature_type} {Z_field} {cover1} {cover2} .../&
+
+&type ...converting [quote %cover_list%] to ungenerate files.
+
+   &do cover &list [unquote %cover_list%]
+      &if not [exists %cover% -cover] &then &goto End_c2g
+      &if [exists %cover%.gen.gz -file] &then &goto End_c2g
+      &if [exists %cover%.gen -file] &then &goto do_gzip
+      &set edit-cov = [scratchname]
+      copy %cover% %edit-cov%
+
+      /* if the elevation field doesn't exist, go straight to ungenerate
+      &if [iteminfo %cover%.aat -info %elev% -exists] &then
+         &do ; ArcEdit
+         /* thanks to CSIRO, Australia for this AE tip (http://www.ffp.csiro.au/nfm/mdp/softqaa.htm#ar1)
+            edit %edit-cov% %feature%
+            select all
+            calculate $id = %elev%
+            save
+         quit ; &end
+
+      ungenerate %feature% %edit-cov% %cover%.gen # fixed
+      kill %edit-cov% all
+      /* compress ungenerate file to save disk space; using Start sends the task to background so we can carry on without waiting
+      &label do_gzip
+      &sys gzip %cover%.gen
+      &type ...gzipped %cover%
+      &label End_c2g
+   &end
+
+
+&RETURN ...[upcase %aml$fullfile%] finished normally.
+/* ------------------------------------------------------------------------
+&routine bail
+   &if not [variable str] &then &s str Bailing out of %aml$file%...
+   &return; &return &warning %str%
+/*===========================================================================

@@ -1,0 +1,119 @@
+&severity &error &routine bail
+&args tile:REST
+&ty
+&ty   * [upcase %aml$file%] * Updated LIMS 50k DEM * mhwilkie * 20 Sept 2k
+&ty     ::Step #::  (see scripts\__ReadMe.aml)
+&ty
+&ty     - retrieve Alaska 250k DEM points, clip to tile 2k buffer
+&ty
+&if [null %quad%] &then &do
+    &s pause [response '<Enter> to continue, something else to abort']
+    &if not [null %pause%] &then &return %aml$file% exited by user request.
+    &end
+
+&if not [variable .library] &then &return &error Project Environment is not setup.
+&workspace %.home%
+
+/* put header variables here
+&set ak-src = [listfile i:\ak_250kdem\* -grid]
+&set ak-count = [token %ak-src% -count]
+/* see \\killerbee2\imagery\ak_250kdems\scripts\Border_Names.txt
+&set tile = 117c
+    &set ak = dem tab
+    &call main
+&set tile =  117b
+    &set ak =  dem tab col
+    &call main
+&s tile = 116n
+    &set ak =  tab col bla
+    &call main
+&s tile = 116k
+    &set ak =  col bla cly
+    &call main
+&s tile = 116f
+    &set ak =  bla cly eag
+    &call main
+&s tile = 116c
+    &set ak =  cly eag tan
+    &call main
+&s tile = 115n
+    &set ak =  eag tnc nab
+    &call main
+&s tile = 115k
+    &set ak =  tnc nab mcc
+    &call main
+&s tile = 115f
+    &set ak =  nab mcc ber mse
+    &call main
+&s tile = 115c
+    &set ak =  mcc ber yak mse
+    &call main
+&s tile = 115b
+    &set ak =  yak mse
+    &call main
+&s tile = 114o
+    &set ak =   yak ska mse /*ber
+    &call main
+&s tile = 114p
+    &set ak =  yak ska atl
+    &call main
+&s tile = 104m
+    &set ak =  ska atl tak
+    &call main
+&s tile = 104n
+    &set ak =  atl tak
+    &call main
+
+&RETURN ...[upcase %aml$file%] finished normally.
+
+/*===========================================================================
+&ROUTINE MAIN
+&if [exists %.home%\%tile% -directory] &then &workspace %.home%\%tile%
+    &else &return
+    &do minor &list [listfile * -workspace]
+        &wo %minor%
+        /* -----------mark workspace busy------------------
+        &if [exists lock -file] &then &return
+        &set lockfile = [OPEN lock openstat -write]
+        &if  %openstat% = 0 &then &type ...workspace %minor% locked
+            &else &return Error %openstat% opening lockfile
+        /* ------------------------------------------------
+/* &echo &on /* debug line
+            &if [exists ak_pnt -cover] &then &goto Fini
+            &severity &error &ignore
+            &do aktile &list [unquote %ak%]
+                &if not [exists ak-%aktile% -grid] &then ~
+                    LATTICECLIP I:\ak_250kdem\%aktile% buf_2k ak-%aktile%
+            &end
+            &severity &error &routine bail
+
+            &s aktemp = [listfile ak-* -grid]
+                &if [null %aktemp%] &then &goto Fini
+                &if [exists ak_dem -grid] &then kill ak_dem all
+                GRID
+                    ak_dem = mosaic (%aktemp%)
+                QUIT
+
+            KILL (!%aktemp%!) ALL
+
+            &if [exists ak_pnt -cover] &then kill ak_pnt all
+            GRIDPOINT ak_dem ak_pnt Z
+
+            &label Fini
+/* &echo &off /* debug line
+        /*-------mark workspace not busy-----------------
+        &if [close %lockfile%] = 0 &then
+           &type ...workspace %minor% unlocked
+           &else &return Error closing lockfile
+        &sys del lock
+        &delvar lockfile
+        /*-----------------------------------------------
+        &wo ..
+    &end
+&workspace ..
+&RETURN
+/*===========================================================================
+&routine bail
+   &if not [variable str] &then &s str Bailing out of %aml$file%...
+   &return; &return &warning %str%
+/*===========================================================================
