@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 
 '''
@@ -35,7 +34,6 @@ else:
    sys.stderr.write ('error: Please set OSGEO4W_ROOT\n')
    sys.exit (2)
 
-
 #FIXME: should this really be hardcoded?
 #FIXME:  this only works for English, (e.g. called Startmenu with umlaut in a german windows)
 # related: http://trac.osgeo.org/osgeo4w/ticket/21, http://code.google.com/p/maphew/issues/detail?id=13
@@ -46,11 +44,6 @@ root = OSGEO4W_ROOT
 
 CWD = os.getcwd ()
 
-mirror = 'http://download.osgeo.org/osgeo4w'
-
-#TODO: use same default cache as osgeo4w-setup.exe
-downloads = root + '/var/cache/setup/' + urllib.quote (mirror, '').lower ()
-
 config = root + '/etc/setup/'
 setup_ini = config + '/setup.ini'
 setup_bak = config + '/setup.bak'
@@ -58,6 +51,47 @@ installed_db = config + '/installed.db'
 installed_db_magic = 'INSTALLED.DB 2\n'
 
 INSTALL = 'install'
+
+###############
+
+# NEW
+# adapted from http://cyg-apt.googlecode.com: cygpath()
+def cygpath(path):
+    path = path.replace("\\", "/")
+    if len(path) == 3:
+        if path[1] == ":":
+            path = "/" + path[0].lower()
+    elif len(path) > 1:
+        if path[1] == ":":
+            path = "/" + path[0].lower() + path[2:]
+    return path
+
+
+# NEW
+# adapted from http://cyg-apt.googlecode.com: get_pre17_last()
+def get_last_cache():
+    if not os.path.exists(config + "/last-mirror" or\
+        not os.path.exists(config + "/last-cache")):
+        return (None, None)
+    else:
+        last_cache = file(config + "/last-cache").read().strip()
+        #last_cache = cygpath(last_cache)
+        last_mirror = file(config + "/last-mirror").read().strip()
+
+        print "Last cache:\t%s\nLast mirror:\t%s" % (last_cache, last_mirror)
+
+        return (last_cache, last_mirror)
+
+###############
+
+
+mirror = 'http://download.osgeo.org/osgeo4w'
+get_last_cache()
+#mirror = get_last_cache()
+print "Using mirror %s" % (mirror)
+
+#TODO: use same default cache as osgeo4w-setup.exe
+downloads = root + '/var/cache/setup/' + urllib.quote (mirror, '').lower ()
 
 
 def usage ():
@@ -157,7 +191,6 @@ def join_ball (t):
     return t[0] + '-' + version_to_string (t[1])
 
 ###########################
-
 
 def debug (s):
     s
