@@ -769,7 +769,12 @@ def source ():
     if 1 or download_p:
         sys.exit (0)
 
-
+def get_mirror():
+    if last_mirror == None:
+        mirror = 'http://download.osgeo.org/osgeo4w'
+    else:
+        mirror = last_mirror
+    return mirror
 
 ###########################
 #Main
@@ -805,13 +810,6 @@ if __name__ == '__main__':
     setup_bak = config + '/setup.bak'
     installed_db = config + '/installed.db'
     installed_db_magic = 'INSTALLED.DB 2\n'
-
-    mirror = 'http://download.osgeo.org/osgeo4w'
-    last_cache, last_mirror=get_last_cache()
-    print "Last cache:\t%s\nLast mirror:\t%s" % (last_cache, last_mirror)
-
-    #TODO: use same default cache as osgeo4w-setup.exe
-    downloads = root + '/var/cache/setup/' + urllib.quote (mirror, '').lower ()
 
     ########################
     #Parse commandline args
@@ -860,6 +858,23 @@ if __name__ == '__main__':
 
     dists = 0
     distnames = ('curr', 'test', 'prev')
+
+    ########################
+    # Post-args globals
+    ########################
+    last_cache, last_mirror=get_last_cache()
+    try:
+        mirror
+    except NameError:
+        mirror = get_mirror()
+    print "Last cache:\t%s\nLast mirror:\t%s" % (last_cache, last_mirror)
+    print "Using mirror:\t%s" % (mirror)
+
+    try:
+        downloads = last_cache
+    except NameError:
+        downloads = root + '/var/cache/setup/' + urllib.quote (mirror, '').lower ()
+    print "Download cache:\t%s" % (downloads)
 
     ########################
     #Run the commands
