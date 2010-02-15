@@ -448,6 +448,13 @@ def get_last_cache():
 
         return (last_cache, last_mirror)
 
+def get_mirror():
+    if last_mirror == None:
+        mirror = 'http://download.osgeo.org/osgeo4w'
+    else:
+        mirror = last_mirror
+    return mirror
+
 def get_missing ():
     reqs = get_requires ()
     lst = []
@@ -769,12 +776,6 @@ def source ():
     if 1 or download_p:
         sys.exit (0)
 
-def get_mirror():
-    if last_mirror == None:
-        mirror = 'http://download.osgeo.org/osgeo4w'
-    else:
-        mirror = last_mirror
-    return mirror
 
 ###########################
 #Main
@@ -867,14 +868,17 @@ if __name__ == '__main__':
         mirror
     except NameError:
         mirror = get_mirror()
-    print "Last cache:\t%s\nLast mirror:\t%s" % (last_cache, last_mirror)
-    print "Using mirror:\t%s" % (mirror)
+
+    # convert mirror url into acceptable folder name
+    mirror_dir = urllib.quote (mirror, '').lower ()
 
     try:
-        downloads = last_cache
+        downloads = '%s/%s' % (last_cache, mirror_dir)
     except NameError:
-        downloads = root + '/var/cache/setup/' + urllib.quote (mirror, '').lower ()
-    print "Download cache:\t%s" % (downloads)
+        downloads = '%s/var/cache/setup/%s' %s (root, mirror_dir)
+
+    #print "Last cache:\t%s\nLast mirror:\t%s" % (last_cache, last_mirror)
+    #print "Using mirror:\t%s" % (mirror)
 
     ########################
     #Run the commands
