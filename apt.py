@@ -448,6 +448,27 @@ def get_last_cache():
 
         return (last_cache, last_mirror)
 
+def get_config(fname):
+    # open /etc/setup/fname and return contents
+    # e.g. /etc/setup/last-cache
+    f = os.path.join(config, fname)
+    if not os.path.exists(f):
+        return None
+    else:
+        value = file(f).read().strip()
+        return value
+
+def save_config(fname,values):
+    # save stuff like last-mirror, last-cache
+    # e.g. /etc/setup/last-cache --> d:\downloads\osgeo4w
+    os.chdir(config)
+    pipe = open(fname,'w')
+
+    for i in values:
+        pipe.write (i)
+    if pipe.close ():
+        raise 'urg'
+
 def get_mirror():
     if last_mirror == None:
         mirror = 'http://download.osgeo.org/osgeo4w'
@@ -702,6 +723,14 @@ def write_filelist (lst):
     if pipe.close ():
         raise 'urg'
 
+#def save_last_cache (lst):
+#    os.chdir(config)
+#    pipe = open('last-cache','w')
+#    
+#    for i in lst:
+#        pipe.write (i)
+#    if pipe.close ():
+#        raise 'urg'
 
 ###########################
 ##TODO: remove do_unpack, do_build, build, source ??
@@ -863,7 +892,10 @@ if __name__ == '__main__':
     ########################
     # Post-args globals
     ########################
-    last_cache, last_mirror=get_last_cache()
+    #last_cache, last_mirror=get_last_cache()
+    last_mirror = get_config('last-mirror')
+    last_cache = get_config('last-cache')
+
     try:
         mirror
     except NameError:
@@ -872,13 +904,28 @@ if __name__ == '__main__':
     # convert mirror url into acceptable folder name
     mirror_dir = urllib.quote (mirror, '').lower ()
 
-    try:
-        downloads = '%s/%s' % (last_cache, mirror_dir)
-    except NameError:
-        downloads = '%s/var/cache/setup/%s' %s (root, mirror_dir)
+    if last_cache == None:
+        cache_dir = '%s/var/cache/setup' % (root)
+    else:
+        cache_dir = last_cache
 
-    #print "Last cache:\t%s\nLast mirror:\t%s" % (last_cache, last_mirror)
-    #print "Using mirror:\t%s" % (mirror)
+    downloads = '%s/%s' % (cache_dir, mirror_dir)
+
+    print "Last cache:\t%s\nLast mirror:\t%s" % (last_cache, last_mirror)
+    print "Using mirror:\t%s" % (mirror)
+    print "Saving to:\t%s" % (cache_dir)
+
+    save_config('last-mirror', mirror)
+    save_config('last-cache', cache_dir)
+
+#try:
+    #    downloads = '%s/%s' % (last_cache, mirror_dir)
+    #except NameError:
+    #    downloads = '%s/var/cache/setup/%s' %s (root)
+    #    save_last_cache(downloads)
+    #    downloads = '%s/%s' %s (downloads, mirror_dir)
+    #    #TODO: write dn-dir to last-cache file
+
 
     ########################
     #Run the commands
