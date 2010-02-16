@@ -25,6 +25,6 @@ goto :EOF
 	set QuadList=115 105 095 106 116 117 114 094 104
 
 	for %%a in (%QuadList%) do (
-	wget -recursive -continue -level=3 -no-host-directories -cut-dirs=2  %urlRoot%/%%a/*
+	wget --recursive --continue --level=3 --no-host-directories --cut-dirs=2  %urlRoot%/%%a/*
 	)
 	goto :EOF
