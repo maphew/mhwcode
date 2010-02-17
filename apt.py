@@ -910,14 +910,10 @@ if __name__ == '__main__':
 
     downloads = '%s/%s' % (cache_dir, mirror_dir)
 
-    save_config('last-mirror', mirror)
-    save_config('last-cache', cache_dir)
-
-    #fixme: this is useful, but too noisy to report every time
+    ##fixme: this is useful, but too noisy to report every time
     #print "Last cache:\t%s\nLast mirror:\t%s" % (last_cache, last_mirror)
     #print "Using mirror:\t%s" % (mirror)
     #print "Saving to:\t%s" % (cache_dir)
-
 
     ########################
     #Run the commands
@@ -942,3 +938,11 @@ if __name__ == '__main__':
 
         if command and command in __main__.__dict__:
             __main__.__dict__[command] ()
+
+
+    ########################
+    #Before we finish...
+    ########################
+    save_config('last-mirror', mirror)
+    save_config('last-cache', cache_dir)
+
