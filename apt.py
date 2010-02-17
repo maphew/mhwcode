@@ -892,7 +892,6 @@ if __name__ == '__main__':
     ########################
     # Post-args globals
     ########################
-    #last_cache, last_mirror=get_last_cache()
     last_mirror = get_config('last-mirror')
     last_cache = get_config('last-cache')
 
@@ -911,20 +910,13 @@ if __name__ == '__main__':
 
     downloads = '%s/%s' % (cache_dir, mirror_dir)
 
-    print "Last cache:\t%s\nLast mirror:\t%s" % (last_cache, last_mirror)
-    print "Using mirror:\t%s" % (mirror)
-    print "Saving to:\t%s" % (cache_dir)
-
     save_config('last-mirror', mirror)
     save_config('last-cache', cache_dir)
 
-#try:
-    #    downloads = '%s/%s' % (last_cache, mirror_dir)
-    #except NameError:
-    #    downloads = '%s/var/cache/setup/%s' %s (root)
-    #    save_last_cache(downloads)
-    #    downloads = '%s/%s' %s (downloads, mirror_dir)
-    #    #TODO: write dn-dir to last-cache file
+    #fixme: this is useful, but too noisy to report every time
+    #print "Last cache:\t%s\nLast mirror:\t%s" % (last_cache, last_mirror)
+    #print "Using mirror:\t%s" % (mirror)
+    #print "Saving to:\t%s" % (cache_dir)
 
 
     ########################
