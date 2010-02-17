@@ -827,7 +827,7 @@ if __name__ == '__main__':
     # http://stackoverflow.com/questions/2216173
     #PROGRAMS=2
     ALLUSERSPROGRAMS=23
-    OSGEO4W_STARTMENU = get_special_folder(ALLUSERSPROGRAMS)
+    OSGEO4W_STARTMENU = get_special_folder(ALLUSERSPROGRAMS) + "\OSGeo4W"
     os.putenv('OSGEO4W_STARTMENU', OSGEO4W_STARTMENU)
 
     CWD = os.getcwd ()
