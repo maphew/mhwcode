@@ -895,9 +895,7 @@ if __name__ == '__main__':
     last_mirror = get_config('last-mirror')
     last_cache = get_config('last-cache')
 
-    try:
-        mirror
-    except NameError:
+    if not 'mirror' in globals():
         mirror = get_mirror()
 
     # convert mirror url into acceptable folder name
@@ -910,10 +908,10 @@ if __name__ == '__main__':
 
     downloads = '%s/%s' % (cache_dir, mirror_dir)
 
-    ##fixme: this is useful, but too noisy to report every time
-    #print "Last cache:\t%s\nLast mirror:\t%s" % (last_cache, last_mirror)
-    #print "Using mirror:\t%s" % (mirror)
-    #print "Saving to:\t%s" % (cache_dir)
+    #fixme: this is useful, but too noisy to report every time
+    print "Last cache:\t%s\nLast mirror:\t%s" % (last_cache, last_mirror)
+    print "Using mirror:\t%s" % (mirror)
+    print "Saving to:\t%s" % (cache_dir)
 
     ########################
     #Run the commands
