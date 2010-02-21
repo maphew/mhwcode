@@ -8,7 +8,8 @@
   License: GNU GPL
 
 
-  Modified July 2008 by Matt.Wilkie@gov.yk.ca for OSGeo4W
+  Modified by Matt.Wilkie@gov.yk.ca for OSGeo4W, 
+  beginning July 2008
 
 '''
 
@@ -24,6 +25,7 @@ import urllib
 import gzip, tarfile
 import hashlib
 import subprocess
+import shlex
 
 ###########################
 #Usage
@@ -414,7 +416,6 @@ def get_field (field, default=''):
     return default
 
 def get_filelist ():
-    # CHANGED: pythonized gzip
     os.chdir (config)
     pipe = gzip.open (config + packagename + '.lst.gz', 'r')
     lst = map (string.strip, pipe.readlines ())
@@ -468,6 +469,24 @@ def save_config(fname,values):
         pipe.write (i)
     if pipe.close ():
         raise 'urg'
+
+def get_menu_links(bat):
+    # '''Parse postinstall batch file for menu and desktop links'''
+    #
+    # from 'xxmklink' lines grab first parameter, which is the link path
+    # and interpret known variables.
+    # Relies on shlex modulem which splits on spaces, yet preserves 
+    # spaces within quotes (http://stackoverflow.com/questions/79968)
+    links = []
+    for line in open(bat,'r'):
+        if 'xxmklink' in line: 
+            link = shlex.split(line)[1]
+            link = link.replace ('%OSGEO4W_ROOT%',OSGEO4W_ROOT)
+            link = link.replace ('%OSGEO4W_STARTMENU%',OSGEO4W_STARTMENU)
+            link = link.replace ('%ALLUSERSPROFILE%',os.environ['ALLUSERSPROFILE'])
+            link = link.replace ('%USERPROFILE%',os.environ['USERPROFILE'])
+            links.append(link)
+    return links
 
 def get_mirror():
     if last_mirror == None:
@@ -694,6 +713,10 @@ def post_install ():
                 lst.remove(bat)
                 lst.append(bat + '.done')
 
+                # retrieve menu & desktop links from postinstall bats
+                for link in get_menu_links(done_bat):
+                    lst.append(link)
+
                 # and bin/bar.bat.tmpl --> bin/bar.bat in pkg-foo.gz
                 for s in lst:
                     if '.tmpl' in s:
@@ -712,7 +735,6 @@ def post_install ():
         except OSError, e:
             print >>sys.stderr, "Execution failed:", e
 
-# CHANGED: pythonized gzip
 def write_filelist (lst):
     os.chdir(config)
     pipe = gzip.open (packagename + '.lst.gz','w')
@@ -722,15 +744,6 @@ def write_filelist (lst):
         pipe.write ('\n')
     if pipe.close ():
         raise 'urg'
-
-#def save_last_cache (lst):
-#    os.chdir(config)
-#    pipe = open('last-cache','w')
-#    
-#    for i in lst:
-#        pipe.write (i)
-#    if pipe.close ():
-#        raise 'urg'
 
 ###########################
 ##TODO: remove do_unpack, do_build, build, source ??
@@ -908,10 +921,10 @@ if __name__ == '__main__':
 
     downloads = '%s/%s' % (cache_dir, mirror_dir)
 
-    #fixme: this is useful, but too noisy to report every time
-    print "Last cache:\t%s\nLast mirror:\t%s" % (last_cache, last_mirror)
-    print "Using mirror:\t%s" % (mirror)
-    print "Saving to:\t%s" % (cache_dir)
+    ##fixme: this is useful, but too noisy to report every time
+    #print "Last cache:\t%s\nLast mirror:\t%s" % (last_cache, last_mirror)
+    #print "Using mirror:\t%s" % (mirror)
+    #print "Saving to:\t%s" % (cache_dir)
 
     ########################
     #Run the commands
