@@ -365,6 +365,7 @@ def debug (s):
 
 #@-node:maphew.20100223163802.3738:debug
 #@-node:maphew.20100302221232.1485:Helper functions
+#@+node:maphew.20100308085005.1379:Doers
 #@+node:maphew.20100223163802.3739:do_download
 def do_download ():
     # CHANGED: pythonized tar
@@ -382,6 +383,23 @@ def do_download ():
         if not os.path.exists (dir):
             os.makedirs (dir)
         status = urllib.urlretrieve(srcFile, dstFile, down_stat)
+#@+node:maphew.20100223163802.3742:down_stat
+def down_stat(count, blockSize, totalSize):
+    # ''' Report download progress '''
+    #courtesy of http://stackoverflow.com/questions/51212/how-to-write-a-download-progress-indicator-in-python
+    percent = int(count*blockSize*100/totalSize+0.5)#Round percentage
+
+    if not 'last_percent' in vars(down_stat):down_stat.last_percent=0 #Static var to track percentages so we only print N% once.
+
+    if percent > 100:    # filesize usually doesn't correspond to blocksize multiple, so flatten overrun
+        percent = 100
+        down_stat.last_percent=0
+
+    if percent > down_stat.last_percent:
+        sys.stdout.write("\r...%d%%  " % percent)
+        sys.stdout.flush()
+    down_stat.last_percent=percent
+#@-node:maphew.20100223163802.3742:down_stat
 #@-node:maphew.20100223163802.3739:do_download
 #@+node:maphew.20100223163802.3740:do_install
 def do_install ():
@@ -439,23 +457,8 @@ def do_uninstall ():
     write_installed ()
 
 #@-node:maphew.20100223163802.3741:do_uninstall
-#@+node:maphew.20100223163802.3742:down_stat
-def down_stat(count, blockSize, totalSize):
-    # ''' Report download progress '''
-    #courtesy of http://stackoverflow.com/questions/51212/how-to-write-a-download-progress-indicator-in-python
-    percent = int(count*blockSize*100/totalSize+0.5)#Round percentage
-
-    if not 'last_percent' in vars(down_stat):down_stat.last_percent=0 #Static var to track percentages so we only print N% once.
-
-    if percent > 100:    # filesize usually doesn't correspond to blocksize multiple, so flatten overrun
-        percent = 100
-        down_stat.last_percent=0
-
-    if percent > down_stat.last_percent:
-        sys.stdout.write("\r...%d%%  " % percent)
-        sys.stdout.flush()
-    down_stat.last_percent=percent
-#@-node:maphew.20100223163802.3742:down_stat
+#@-node:maphew.20100308085005.1379:Doers
+#@+node:maphew.20100308085005.1380:Getters
 #@+node:maphew.20100223163802.3743:get_ball
 def get_ball ():
     url, md5 = get_url ()
@@ -473,6 +476,7 @@ def get_field (field, default=''):
 #@-node:maphew.20100223163802.3744:get_field
 #@+node:maphew.20100223163802.3745:get_filelist
 def get_filelist ():
+    # ''' Retrieve list of files installed for package X from manifest (/etc/setup/package.lst.gz)'''
     os.chdir (config)
     pipe = gzip.open (config + packagename + '.lst.gz', 'r')
     lst = map (string.strip, pipe.readlines ())
@@ -483,6 +487,7 @@ def get_filelist ():
 #@-node:maphew.20100223163802.3745:get_filelist
 #@+node:maphew.20100223163802.3746:get_installed
 def get_installed ():
+    # ''' Get list of installed packages '''
     global installed
     if installed:
         return installed
@@ -510,19 +515,6 @@ def get_config(fname):
         return value
 
 #@-node:maphew.20100223163802.3749:get_config
-#@+node:maphew.20100223163802.3750:save_config
-def save_config(fname,values):
-    # '''save settings like last-mirror, last-cache'''
-    # e.g. /etc/setup/last-cache --> d:\downloads\osgeo4w
-    os.chdir(config)
-    pipe = open(fname,'w')
-
-    for i in values:
-        pipe.write (i)
-    if pipe.close ():
-        raise 'urg'
-#@nonl
-#@-node:maphew.20100223163802.3750:save_config
 #@+node:maphew.20100307230644.3848:get_menu_links
 def get_menu_links(bat):
     # '''Parse postinstall batch file for menu and desktop links'''
@@ -574,6 +566,7 @@ def get_missing ():
 #@-node:maphew.20100223163802.3752:get_missing
 #@+node:maphew.20100223163802.3753:get_new
 def get_new ():
+    # '''get available upgrades '''
     global packagename
     lst = []
     for packagename in installed[0].keys ():
@@ -585,51 +578,9 @@ def get_new ():
     return lst
 
 #@-node:maphew.20100223163802.3753:get_new
-#@+node:maphew.20100223163802.3754:get_setup_ini
-def get_setup_ini ():
-    global dists
-    if dists:
-        return
-    dists = {'test': {}, 'curr': {}, 'prev' : {}}
-    chunks = string.split (open (setup_ini).read (), '\n\n@ ')
-    for i in chunks[1:]:
-        lines = string.split (i, '\n')
-        name = string.strip (lines[0])
-        debug ('package: ' + name)
-        packages = dists['curr']
-        records = {'sdesc': name}
-        j = 1
-        while j < len (lines) and string.strip (lines[j]):
-            debug ('raw: ' + lines[j])
-            if lines[j][0] == '#':
-                j = j + 1
-                continue
-            elif lines[j][0] == '[':
-                debug ('dist: ' + lines[j][1:5])
-                packages[name] = records.copy ()
-                packages = dists[lines[j][1:5]]
-                j = j + 1
-                continue
-
-            try:
-                key, value = map (string.strip,
-                      string.split (lines[j], ': ', 1))
-            except:
-                print lines[j]
-                raise 'URG'
-            if value[0] == '"' and value.find ('"', 1) == -1:
-                while 1:
-                    j = j + 1
-                    value += lines[j]
-                    if lines[j].find ('"') != -1:
-                        break
-            records[key] = value
-            j = j + 1
-        packages[name] = records
-
-#@-node:maphew.20100223163802.3754:get_setup_ini
 #@+node:maphew.20100223163802.3755:get_special_folder
 def get_special_folder(intFolder):
+    # ''' Fetch paths of Windows special folders: Program Files, Desktop, Startmenu, etc. '''
     #Written by Luke Pinner, 2010. Code is public domain, do with it what you will...
     import ctypes
     from ctypes.wintypes import HWND , HANDLE ,DWORD ,LPCWSTR ,MAX_PATH , create_unicode_buffer
@@ -676,13 +627,9 @@ def get_version ():
     return package['ver']
 
 #@-node:maphew.20100223163802.3757:get_version
-#@+node:maphew.20100223163802.3758:no_package
-def no_package (s='error'):
-    sys.stderr.write ("%s: %s not in [%s]\n" % (s, packagename, distname))
-
-#@-node:maphew.20100223163802.3758:no_package
 #@+node:maphew.20100223163802.3759:get_requires
 def get_requires ():
+    # ''' identify dependencies of package'''
     dist = dists[distname]
     if not dists[distname].has_key (packagename):
         no_package ('warning')
@@ -708,8 +655,90 @@ def get_requires ():
             reqs.update (dict (map (lambda x: (x, 0),
                         string.split (p['requires']))))
     return reqs.keys ()
-
 #@-node:maphew.20100223163802.3759:get_requires
+#@-node:maphew.20100308085005.1380:Getters
+#@+node:maphew.20100308085005.1381:Writers
+#@+node:maphew.20100223163802.3750:save_config
+def save_config(fname,values):
+    # '''save settings like last-mirror, last-cache'''
+    # e.g. /etc/setup/last-cache --> d:\downloads\osgeo4w
+    os.chdir(config)
+    pipe = open(fname,'w')
+
+    for i in values:
+        pipe.write (i)
+    if pipe.close ():
+        raise 'urg'
+#@nonl
+#@-node:maphew.20100223163802.3750:save_config
+#@+node:maphew.20100223163802.3764:write_installed
+def write_installed ():
+    # ''' Record package in install.db '''
+    file = open (installed_db, 'w')
+    file.write (installed_db_magic)
+    file.writelines (map (lambda x: '%s %s 0\n' % (x, installed[0][x]),
+                  installed[0].keys ()))
+    if file.close ():
+        raise 'urg'
+
+#@-node:maphew.20100223163802.3764:write_installed
+#@+node:maphew.20100223163802.3766:write_filelist
+def write_filelist (lst):
+    # ''' Record installed files in package manifest (etc/setup/packagename.lst.gz) '''
+    os.chdir(config)
+    pipe = gzip.open (packagename + '.lst.gz','w')
+
+    for i in lst:
+        pipe.write (i)
+        pipe.write ('\n')
+    if pipe.close ():
+        raise 'urg'
+#@-node:maphew.20100223163802.3766:write_filelist
+#@-node:maphew.20100308085005.1381:Writers
+#@+node:maphew.20100308085005.1382:Parsers
+#@+node:maphew.20100223163802.3754:get_setup_ini
+def get_setup_ini ():
+    # '''Parse setup.ini into package name, description, version, dependencies, etc.'''
+    global dists
+    if dists:
+        return
+    dists = {'test': {}, 'curr': {}, 'prev' : {}}
+    chunks = string.split (open (setup_ini).read (), '\n\n@ ')
+    for i in chunks[1:]:
+        lines = string.split (i, '\n')
+        name = string.strip (lines[0])
+        debug ('package: ' + name)
+        packages = dists['curr']
+        records = {'sdesc': name}
+        j = 1
+        while j < len (lines) and string.strip (lines[j]):
+            debug ('raw: ' + lines[j])
+            if lines[j][0] == '#':
+                j = j + 1
+                continue
+            elif lines[j][0] == '[':
+                debug ('dist: ' + lines[j][1:5])
+                packages[name] = records.copy ()
+                packages = dists[lines[j][1:5]]
+                j = j + 1
+                continue
+
+            try:
+                key, value = map (string.strip,
+                      string.split (lines[j], ': ', 1))
+            except:
+                print lines[j]
+                raise 'URG'
+            if value[0] == '"' and value.find ('"', 1) == -1:
+                while 1:
+                    j = j + 1
+                    value += lines[j]
+                    if lines[j].find ('"') != -1:
+                        break
+            records[key] = value
+            j = j + 1
+        packages[name] = records
+#@-node:maphew.20100223163802.3754:get_setup_ini
 #@+node:maphew.20100223163802.3760:join_ball
 def join_ball (t):
     return t[0] + '-' + version_to_string (t[1])
@@ -717,17 +746,13 @@ def join_ball (t):
 #@-node:maphew.20100223163802.3760:join_ball
 #@+node:maphew.20100223163802.3761:split_ball
 def split_ball (p):
+    # ''' Parse version number from package archive name ''' 
     # mc-4.6.0a-20030721-1.tar.bz2
     #m = re.match ('^([^.]*)-([0-9][^-/]*-[0-9][0-9]*)(.tar.bz2)?$', p)
     m = re.match ('^([^.]*)-([0-9].*-[0-9][0-9]*)(.tar.bz2)?$', p)
     return (m.group (1), string_to_version (m.group (2)))
 
 #@-node:maphew.20100223163802.3761:split_ball
-#@+node:maphew.20100302221232.1486:psort (disabled)
-#def psort (lst): #Raises "AttributeError: 'function' object has no attribute 'sort'" use sorted() instead
-#    plist.sort (lst)
-#    return lst
-#@-node:maphew.20100302221232.1486:psort (disabled)
 #@+node:maphew.20100223163802.3762:string_to_version
 def string_to_version (s):
     # bash-2.05b-9
@@ -753,19 +778,19 @@ def version_to_string (t):
               t[-1])
 
 #@-node:maphew.20100223163802.3763:version_to_string
-#@+node:maphew.20100223163802.3764:write_installed
-def write_installed ():
-    file = open (installed_db, 'w')
-    file.write (installed_db_magic)
-    file.writelines (map (lambda x: '%s %s 0\n' % (x, installed[0][x]),
-                  installed[0].keys ()))
-    if file.close ():
-        raise 'urg'
+#@-node:maphew.20100308085005.1382:Parsers
+#@+node:maphew.20100223163802.3758:no_package
+def no_package (s='error'):
+    sys.stderr.write ("%s: %s not in [%s]\n" % (s, packagename, distname))
 
-#@-node:maphew.20100223163802.3764:write_installed
+#@-node:maphew.20100223163802.3758:no_package
+#@+node:maphew.20100302221232.1486:psort (disabled)
+#def psort (lst): #Raises "AttributeError: 'function' object has no attribute 'sort'" use sorted() instead
+#    plist.sort (lst)
+#    return lst
+#@-node:maphew.20100302221232.1486:psort (disabled)
 #@+node:maphew.20100223163802.3765:post_install
 def post_install ():
-    # NEW
     # for postinstall *.bat: run x.bat, rename x.bat x.bat.done
     # adapted from "17.1.3.3 Replacing os.system()"
     # http://www.python.org/doc/2.5.2/lib/node536.html
@@ -786,6 +811,7 @@ def post_install ():
                     os.remove(done_bat)
                 os.rename(bat, done_bat)
 
+                # TODO: Move/merge this to cyg_path helper function
                 # harmonize path to match format in etc/setup/pkg-foo.gz
                 bat = bat.replace (root, '')         # strip C:\osgeo4w
                 bat = bat.replace ('\\','/')         # backslash to foreslash
@@ -818,17 +844,6 @@ def post_install ():
         except OSError, e:
             print >>sys.stderr, "Execution failed:", e
 #@-node:maphew.20100223163802.3765:post_install
-#@+node:maphew.20100223163802.3766:write_filelist
-def write_filelist (lst):
-    os.chdir(config)
-    pipe = gzip.open (packagename + '.lst.gz','w')
-
-    for i in lst:
-        pipe.write (i)
-        pipe.write ('\n')
-    if pipe.close ():
-        raise 'urg'
-#@-node:maphew.20100223163802.3766:write_filelist
 #@+node:maphew.20100223163802.3771:Building from source
 #@+node:maphew.20100223163802.3767:do_unpack
 
