@@ -1,11 +1,9 @@
+#!/usr/bin/env python
 #@+leo-ver=4-thin
 #@+node:maphew.20100223163802.3716:@file B:\o4w\apt\apt.py
-#@@language python
-#@@tabwidth -4
-#@+others
-#@+node:maphew.20100223163802.3717:apt declarations
-#!/usr/bin/env python
-
+#@@first
+#@<<docstring>>
+#@+node:maphew.20100307230644.3846:<<docstring>>
 '''
   cyg-apt - Cygwin installer to keep cygwin root up to date
 
@@ -18,7 +16,13 @@
   beginning July 2008 
 
 '''
-
+#@nonl
+#@-node:maphew.20100307230644.3846:<<docstring>>
+#@nl
+#@@language python
+#@@tabwidth -4
+#@<<imports>>
+#@+node:maphew.20100307230644.3847:<<imports>>
 import __main__
 import getopt
 import os
@@ -32,8 +36,10 @@ import gzip, tarfile
 import hashlib
 import subprocess
 import shlex
-
-#@-node:maphew.20100223163802.3717:apt declarations
+#@nonl
+#@-node:maphew.20100307230644.3847:<<imports>>
+#@nl
+#@+others
 #@+node:maphew.20100223163802.3718:usage
 ###########################
 #Usage
@@ -64,7 +70,7 @@ Options:
     -t,--t=NAME            set dist name (*curr*, test, prev)
     -x,--no-deps           ignore dependencies
 ''' % {'setup_ini':setup_ini,'mirror':mirror,'root':root}) #As they were just printing as "%(setup_ini)s" etc...
-
+#@nonl
 #@-node:maphew.20100223163802.3718:usage
 #@+node:maphew.20100302221232.1487:Commands
 ###########################
@@ -337,7 +343,8 @@ def version ():
 ###########################
 #@+node:maphew.20100223163802.3737:cygpath
 def cygpath(path):
-    # NEW
+    # change dos path to unix style path, plus add cygwin prefix
+    # needs some changes to work for osgeo4w
     # adapted from http://cyg-apt.googlecode.com: cygpath()
     path = path.replace("\\", "/")
     if len(path) == 3:
@@ -351,6 +358,8 @@ def cygpath(path):
 #@-node:maphew.20100223163802.3737:cygpath
 #@+node:maphew.20100223163802.3738:debug
 def debug (s):
+    # still haven't figured out quite how this is meant to be used
+    # uncomment the print statement to display contents of parsed setup.ini
     s
     #print s
 
@@ -360,7 +369,9 @@ def debug (s):
 def do_download ():
     # CHANGED: pythonized tar
     #        : only print % downloaded if > than last time (lpinner)
-    url, md5 = get_url ()
+
+    url, md5 = get_url ()   # md5 is retrieved but not used, remove from function?
+
     dir = '%s/%s' % (downloads, os.path.split (url)[0])
     srcFile = os.path.join (mirror + '/' + url)
     dstFile = os.path.join (downloads + '/' + url)
@@ -374,45 +385,42 @@ def do_download ():
 #@-node:maphew.20100223163802.3739:do_download
 #@+node:maphew.20100223163802.3740:do_install
 def do_install ():
-    # find ball
+    # ''' Unpack the package in appropriate locations, write file list to installed manifest, run postinstall confguration. '''
+
+    # retrieve local package (ball) and check md5
     ball = get_ball ()
-    ## was:
-    #pipe = os.popen ('tar -C %s -xjvf %s' % (root, ball), 'r')
+
+    # unpack
     os.chdir (root)
     pipe = tarfile.open (ball,'r:bz2')
-    ## was:
-    #lst = map (string.strip, pipe.readlines ())
     lst = pipe.getnames()
     pipe.extractall()
     pipe.close()
-
     if pipe.close ():
         raise 'urg'
+
    # record list of files installed
     write_filelist (lst)
 
     # configure...
     if os.path.isdir ('%s/etc/postinstall' % root):
-        ## was:
-        #post = os.listdir ('%s/etc/postinstall' % root)
         post = glob.glob ('%s/etc/postinstall/*.bat' % root)
         if post:
-            #print '\nThe tasks below are unfinished, please follow up manually:'
-            #sys.stderr.write ('not run:\t%s' % string.join (map (lambda x: '%s' % x, post)))
-            #print
-            post_install () # CHANGED: run postinstall .bat automatically
-    #update installed[]
-    installed[0][packagename] = os.path.basename (ball)
-    # write installed.db
-    write_installed ()
+            post_install ()
 
+    #update package details in installed.db
+    installed[0][packagename] = os.path.basename (ball)
+    write_installed ()
 #@-node:maphew.20100223163802.3740:do_install
 #@+node:maphew.20100223163802.3741:do_uninstall
 def do_uninstall ():
+    # ''' For package X: delete installed files & remove from manifest, remove from installed.db ''' 
+    # TODO: remove empty dirs?
+
     # retrieve list of installed files
     lst = get_filelist ()
 
-    # remove files
+    # delete files
     for i in lst:
         file = os.path.abspath (os.path.join(root,i))
         if not os.path.exists (file):
@@ -423,17 +431,17 @@ def do_uninstall ():
             else:
                 sys.stdout.write('removed: %s\n' % file)
 
-    # TODO: remove empty dirs?
-    # TODO: clear list?
+    # clear from manifest
     write_filelist ([])
-    # update installed[]
+
+    # remove package details from installed.db
     del (installed[0][packagename])
     write_installed ()
 
 #@-node:maphew.20100223163802.3741:do_uninstall
 #@+node:maphew.20100223163802.3742:down_stat
 def down_stat(count, blockSize, totalSize):
-    # report download progress
+    # ''' Report download progress '''
     #courtesy of http://stackoverflow.com/questions/51212/how-to-write-a-download-progress-indicator-in-python
     percent = int(count*blockSize*100/totalSize+0.5)#Round percentage
 
@@ -447,7 +455,6 @@ def down_stat(count, blockSize, totalSize):
         sys.stdout.write("\r...%d%%  " % percent)
         sys.stdout.flush()
     down_stat.last_percent=percent
-
 #@-node:maphew.20100223163802.3742:down_stat
 #@+node:maphew.20100223163802.3743:get_ball
 def get_ball ():
@@ -491,21 +498,6 @@ def get_installed_version ():
     return split_ball (installed[0][packagename])[1]
 
 #@-node:maphew.20100223163802.3747:get_installed_version
-#@+node:maphew.20100223163802.3748:get_last_cache
-def get_last_cache():
-    # NEW
-    # adapted from http://cyg-apt.googlecode.com: get_pre17_last()
-    if not os.path.exists(config + "/last-mirror" or\
-        not os.path.exists(config + "/last-cache")):
-        return (None, None)
-    else:
-        last_cache = file(config + "/last-cache").read().strip()
-        #last_cache = cygpath(last_cache)
-        last_mirror = file(config + "/last-mirror").read().strip()
-
-        return (last_cache, last_mirror)
-
-#@-node:maphew.20100223163802.3748:get_last_cache
 #@+node:maphew.20100223163802.3749:get_config
 def get_config(fname):
     # open /etc/setup/fname and return contents
@@ -520,7 +512,7 @@ def get_config(fname):
 #@-node:maphew.20100223163802.3749:get_config
 #@+node:maphew.20100223163802.3750:save_config
 def save_config(fname,values):
-    # save stuff like last-mirror, last-cache
+    # '''save settings like last-mirror, last-cache'''
     # e.g. /etc/setup/last-cache --> d:\downloads\osgeo4w
     os.chdir(config)
     pipe = open(fname,'w')
@@ -529,7 +521,9 @@ def save_config(fname,values):
         pipe.write (i)
     if pipe.close ():
         raise 'urg'
-
+#@nonl
+#@-node:maphew.20100223163802.3750:save_config
+#@+node:maphew.20100307230644.3848:get_menu_links
 def get_menu_links(bat):
     # '''Parse postinstall batch file for menu and desktop links'''
     #
@@ -547,8 +541,8 @@ def get_menu_links(bat):
             link = link.replace ('%USERPROFILE%',os.environ['USERPROFILE'])
             links.append(link)
     return links
-
-#@-node:maphew.20100223163802.3750:save_config
+#@nonl
+#@-node:maphew.20100307230644.3848:get_menu_links
 #@+node:maphew.20100223163802.3751:get_mirror
 def get_mirror():
     if last_mirror == None:
@@ -926,9 +920,8 @@ def source ():
 ###########################
 if __name__ == '__main__':
 
-    ##################
-    #Set some globals
-    #################
+    #@    <<globals>>
+    #@+node:maphew.20100307230644.3841:<<globals>>
     OSGEO4W_ROOT = ''
     if 'OSGEO4W_ROOT' in os.environ.keys ():
         OSGEO4W_ROOT = os.environ['OSGEO4W_ROOT']
@@ -955,10 +948,10 @@ if __name__ == '__main__':
     setup_bak = config + '/setup.bak'
     installed_db = config + '/installed.db'
     installed_db_magic = 'INSTALLED.DB 2\n'
-
-    ########################
-    #Parse commandline args
-    ########################
+    #@-node:maphew.20100307230644.3841:<<globals>>
+    #@nl
+    #@    <<parse command line>>
+    #@+node:maphew.20100307230644.3842:<<parse command line>>
     (options, files) = getopt.getopt (sys.argv[1:],
                       'dhi:m:r:t:x',
                       ('download', 'help', 'mirror=', 'root='
@@ -1003,10 +996,10 @@ if __name__ == '__main__':
 
     dists = 0
     distnames = ('curr', 'test', 'prev')
-
-    ########################
-    # Post-args globals
-    ########################
+    #@-node:maphew.20100307230644.3842:<<parse command line>>
+    #@nl
+    #@    <<post-parse globals>>
+    #@+node:maphew.20100307230644.3844:<<post-parse globals>>
     last_mirror = get_config('last-mirror')
     last_cache = get_config('last-cache')
 
@@ -1027,10 +1020,10 @@ if __name__ == '__main__':
     #print "Last cache:\t%s\nLast mirror:\t%s" % (last_cache, last_mirror)
     #print "Using mirror:\t%s" % (mirror)
     #print "Saving to:\t%s" % (cache_dir)
-
-    ########################
-    #Run the commands
-    ########################
+    #@-node:maphew.20100307230644.3844:<<post-parse globals>>
+    #@nl
+    #@    <<run the commands>>
+    #@+node:maphew.20100307230644.3843:<<run the commands>>
     if command == 'setup':
         setup ()
         sys.exit (0)
@@ -1051,13 +1044,13 @@ if __name__ == '__main__':
 
         if command and command in __main__.__dict__:
             __main__.__dict__[command] ()
-
-
-    ########################
-    #Before we finish...
-    ########################
+    #@-node:maphew.20100307230644.3843:<<run the commands>>
+    #@nl
+    #@    <<wrap up>>
+    #@+node:maphew.20100307230644.3845:<<wrap up>>
     save_config('last-mirror', mirror)
     save_config('last-cache', cache_dir)
-
+    #@-node:maphew.20100307230644.3845:<<wrap up>>
+    #@nl
 #@-node:maphew.20100223163802.3716:@file B:\o4w\apt\apt.py
 #@-leo
