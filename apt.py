@@ -830,11 +830,11 @@ def post_install ():
 
                 # and bin/bar.bat.tmpl --> bin/bar.bat in pkg-foo.gz
                 for s in lst:
-                    if '.tmpl' in s:
+                    if s.endswith('.tmpl'):
                          lst.remove(s)
                          lst.append(s.replace('.tmpl',''))
                     # catch bat's which are made for py's post install
-                    elif '.py' in s:
+                    if s.startswith('bin/') and s.endswith('.py'):
                         p =  re.compile(r'^bin/(.*?)\.py$', re.VERBOSE)
                         out = p.sub(r'bin/\1.bat', s)
                         lst.append(out)
