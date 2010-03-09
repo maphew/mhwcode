@@ -750,6 +750,8 @@ def split_ball (p):
     # mc-4.6.0a-20030721-1.tar.bz2
     #m = re.match ('^([^.]*)-([0-9][^-/]*-[0-9][0-9]*)(.tar.bz2)?$', p)
     m = re.match ('^([^.]*)-([0-9].*-[0-9][0-9]*)(.tar.bz2)?$', p)
+    if not m:
+        print '\n\n*** Error parsing version numer from "%s"\n\n' % (p)
     return (m.group (1), string_to_version (m.group (2)))
 
 #@-node:maphew.20100223163802.3761:split_ball
