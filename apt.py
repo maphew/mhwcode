@@ -793,33 +793,39 @@ def no_package (s='error'):
 #@-node:maphew.20100302221232.1486:psort (disabled)
 #@+node:maphew.20100223163802.3765:post_install
 def post_install ():
-    # for postinstall *.bat: run x.bat, rename x.bat x.bat.done
+    # ''' Run postinstall batch files and update package manifest 
+    #     to catch those files not included in the package archive. 
+    #     (manifest = etc/setup/pkg-foo.lst.gz) '''
     # adapted from "17.1.3.3 Replacing os.system()"
     # http://www.python.org/doc/2.5.2/lib/node536.html
 
     os.chdir(root)
 
-    # necessary for textreplace, xmklink
+    # necessary for textreplace, xxmklink
     os.putenv('PATH', '%s\\bin' % os.path.normpath(OSGEO4W_ROOT))
 
     for bat in glob.glob ('%s/etc/postinstall/*.bat' % root):
         try:
+            # run the postinstall batch files
             retcode = subprocess.call (bat, shell=True)
             if retcode < 0:
                 print >>sys.stderr, "Child was terminated by signal", -retcode
+            
+            # then update manifest 
             else:
+                # mark bat as completed
                 done_bat = bat + '.done'
                 if os.path.exists(done_bat):
                     os.remove(done_bat)
                 os.rename(bat, done_bat)
 
+                # harmonize path conventions
                 # TODO: Move/merge this to cyg_path helper function
-                # harmonize path to match format in etc/setup/pkg-foo.gz
                 bat = bat.replace (root, '')         # strip C:\osgeo4w
                 bat = bat.replace ('\\','/')         # backslash to foreslash
                 bat = bat.replace ('/etc/', 'etc/')  # strip leading slash
 
-                # also change foo.bat --> .done in pkg-foo.gz
+                # foo.bat --> foo.bat.done in manifest
                 lst = get_filelist()
                 lst.remove(bat)
                 lst.append(bat + '.done')
@@ -827,9 +833,9 @@ def post_install ():
                 # retrieve menu & desktop links from postinstall bats
                 for link in get_menu_links(done_bat):
                     lst.append(link)
-
-                # and bin/bar.bat.tmpl --> bin/bar.bat in pkg-foo.gz
+                
                 for s in lst:
+                    # bin/bar.bat.tmpl --> bin/bar.bat in manifest
                     if s.endswith('.tmpl'):
                          lst.remove(s)
                          lst.append(s.replace('.tmpl',''))
