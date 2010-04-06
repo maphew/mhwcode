@@ -90,7 +90,7 @@ ARGV.each_with_index do |page_url, page_url_index|
     end
 
     filename = "/tmp/zoomified-#{page_url_index}.#{path_index}.jpg"
-    `montage #{row_files.join(' ')} -geometry +0+0 -tile 1x#{tiles_high} #{filename}`
+    `montage -limit memory 1024 -limit map 512 #{row_files.join(' ')} -geometry +0+0 -tile 1x#{tiles_high} #{filename}`
 
     puts "    Done: #{filename}"
 
