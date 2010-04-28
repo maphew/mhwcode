@@ -1,44 +1,47 @@
-import ctypes
-from ctypes.wintypes import HWND, HANDLE, DWORD, LPCWSTR, MAX_PATH
-ctypes.create_unicode_buffer
+''' Get windows special folders without pythonwin
+    Example:
+            import win-specialfolders
+            start_programs = win-specialfolders.get(win-specialfolders.PROGRAMS)
 
-SpecialFolders={
-   'Desktop':0,
-   'Programs':2,
-   'MyDocuments':5,
-   'Favorites':6,
-   'Startup':7,
-   'Recent':8,
-   'SendTo':9,
-   'StartMenu':11,
-   'MyMusic':13,
-   'MyVideos':14,
-   'NetHood':19,
-   'Fonts':20,
-   'Templates':21,
-   'AllUsersStartMenu':22,
-   'AllUsersPrograms':23,
-   'AllUsersStartup':24,
-   'AllUsersDesktop':25,
-   'ApplicationData':26,
-   'PrintHood':27,
-   'LocalSettingsApplicationData':28,
-   'AllUsersFavorites':31,
-   'LocalSettingsTemporaryInternetFiles':32,
-   'Cookies':33,
-   'LocalSettingsHistory':34,
-   'AllUsersApplicationData':35
-}
+Code is public domain, do with it what you will. 
 
+Luke Pinner - Environment.gov.au, 2010 February 10
+'''
 
-SHGetFolderPath = ctypes.windll.shell32.SHGetFolderPathW
-SHGetFolderPath.argtypes = [HWND, ctypes.c_int, HANDLE, DWORD, LPCWSTR]
-auPathBuffer = ctypes.wintypes.create_unicode_buffer(MAX_PATH)
+#Imports use _syntax to mask them from autocomplete IDE's
+import ctypes as _ctypes
+from ctypes.wintypes import HWND as _HWND, HANDLE as _HANDLE,DWORD as _DWORD,LPCWSTR as _LPCWSTR,MAX_PATH as _MAX_PATH, create_unicode_buffer as _cub
+_SHGetFolderPath = _ctypes.windll.shell32.SHGetFolderPathW
 
-for i in SpecialFolders:
-   try:
-       exit_code=SHGetFolderPath(0, SpecialFolders[i], 0, 0,
-auPathBuffer)
-       print "%s - %s = %s" % (SpecialFolders[i],i,auPathBuffer.value)
-   except:pass
+#public special folder constants
+DESKTOP=                             0
+PROGRAMS=                            2
+MYDOCUMENTS=                         5
+FAVORITES=                           6
+STARTUP=                             7
+RECENT=                              8
+SENDTO=                              9
+STARTMENU=                          11
+MYMUSIC=                            13
+MYVIDEOS=                           14
+NETHOOD=                            19
+FONTS=                              20
+TEMPLATES=                          21
+ALLUSERSSTARTMENU=                  22
+ALLUSERSPROGRAMS=                   23
+ALLUSERSSTARTUP=                    24
+ALLUSERSDESKTOP=                    25
+APPLICATIONDATA=                    26
+PRINTHOOD=                          27
+LOCALSETTINGSAPPLICATIONDATA=       28
+ALLUSERSFAVORITES=                  31
+LOCALSETTINGSTEMPORARYINTERNETFILES=32
+COOKIES=                            33
+LOCALSETTINGSHISTORY=               34
+ALLUSERSAPPLICATIONDATA=            35
 
+def get(intFolder):
+    _SHGetFolderPath.argtypes = [_HWND, _ctypes.c_int, _HANDLE, _DWORD, _LPCWSTR]
+    auPathBuffer = _cub(_MAX_PATH)
+    exit_code=_SHGetFolderPath(0, intFolder, 0, 0, auPathBuffer)
+    return auPathBuffer.value
