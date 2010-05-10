@@ -192,7 +192,7 @@ def md5 ():
 
     # make sure we md5 the *file* not the *filename*
     # kudos to http://www.peterbe.com/plog/using-md5-to-check-equality-between-files
-    localFile = file(os.path.join(downloads + url), 'rb')
+    localFile = file(os.path.join(downloads, url), 'rb')
     my_md5 = hashlib.md5(localFile.read()).hexdigest()
 
     print '%s  %s - local' % (my_md5, ball)
