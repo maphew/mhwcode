@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #@+leo-ver=4-thin
-#@+node:maphew.20100223163802.3716:@file B:\o4w\apt\apt.py
+#@+node:maphew.20100510140007.7282:@thin apt.py
 #@@first
 #@<<docstring>>
 #@+node:maphew.20100307230644.3846:<<docstring>>
@@ -158,7 +158,7 @@ def install ():
     global installed_this_run
     installed_this_run = {}
     install_next(missing.keys ())
-
+#@+node:maphew.20100510140324.2366:install_next (missing_packages)
 def install_next (missing_packages):
     global packagename
     for miss_package in missing_packages:
@@ -180,7 +180,8 @@ def install_next (missing_packages):
                      version_to_string (get_version ())))
         do_install ()
         installed_this_run[miss_package] = 0
-
+#@nonl
+#@-node:maphew.20100510140324.2366:install_next (missing_packages)
 #@-node:maphew.20100223163802.3724:install
 #@+node:maphew.20100223163802.3725:list
 #plist = list
@@ -537,7 +538,7 @@ def get_menu_links(bat):
     #
     # from 'xxmklink' lines grab first parameter, which is the link path
     # and interpret known variables.
-    # Relies on shlex modulem which splits on spaces, yet preserves 
+    # Relies on shlex module which splits on spaces, yet preserves 
     # spaces within quotes (http://stackoverflow.com/questions/79968)
     links = []
     for line in open(bat,'r'):
@@ -826,7 +827,7 @@ def post_install ():
             retcode = subprocess.call (bat, shell=True)
             if retcode < 0:
                 print >>sys.stderr, "Child was terminated by signal", -retcode
-            
+
             # then update manifest 
             else:
                 # mark bat as completed
@@ -849,7 +850,7 @@ def post_install ():
                 # retrieve menu & desktop links from postinstall bats
                 for link in get_menu_links(done_bat):
                     lst.append(link)
-                
+
                 for s in lst:
                     # bin/bar.bat.tmpl --> bin/bar.bat in manifest
                     if s.endswith('.tmpl'):
@@ -1028,14 +1029,14 @@ if __name__ == '__main__':
             depend_p = 1
         elif o == '--start-menu' or o == '-s':
             start_menu_name = a
-    
+
     # Thank you Luke Pinner for answering how to get path of "Start > Programs"
     # http://stackoverflow.com/questions/2216173
     #PROGRAMS=2
     ALLUSERSPROGRAMS=23
     OSGEO4W_STARTMENU = get_special_folder(ALLUSERSPROGRAMS) + "\\" + start_menu_name
     os.putenv('OSGEO4W_STARTMENU', OSGEO4W_STARTMENU)
-    
+
     dists = 0
     distnames = ('curr', 'test', 'prev')
     #@-node:maphew.20100307230644.3842:<<parse command line>>
@@ -1094,5 +1095,5 @@ if __name__ == '__main__':
     save_config('last-cache', cache_dir)
     #@-node:maphew.20100307230644.3845:<<wrap up>>
     #@nl
-#@-node:maphew.20100223163802.3716:@file B:\o4w\apt\apt.py
+#@-node:maphew.20100510140007.7282:@thin apt.py
 #@-leo
