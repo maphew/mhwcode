@@ -69,6 +69,7 @@ Options:
     -r,--root=DIR          set osgeo4w root [%(root)s]
     -t,--t=NAME            set dist name (*curr*, test, prev)
     -x,--no-deps           ignore dependencies
+    -s,--start-menu=NAME   set the start menu name (OSGeo4W)
 ''' % {'setup_ini':setup_ini,'mirror':mirror,'root':root}) #As they were just printing as "%(setup_ini)s" etc...
 #@nonl
 #@-node:maphew.20100223163802.3718:usage
@@ -154,16 +155,31 @@ def install ():
         download ()
     if download_p:
         sys.exit (0)
-    for packagename in missing.keys ():
-        if installed[0].has_key (packagename):
+    global installed_this_run
+    installed_this_run = {}
+    install_next(missing.keys ())
+
+def install_next (missing_packages):
+    global packagename
+    for miss_package in missing_packages:
+        if installed_this_run.has_key (miss_package):
+            continue
+        packagename = miss_package
+        ret = get_missing()
+        ret.remove(miss_package)
+        if len(ret) > 1:
+            install_next(ret[1:len(ret)])
+        packagename = miss_package
+        if installed[0].has_key (miss_package):
             sys.stderr.write ('preparing to replace %s %s\n' \
-                      % (packagename,
+                      % (miss_package,
                          version_to_string (get_installed_version ())))
             do_uninstall ()
         sys.stderr.write ('installing %s %s\n' \
-                  % (packagename,
+                  % (miss_package,
                      version_to_string (get_version ())))
         do_install ()
+        installed_this_run[miss_package] = 0
 
 #@-node:maphew.20100223163802.3724:install
 #@+node:maphew.20100223163802.3725:list
@@ -954,13 +970,6 @@ if __name__ == '__main__':
        sys.stderr.write ('error: Please set OSGEO4W_ROOT\n')
        sys.exit (2)
 
-    # Thank you Luke Pinner for answering how to get path of "Start > Programs"
-    # http://stackoverflow.com/questions/2216173
-    #PROGRAMS=2
-    ALLUSERSPROGRAMS=23
-    OSGEO4W_STARTMENU = get_special_folder(ALLUSERSPROGRAMS) + "\OSGeo4W"
-    os.putenv('OSGEO4W_STARTMENU', OSGEO4W_STARTMENU)
-
     CWD = os.getcwd ()
     INSTALL = 'install'
     installed = 0
@@ -976,9 +985,9 @@ if __name__ == '__main__':
     #@    <<parse command line>>
     #@+node:maphew.20100307230644.3842:<<parse command line>>
     (options, files) = getopt.getopt (sys.argv[1:],
-                      'dhi:m:r:t:x',
+                      'dhi:m:r:t:s:x',
                       ('download', 'help', 'mirror=', 'root='
-                       'ini=', 't=', 'no-deps'))
+                       'ini=', 't=', 'start-menu=', 'no-deps'))
 
     command = 'help'
     if len (files) > 0:
@@ -992,6 +1001,7 @@ if __name__ == '__main__':
 
     depend_p = 0
     download_p = 0
+    start_menu_name = 'OSGeo4W'
     for i in options:
         o = i[0]
         a = i[1]
@@ -1016,7 +1026,16 @@ if __name__ == '__main__':
             distname = a
         elif o == '--no-deps' or o == '-x':
             depend_p = 1
-
+        elif o == '--start-menu' or o == '-s':
+            start_menu_name = a
+    
+    # Thank you Luke Pinner for answering how to get path of "Start > Programs"
+    # http://stackoverflow.com/questions/2216173
+    #PROGRAMS=2
+    ALLUSERSPROGRAMS=23
+    OSGEO4W_STARTMENU = get_special_folder(ALLUSERSPROGRAMS) + "\\" + start_menu_name
+    os.putenv('OSGEO4W_STARTMENU', OSGEO4W_STARTMENU)
+    
     dists = 0
     distnames = ('curr', 'test', 'prev')
     #@-node:maphew.20100307230644.3842:<<parse command line>>
