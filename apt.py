@@ -155,20 +155,26 @@ def install ():
         download ()
     if download_p:
         sys.exit (0)
-    global installed_this_run
-    installed_this_run = {}
-    install_next(missing.keys ())
+    install_next(missing.keys (), set([]), set([]))
 #@+node:maphew.20100510140324.2366:install_next (missing_packages)
-def install_next (missing_packages):
+def install_next (missing_packages, resolved, seen):
     global packagename
     for miss_package in missing_packages:
-        if installed_this_run.has_key (miss_package):
+        if miss_package in resolved:
             continue
+        seen.add(miss_package)
         packagename = miss_package
-        ret = get_missing()
-        ret.remove(miss_package)
-        if len(ret) > 1:
-            install_next(ret[1:len(ret)])
+        dependences = get_missing()
+        dependences.remove(miss_package)
+        for dep in dependences:
+            if dep in resolved:
+                continue
+            if dep in seen:
+                raise Exception(
+                    'Required package %s from %s is a circular reference '
+                    'with a previous dependent' % (dep, packagename)
+                )
+            install_next(dependences, resolved, seen)
         packagename = miss_package
         if installed[0].has_key (miss_package):
             sys.stderr.write ('preparing to replace %s %s\n' \
@@ -179,7 +185,7 @@ def install_next (missing_packages):
                   % (miss_package,
                      version_to_string (get_version ())))
         do_install ()
-        installed_this_run[miss_package] = 0
+        resolved.add(miss_package)
 #@nonl
 #@-node:maphew.20100510140324.2366:install_next (missing_packages)
 #@-node:maphew.20100223163802.3724:install
@@ -214,7 +220,7 @@ def md5 ():
 
     print '%s  %s - local' % (my_md5, ball)
     if md5 != my_md5:
-        raise 'URG'
+        raise 'file md5 does not match for ' + ball
 
 #@-node:maphew.20100223163802.3726:md5
 #@+node:maphew.20100223163802.3727:missing
@@ -1074,6 +1080,9 @@ if __name__ == '__main__':
     elif command == 'update':
         update ()
         sys.exit (0)
+
+    elif command == 'help':
+        help ()
 
     else:
         for i in (installed_db, setup_ini):
