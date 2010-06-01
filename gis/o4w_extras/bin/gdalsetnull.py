@@ -1,3 +1,9 @@
+#@+leo-ver=4-thin
+#@+node:maphew.20100601093031.2394:@thin gdalsetnull.py
+#@@language python
+#@@tabwidth -4
+#@<<about>>
+#@+node:maphew.20100601093031.2403:<<about>>> and license
 #!/usr/bin/env python
 #******************************************************************************
 #  $Id: gdalsetnull.py	2008-07-08 maphew $
@@ -28,18 +34,27 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
 #******************************************************************************
+#@-node:maphew.20100601093031.2403:<<about>>> and license
+#@nl
+#@<<imports>>
+#@+node:maphew.20100601093031.2402:<<imports>>
+import sys
+import os.path
 try:
     from osgeo import gdal
 except ImportError:
     import gdal
-
-import sys
-import os.path
-
+#@nonl
+#@-node:maphew.20100601093031.2402:<<imports>>
+#@nl
+#@+others
+#@+node:maphew.20100601093031.2401:usage
 if len(sys.argv) < 2:
-	print "Usage: gdalsetnull.py raster_file null_value {null band2} {null band3} ..."
-	sys.exit(1)
-
+    print "Usage: gdalsetnull.py raster_file null_value {null band2} {null band3} ..."
+    sys.exit(1)
+#@nonl
+#@-node:maphew.20100601093031.2401:usage
+#@+node:maphew.20100601093031.2400:Main
 input = sys.argv[1]
 null_value = sys.argv[2]
 
@@ -49,13 +64,18 @@ if dataset is None:
     sys.exit(1)
 
 for i in range(1, dataset.RasterCount+1):
-	band = dataset.GetRasterBand(i)
-	print 'Initial nodata for band ',i,'\t', band.GetNoDataValue()
-   
-   # optionally 
-   if sys.argv[i]:
-      null_value = sys.argv[i]
-   
-   band.SetNoDataValue( float(null_value) )
-   
-	print 'Output  nodata for band ',i,'\t', band.GetNoDataValue()
+    band = dataset.GetRasterBand(i)
+    print 'Initial nodata for band ',i,'\t', band.GetNoDataValue()
+
+    # optionally 
+    if sys.argv[i]:
+        null_value = sys.argv[i]
+
+    band.SetNoDataValue( float(null_value) )
+
+    print 'Output  nodata for band ',i,'\t', band.GetNoDataValue()
+#@-node:maphew.20100601093031.2400:Main
+#@-others
+#@nonl
+#@-node:maphew.20100601093031.2394:@thin gdalsetnull.py
+#@-leo
