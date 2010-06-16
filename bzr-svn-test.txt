@@ -1,0 +1,13 @@
+testing bazaar as a tool to edit and commit to svn repos.
+
+Ok, so the process appears to be:
+
+- bzr pull
+- do stuff
+- bzr commit (to local mirror)
+- do stuff
+- bzr commit (to local mirror)
+- all good for public consumption?
+- bzr push (note: no chance for new comment, uses ones previous local commits)
+
+and it works!

@@ -1,1 +1,0 @@
-testing bazaar as a tool to edit and commit to svn repos.
