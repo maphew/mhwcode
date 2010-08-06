@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-#@+leo-ver=4-thin
-#@+node:maphew.20100611162141.2545:@thin apt.py
+#@+leo-ver=5-thin
+#@+node:maphew.20100510140007.7282: * @thin apt.py
 #@@first
-#@<<docstring>>
-#@+node:maphew.20100307230644.3846:<<docstring>>
+#@+<<docstring>>
+#@+node:maphew.20100307230644.3846: ** <<docstring>>
 '''
   cyg-apt - Cygwin installer to keep cygwin root up to date
 
@@ -16,13 +16,11 @@
   beginning July 2008 
 
 '''
-#@nonl
-#@-node:maphew.20100307230644.3846:<<docstring>>
-#@nl
+#@-<<docstring>>
 #@@language python
 #@@tabwidth -4
-#@<<imports>>
-#@+node:maphew.20100307230644.3847:<<imports>>
+#@+<<imports>>
+#@+node:maphew.20100307230644.3847: ** <<imports>>
 import __main__
 import getopt
 import os
@@ -32,22 +30,13 @@ import shutil
 import string
 import sys
 import urllib
-import gzip, tarfile
+import gzip, tarfile, bz2
 import hashlib
 import subprocess
 import shlex
-#@nonl
-#@-node:maphew.20100307230644.3847:<<imports>>
-#@nl
+#@-<<imports>>
 #@+others
-#@+node:maphew.20100611162141.2543:bzr test
-#@+at
-# testing to see if I can use bazaar as a seamless frontend for svn..
-#@-at
-#@@c
-#@nonl
-#@-node:maphew.20100611162141.2543:bzr test
-#@+node:maphew.20100223163802.3718:usage
+#@+node:maphew.20100223163802.3718: ** usage
 ###########################
 #Usage
 ###########################
@@ -78,13 +67,11 @@ Options:
     -x,--no-deps           ignore dependencies
     -s,--start-menu=NAME   set the start menu name (OSGeo4W)
 ''' % {'setup_ini':setup_ini,'mirror':mirror,'root':root}) #As they were just printing as "%(setup_ini)s" etc...
-#@nonl
-#@-node:maphew.20100223163802.3718:usage
-#@+node:maphew.20100302221232.1487:Commands
+#@+node:maphew.20100302221232.1487: ** Commands
 ###########################
 #COMMANDS
 ###########################
-#@+node:maphew.20100223163802.3719:available
+#@+node:maphew.20100223163802.3719: *3* available
 def available():
     ''' show packages available to be installed'''
     # courtesy of Aaron Digulla, 
@@ -108,14 +95,12 @@ def available():
     for key, value in zip(col1,col2):
         print '%-20s\t\t%s' % (key, value)
 
-#@-node:maphew.20100223163802.3719:available
-#@+node:maphew.20100223163802.3720:ball
+#@+node:maphew.20100223163802.3720: *3* ball
 def ball ():
     '''print tarball name'''
     print get_ball ()
 
-#@-node:maphew.20100223163802.3720:ball
-#@+node:maphew.20100223163802.3721:download
+#@+node:maphew.20100223163802.3721: *3* download
 def download ():
     '''download package'''
     do_download ()
@@ -123,8 +108,7 @@ def download ():
     print
     md5 ()
 
-#@-node:maphew.20100223163802.3721:download
-#@+node:maphew.20100223163802.3722:find
+#@+node:maphew.20100223163802.3722: *3* find
 def find ():
     '''package containing file'''
     global packagename
@@ -136,8 +120,7 @@ def find ():
                 hits.append ('%s: /%s' % (packagename, i))
     print (string.join (hits, '\n'))
 
-#@-node:maphew.20100223163802.3722:find
-#@+node:maphew.20100223163802.3723:help
+#@+node:maphew.20100223163802.3723: *3* help
 def help ():
     '''help COMMAND'''
     if len (files) < 2:
@@ -146,8 +129,7 @@ def help ():
 
     print  __main__.__dict__[packagename].__doc__
 
-#@-node:maphew.20100223163802.3723:help
-#@+node:maphew.20100223163802.3724:install
+#@+node:maphew.20100223163802.3724: *3* install
 def install ():
     '''download and install packages, including dependencies'''
     global packagename
@@ -163,7 +145,7 @@ def install ():
     if download_p:
         sys.exit (0)
     install_next(missing.keys (), set([]), set([]))
-#@+node:maphew.20100510140324.2366:install_next (missing_packages)
+#@+node:maphew.20100510140324.2366: *4* install_next (missing_packages)
 def install_next (missing_packages, resolved, seen):
     global packagename
     for miss_package in missing_packages:
@@ -193,10 +175,7 @@ def install_next (missing_packages, resolved, seen):
                      version_to_string (get_version ())))
         do_install ()
         resolved.add(miss_package)
-#@nonl
-#@-node:maphew.20100510140324.2366:install_next (missing_packages)
-#@-node:maphew.20100223163802.3724:install
-#@+node:maphew.20100223163802.3725:list
+#@+node:maphew.20100223163802.3725: *3* list
 #plist = list
 def list ():
     '''installed packages'''
@@ -212,8 +191,7 @@ def list ():
             s += '(%s)' % version_to_string (new)
         print s
 
-#@-node:maphew.20100223163802.3725:list
-#@+node:maphew.20100223163802.3726:md5
+#@+node:maphew.20100223163802.3726: *3* md5
 def md5 ():
     '''check md5 sum'''
     url, md5 = get_url ()
@@ -229,14 +207,12 @@ def md5 ():
     if md5 != my_md5:
         raise 'file md5 does not match for ' + ball
 
-#@-node:maphew.20100223163802.3726:md5
-#@+node:maphew.20100223163802.3727:missing
+#@+node:maphew.20100223163802.3727: *3* missing
 def missing ():
     '''print missing dependencies'''
     print string.join (get_missing (), '\n')
 
-#@-node:maphew.20100223163802.3727:missing
-#@+node:maphew.20100223163802.3728:new
+#@+node:maphew.20100223163802.3728: *3* new
 def new ():
     '''list available upgrades to currently installed packages'''
     print '\nThe following packages are newer than the installed version:'
@@ -245,8 +221,7 @@ def new ():
         print '%-20s%-12s' % (packagename,
                       version_to_string (get_version ()))
 
-#@-node:maphew.20100223163802.3728:new
-#@+node:maphew.20100223163802.3729:remove
+#@+node:maphew.20100223163802.3729: *3* remove
 def remove ():
     '''uninstall packages'''
     global packagename
@@ -259,14 +234,12 @@ def remove ():
                      version_to_string (get_installed_version ())))
         do_uninstall ()
 
-#@-node:maphew.20100223163802.3729:remove
-#@+node:maphew.20100223163802.3730:requires
+#@+node:maphew.20100223163802.3730: *3* requires
 def requires ():
     '''print requires: for package'''
     print string.join (get_requires (), '\n')
 
-#@-node:maphew.20100223163802.3730:requires
-#@+node:maphew.20100223163802.3731:search
+#@+node:maphew.20100223163802.3731: *3* search
 def search ():
     '''search package list'''
     global packagename
@@ -294,8 +267,7 @@ def search ():
             s += ' - %s' % d[1:-1]
         print s
 
-#@-node:maphew.20100223163802.3731:search
-#@+node:maphew.20100223163802.3732:setup
+#@+node:maphew.20100223163802.3732: *3* setup
 def setup ():
     '''cygwin environment'''
     if not os.path.isdir (root):
@@ -313,45 +285,45 @@ def setup ():
         sys.stderr.write ('getting %s\n' % setup_ini)
         update ()
 
-#@-node:maphew.20100223163802.3732:setup
-#@+node:maphew.20100223163802.3733:update
+#@+node:maphew.20100223163802.3733: *3* update
 def update ():
-    # CHANGED: pythonized rm,mv,wget which do not always exist on windows
     '''setup.ini'''
     if not os.path.exists (downloads):
         os.makedirs (downloads)
 
-   # remove cached ini
-    if os.path.exists (downloads + 'setup.ini'):
-        os.remove (downloads + 'setup.ini')
+    source = mirror + '/setup.ini.bz2'
+    archive = downloads + 'setup.ini.bz2'
 
-   # get current ini
-    f = urllib.urlretrieve(mirror + '/setup.ini', downloads + 'setup.ini', down_stat)
-
+    # backup existing setup config
     if os.path.exists (setup_ini):
-      # backup existing setup config
         if os.path.exists (setup_bak):
                 os.remove (setup_bak)
         os.rename (setup_ini, setup_bak)
 
-   # move new setup to config
-    os.rename(downloads + 'setup.ini', setup_ini)
+   # remove cached ini
+    if os.path.exists (archive):
+        os.remove (archive)
 
-#@-node:maphew.20100223163802.3733:update
-#@+node:maphew.20100223163802.3734:upgrade
+   # get current ini
+    f = urllib.urlretrieve(source, archive, down_stat)
+    uncompressedData = bz2.BZ2File(archive).read()
+
+    # save uncompressed ini to setup dir
+    ini = open(setup_ini, 'w')
+    ini.write(uncompressedData)
+    ini.close
+#@+node:maphew.20100223163802.3734: *3* upgrade
 def upgrade ():
     '''all installed packages'''
     files[1:] = get_new ()
     install ()
 
-#@-node:maphew.20100223163802.3734:upgrade
-#@+node:maphew.20100223163802.3735:url
+#@+node:maphew.20100223163802.3735: *3* url
 def url ():
     '''print tarball url'''
     print get_url ()[0]
 
-#@-node:maphew.20100223163802.3735:url
-#@+node:maphew.20100223163802.3736:version
+#@+node:maphew.20100223163802.3736: *3* version
 def version ():
     '''print installed version'''
     global packagename
@@ -365,13 +337,11 @@ def version ():
                  version_to_string (get_installed_version ()))
 
 
-#@-node:maphew.20100223163802.3736:version
-#@-node:maphew.20100302221232.1487:Commands
-#@+node:maphew.20100302221232.1485:Helper functions
+#@+node:maphew.20100302221232.1485: ** Helper functions
 ###########################
 #Helper functions
 ###########################
-#@+node:maphew.20100223163802.3737:cygpath
+#@+node:maphew.20100223163802.3737: *3* cygpath
 def cygpath(path):
     # change dos path to unix style path, plus add cygwin prefix
     # needs some changes to work for osgeo4w
@@ -385,18 +355,15 @@ def cygpath(path):
             path = "/" + path[0].lower() + path[2:]
     return path
 
-#@-node:maphew.20100223163802.3737:cygpath
-#@+node:maphew.20100223163802.3738:debug
+#@+node:maphew.20100223163802.3738: *3* debug
 def debug (s):
     # still haven't figured out quite how this is meant to be used
     # uncomment the print statement to display contents of parsed setup.ini
     s
     #print s
 
-#@-node:maphew.20100223163802.3738:debug
-#@-node:maphew.20100302221232.1485:Helper functions
-#@+node:maphew.20100308085005.1379:Doers
-#@+node:maphew.20100223163802.3739:do_download
+#@+node:maphew.20100308085005.1379: ** Doers
+#@+node:maphew.20100223163802.3739: *3* do_download
 def do_download ():
     # CHANGED: pythonized tar
     #        : only print % downloaded if > than last time (lpinner)
@@ -413,7 +380,7 @@ def do_download ():
         if not os.path.exists (dir):
             os.makedirs (dir)
         status = urllib.urlretrieve(srcFile, dstFile, down_stat)
-#@+node:maphew.20100223163802.3742:down_stat
+#@+node:maphew.20100223163802.3742: *4* down_stat
 def down_stat(count, blockSize, totalSize):
     # ''' Report download progress '''
     #courtesy of http://stackoverflow.com/questions/51212/how-to-write-a-download-progress-indicator-in-python
@@ -429,9 +396,7 @@ def down_stat(count, blockSize, totalSize):
         sys.stdout.write("\r...%d%%  " % percent)
         sys.stdout.flush()
     down_stat.last_percent=percent
-#@-node:maphew.20100223163802.3742:down_stat
-#@-node:maphew.20100223163802.3739:do_download
-#@+node:maphew.20100223163802.3740:do_install
+#@+node:maphew.20100223163802.3740: *3* do_install
 def do_install ():
     # ''' Unpack the package in appropriate locations, write file list to installed manifest, run postinstall confguration. '''
 
@@ -459,8 +424,7 @@ def do_install ():
     #update package details in installed.db
     installed[0][packagename] = os.path.basename (ball)
     write_installed ()
-#@-node:maphew.20100223163802.3740:do_install
-#@+node:maphew.20100223163802.3741:do_uninstall
+#@+node:maphew.20100223163802.3741: *3* do_uninstall
 def do_uninstall ():
     # ''' For package X: delete installed files & remove from manifest, remove from installed.db ''' 
     # TODO: remove empty dirs?
@@ -486,16 +450,13 @@ def do_uninstall ():
     del (installed[0][packagename])
     write_installed ()
 
-#@-node:maphew.20100223163802.3741:do_uninstall
-#@-node:maphew.20100308085005.1379:Doers
-#@+node:maphew.20100308085005.1380:Getters
-#@+node:maphew.20100223163802.3743:get_ball
+#@+node:maphew.20100308085005.1380: ** Getters
+#@+node:maphew.20100223163802.3743: *3* get_ball
 def get_ball ():
     url, md5 = get_url ()
     return '%s/%s' % (downloads, url)
 
-#@-node:maphew.20100223163802.3743:get_ball
-#@+node:maphew.20100223163802.3744:get_field
+#@+node:maphew.20100223163802.3744: *3* get_field
 def get_field (field, default=''):
     for d in (distname,) + distnames:
         if dists[d].has_key (packagename) \
@@ -503,8 +464,7 @@ def get_field (field, default=''):
             return dists[d][packagename][field]
     return default
 
-#@-node:maphew.20100223163802.3744:get_field
-#@+node:maphew.20100223163802.3745:get_filelist
+#@+node:maphew.20100223163802.3745: *3* get_filelist
 def get_filelist ():
     # ''' Retrieve list of files installed for package X from manifest (/etc/setup/package.lst.gz)'''
     os.chdir (config)
@@ -514,8 +474,7 @@ def get_filelist ():
         raise 'urg'
     return lst
 
-#@-node:maphew.20100223163802.3745:get_filelist
-#@+node:maphew.20100223163802.3746:get_installed
+#@+node:maphew.20100223163802.3746: *3* get_installed
 def get_installed ():
     # ''' Get list of installed packages '''
     global installed
@@ -527,13 +486,11 @@ def get_installed ():
         installed[int (status)][name] = ball
     return installed
 
-#@-node:maphew.20100223163802.3746:get_installed
-#@+node:maphew.20100223163802.3747:get_installed_version
+#@+node:maphew.20100223163802.3747: *3* get_installed_version
 def get_installed_version ():
     return split_ball (installed[0][packagename])[1]
 
-#@-node:maphew.20100223163802.3747:get_installed_version
-#@+node:maphew.20100223163802.3749:get_config
+#@+node:maphew.20100223163802.3749: *3* get_config
 def get_config(fname):
     # open /etc/setup/fname and return contents
     # e.g. /etc/setup/last-cache
@@ -544,8 +501,7 @@ def get_config(fname):
         value = file(f).read().strip()
         return value
 
-#@-node:maphew.20100223163802.3749:get_config
-#@+node:maphew.20100307230644.3848:get_menu_links
+#@+node:maphew.20100307230644.3848: *3* get_menu_links
 def get_menu_links(bat):
     # '''Parse postinstall batch file for menu and desktop links'''
     #
@@ -563,9 +519,7 @@ def get_menu_links(bat):
             link = link.replace ('%USERPROFILE%',os.environ['USERPROFILE'])
             links.append(link)
     return links
-#@nonl
-#@-node:maphew.20100307230644.3848:get_menu_links
-#@+node:maphew.20100223163802.3751:get_mirror
+#@+node:maphew.20100223163802.3751: *3* get_mirror
 def get_mirror():
     if last_mirror == None:
         mirror = 'http://download.osgeo.org/osgeo4w'
@@ -573,8 +527,7 @@ def get_mirror():
         mirror = last_mirror
     return mirror
 
-#@-node:maphew.20100223163802.3751:get_mirror
-#@+node:maphew.20100223163802.3752:get_missing
+#@+node:maphew.20100223163802.3752: *3* get_missing
 def get_missing ():
     reqs = get_requires ()
     lst = []
@@ -593,8 +546,7 @@ def get_missing ():
             lst.append (packagename)
     return lst
 
-#@-node:maphew.20100223163802.3752:get_missing
-#@+node:maphew.20100223163802.3753:get_new
+#@+node:maphew.20100223163802.3753: *3* get_new
 def get_new ():
     # '''get available upgrades '''
     global packagename
@@ -607,8 +559,7 @@ def get_new ():
             lst.append (packagename)
     return lst
 
-#@-node:maphew.20100223163802.3753:get_new
-#@+node:maphew.20100223163802.3755:get_special_folder
+#@+node:maphew.20100223163802.3755: *3* get_special_folder
 def get_special_folder(intFolder):
     # ''' Fetch paths of Windows special folders: Program Files, Desktop, Startmenu, etc. '''
     #Written by Luke Pinner, 2010. Code is public domain, do with it what you will...
@@ -620,8 +571,7 @@ def get_special_folder(intFolder):
     exit_code=SHGetFolderPath(0, intFolder, 0, 0, auPathBuffer)
     return auPathBuffer.value
 
-#@-node:maphew.20100223163802.3755:get_special_folder
-#@+node:maphew.20100223163802.3756:get_url
+#@+node:maphew.20100223163802.3756: *3* get_url
 def get_url ():
     if not dists[distname].has_key (packagename) \
        or not dists[distname][packagename].has_key (INSTALL):
@@ -641,8 +591,7 @@ def get_url ():
     file, size, md5 = string.split (install)
     return file, md5
 
-#@-node:maphew.20100223163802.3756:get_url
-#@+node:maphew.20100223163802.3757:get_version
+#@+node:maphew.20100223163802.3757: *3* get_version
 def get_version ():
     if not dists[distname].has_key (packagename) \
        or not dists[distname][packagename].has_key (INSTALL):
@@ -656,8 +605,7 @@ def get_version ():
         package['ver'] = split_ball (ball)[1]
     return package['ver']
 
-#@-node:maphew.20100223163802.3757:get_version
-#@+node:maphew.20100223163802.3759:get_requires
+#@+node:maphew.20100223163802.3759: *3* get_requires
 def get_requires ():
     # ''' identify dependencies of package'''
     dist = dists[distname]
@@ -685,10 +633,8 @@ def get_requires ():
             reqs.update (dict (map (lambda x: (x, 0),
                         string.split (p['requires']))))
     return reqs.keys ()
-#@-node:maphew.20100223163802.3759:get_requires
-#@-node:maphew.20100308085005.1380:Getters
-#@+node:maphew.20100308085005.1381:Writers
-#@+node:maphew.20100223163802.3750:save_config
+#@+node:maphew.20100308085005.1381: ** Writers
+#@+node:maphew.20100223163802.3750: *3* save_config
 def save_config(fname,values):
     # '''save settings like last-mirror, last-cache'''
     # e.g. /etc/setup/last-cache --> d:\downloads\osgeo4w
@@ -699,9 +645,7 @@ def save_config(fname,values):
         pipe.write (i)
     if pipe.close ():
         raise 'urg'
-#@nonl
-#@-node:maphew.20100223163802.3750:save_config
-#@+node:maphew.20100223163802.3764:write_installed
+#@+node:maphew.20100223163802.3764: *3* write_installed
 def write_installed ():
     # ''' Record package in install.db '''
     file = open (installed_db, 'w')
@@ -711,8 +655,7 @@ def write_installed ():
     if file.close ():
         raise 'urg'
 
-#@-node:maphew.20100223163802.3764:write_installed
-#@+node:maphew.20100223163802.3766:write_filelist
+#@+node:maphew.20100223163802.3766: *3* write_filelist
 def write_filelist (lst):
     # ''' Record installed files in package manifest (etc/setup/packagename.lst.gz) '''
     os.chdir(config)
@@ -723,10 +666,8 @@ def write_filelist (lst):
         pipe.write ('\n')
     if pipe.close ():
         raise 'urg'
-#@-node:maphew.20100223163802.3766:write_filelist
-#@-node:maphew.20100308085005.1381:Writers
-#@+node:maphew.20100308085005.1382:Parsers
-#@+node:maphew.20100223163802.3754:get_setup_ini
+#@+node:maphew.20100308085005.1382: ** Parsers
+#@+node:maphew.20100223163802.3754: *3* get_setup_ini
 def get_setup_ini ():
     # '''Parse setup.ini into package name, description, version, dependencies, etc.'''
     global dists
@@ -768,13 +709,11 @@ def get_setup_ini ():
             records[key] = value
             j = j + 1
         packages[name] = records
-#@-node:maphew.20100223163802.3754:get_setup_ini
-#@+node:maphew.20100223163802.3760:join_ball
+#@+node:maphew.20100223163802.3760: *3* join_ball
 def join_ball (t):
     return t[0] + '-' + version_to_string (t[1])
 
-#@-node:maphew.20100223163802.3760:join_ball
-#@+node:maphew.20100223163802.3761:split_ball
+#@+node:maphew.20100223163802.3761: *3* split_ball
 def split_ball (p):
     # ''' Parse version number from package archive name ''' 
     # mc-4.6.0a-20030721-1.tar.bz2
@@ -784,8 +723,7 @@ def split_ball (p):
         print '\n\n*** Error parsing version numer from "%s"\n\n' % (p)
     return (m.group (1), string_to_version (m.group (2)))
 
-#@-node:maphew.20100223163802.3761:split_ball
-#@+node:maphew.20100223163802.3762:string_to_version
+#@+node:maphew.20100223163802.3762: *3* string_to_version
 def string_to_version (s):
     # bash-2.05b-9
     # return map (string.atoi, (string.split (re.sub ('[.-]', ' ', s))))
@@ -797,8 +735,7 @@ def string_to_version (s):
         return x
     return tuple (map (try_atoi, (string.split (s, ' '))))
 
-#@-node:maphew.20100223163802.3762:string_to_version
-#@+node:maphew.20100223163802.3763:version_to_string
+#@+node:maphew.20100223163802.3763: *3* version_to_string
 def version_to_string (t):
     #return '%s-%s' % (string.join (map (lambda x: "%d" % x, t[:-1]), '.'),
     #         t[-1])
@@ -809,19 +746,15 @@ def version_to_string (t):
     return '%s-%s' % (string.join (map (try_itoa, t[:-1]), '.'),
               t[-1])
 
-#@-node:maphew.20100223163802.3763:version_to_string
-#@-node:maphew.20100308085005.1382:Parsers
-#@+node:maphew.20100223163802.3758:no_package
+#@+node:maphew.20100223163802.3758: ** no_package
 def no_package (s='error'):
     sys.stderr.write ("%s: %s not in [%s]\n" % (s, packagename, distname))
 
-#@-node:maphew.20100223163802.3758:no_package
-#@+node:maphew.20100302221232.1486:psort (disabled)
+#@+node:maphew.20100302221232.1486: ** psort (disabled)
 #def psort (lst): #Raises "AttributeError: 'function' object has no attribute 'sort'" use sorted() instead
 #    plist.sort (lst)
 #    return lst
-#@-node:maphew.20100302221232.1486:psort (disabled)
-#@+node:maphew.20100223163802.3765:post_install
+#@+node:maphew.20100223163802.3765: ** post_install
 def post_install ():
     # ''' Run postinstall batch files and update package manifest 
     #     to catch those files not included in the package archive. 
@@ -881,9 +814,8 @@ def post_install ():
 
         except OSError, e:
             print >>sys.stderr, "Execution failed:", e
-#@-node:maphew.20100223163802.3765:post_install
-#@+node:maphew.20100223163802.3771:Building from source
-#@+node:maphew.20100223163802.3767:do_unpack
+#@+node:maphew.20100223163802.3771: ** Building from source
+#@+node:maphew.20100223163802.3767: *3* do_unpack
 
 ###########################
 ##TODO: remove do_unpack, do_build, build, source ??
@@ -912,8 +844,7 @@ def do_unpack ():
     if not os.path.exists ('%s/%s' % (SRC, packagename)):
         raise 'urg2'
 
-#@-node:maphew.20100223163802.3767:do_unpack
-#@+node:maphew.20100223163802.3768:do_build
+#@+node:maphew.20100223163802.3768: *3* do_build
 def do_build ():
     src = '%s/%s' % (SRC, packagename)
     if not os.path.exists (src):
@@ -938,8 +869,7 @@ def do_build ():
 
     os.system ('mknetrel %s' % namever)
 
-#@-node:maphew.20100223163802.3768:do_build
-#@+node:maphew.20100223163802.3769:build
+#@+node:maphew.20100223163802.3769: *3* build
 def build ():
     '''build package from source in CWD'''
     global packagename
@@ -947,8 +877,7 @@ def build ():
         packagename = os.path.basename (CWD)
     do_build ()
 
-#@-node:maphew.20100223163802.3769:build
-#@+node:maphew.20100223163802.3770:source
+#@+node:maphew.20100223163802.3770: *3* source
 def source ():
     '''download, build and install'''
     global packagename
@@ -965,16 +894,14 @@ def source ():
         sys.exit (0)
 
 
-#@-node:maphew.20100223163802.3770:source
-#@-node:maphew.20100223163802.3771:Building from source
 #@-others
 ###########################
 #Main
 ###########################
 if __name__ == '__main__':
 
-    #@    <<globals>>
-    #@+node:maphew.20100307230644.3841:<<globals>>
+    #@+<<globals>>
+    #@+node:maphew.20100307230644.3841: ** <<globals>>
     OSGEO4W_ROOT = ''
     if 'OSGEO4W_ROOT' in os.environ.keys ():
         OSGEO4W_ROOT = os.environ['OSGEO4W_ROOT']
@@ -994,10 +921,9 @@ if __name__ == '__main__':
     setup_bak = config + '/setup.bak'
     installed_db = config + '/installed.db'
     installed_db_magic = 'INSTALLED.DB 2\n'
-    #@-node:maphew.20100307230644.3841:<<globals>>
-    #@nl
-    #@    <<parse command line>>
-    #@+node:maphew.20100307230644.3842:<<parse command line>>
+    #@-<<globals>>
+    #@+<<parse command line>>
+    #@+node:maphew.20100307230644.3842: ** <<parse command line>>
     (options, files) = getopt.getopt (sys.argv[1:],
                       'dhi:m:r:t:s:x',
                       ('download', 'help', 'mirror=', 'root='
@@ -1052,10 +978,9 @@ if __name__ == '__main__':
 
     dists = 0
     distnames = ('curr', 'test', 'prev')
-    #@-node:maphew.20100307230644.3842:<<parse command line>>
-    #@nl
-    #@    <<post-parse globals>>
-    #@+node:maphew.20100307230644.3844:<<post-parse globals>>
+    #@-<<parse command line>>
+    #@+<<post-parse globals>>
+    #@+node:maphew.20100307230644.3844: ** <<post-parse globals>>
     last_mirror = get_config('last-mirror')
     last_cache = get_config('last-cache')
 
@@ -1076,10 +1001,9 @@ if __name__ == '__main__':
     #print "Last cache:\t%s\nLast mirror:\t%s" % (last_cache, last_mirror)
     #print "Using mirror:\t%s" % (mirror)
     #print "Saving to:\t%s" % (cache_dir)
-    #@-node:maphew.20100307230644.3844:<<post-parse globals>>
-    #@nl
-    #@    <<run the commands>>
-    #@+node:maphew.20100307230644.3843:<<run the commands>>
+    #@-<<post-parse globals>>
+    #@+<<run the commands>>
+    #@+node:maphew.20100307230644.3843: ** <<run the commands>>
     if command == 'setup':
         setup ()
         sys.exit (0)
@@ -1103,14 +1027,10 @@ if __name__ == '__main__':
 
         if command and command in __main__.__dict__:
             __main__.__dict__[command] ()
-    #@-node:maphew.20100307230644.3843:<<run the commands>>
-    #@nl
-    #@    <<wrap up>>
-    #@+node:maphew.20100307230644.3845:<<wrap up>>
+    #@-<<run the commands>>
+    #@+<<wrap up>>
+    #@+node:maphew.20100307230644.3845: ** <<wrap up>>
     save_config('last-mirror', mirror)
     save_config('last-cache', cache_dir)
-    #@-node:maphew.20100307230644.3845:<<wrap up>>
-    #@nl
-
-#@-node:maphew.20100611162141.2545:@thin apt.py
+    #@-<<wrap up>>
 #@-leo
