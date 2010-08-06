@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #@+leo-ver=4-thin
-#@+node:maphew.20100510140007.7282:@thin apt.py
+#@+node:maphew.20100611162141.2545:@thin apt.py
 #@@first
 #@<<docstring>>
 #@+node:maphew.20100307230644.3846:<<docstring>>
@@ -40,6 +40,13 @@ import shlex
 #@-node:maphew.20100307230644.3847:<<imports>>
 #@nl
 #@+others
+#@+node:maphew.20100611162141.2543:bzr test
+#@+at
+# testing to see if I can use bazaar as a seamless frontend for svn..
+#@-at
+#@@c
+#@nonl
+#@-node:maphew.20100611162141.2543:bzr test
 #@+node:maphew.20100223163802.3718:usage
 ###########################
 #Usage
@@ -1104,5 +1111,6 @@ if __name__ == '__main__':
     save_config('last-cache', cache_dir)
     #@-node:maphew.20100307230644.3845:<<wrap up>>
     #@nl
-#@-node:maphew.20100510140007.7282:@thin apt.py
+
+#@-node:maphew.20100611162141.2545:@thin apt.py
 #@-leo
