@@ -405,7 +405,12 @@ def do_install ():
 
     # unpack
     os.chdir (root)
-    pipe = tarfile.open (ball,'r:bz2')
+	# very strange, on some files opening the tarfile with bz2 argument doesn't work
+	# http://lists.osgeo.org/pipermail/osgeo4w-dev/2011-January/001202.html
+	# in any case the docs say transparent decompression via plain 'r' is recommended.
+	#   http://docs.python.org/library/tarfile.html
+    #pipe = tarfile.open (ball,'r:bz2')
+    pipe = tarfile.open(ball,'r')
     lst = pipe.getnames()
     pipe.extractall()
     pipe.close()
@@ -906,7 +911,7 @@ if __name__ == '__main__':
     if 'OSGEO4W_ROOT' in os.environ.keys ():
         OSGEO4W_ROOT = os.environ['OSGEO4W_ROOT']
         os.putenv('OSGEO4W_ROOT_MSYS', OSGEO4W_ROOT) # textreplace.exe needs this (post_install)
-        OSGEO4W_ROOT = string.replace(OSGEO4W_ROOT, '\\', '/') # convert backslash to foreslash
+        OSGEO4W_ROOT = string.replace(OSGEO4W_ROOT, '\\', '/') # convert 2x backslash to foreslash
     else:
        sys.stderr.write ('error: Please set OSGEO4W_ROOT\n')
        sys.exit (2)
