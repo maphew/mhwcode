@@ -116,7 +116,7 @@ def find ():
     hits = []
     for packagename in sorted (installed[0].keys ()):
         for i in get_filelist ():
-            if re.search (regexp, '/%s' % i):
+            if re.search (regexp, '/%s' % i, re.IGNORECASE):
                 hits.append ('%s: /%s' % (packagename, i))
     print (string.join (hits, '\n'))
 
@@ -312,6 +312,7 @@ def update ():
     ini = open(setup_ini, 'w')
     ini.write(uncompressedData)
     ini.close
+
 #@+node:maphew.20100223163802.3734: *3* upgrade
 def upgrade ():
     '''all installed packages'''
