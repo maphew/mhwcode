@@ -33,7 +33,7 @@ set homedir=%cd%
 
 :Excludes
 	del xcopy_exclude.txt
-	for %%g in (.svn tests xcopy_exclude.txt install-o4w-extras.bat) do (
+	for %%g in (.svn tests xcopy_exclude.txt install-o4w-extras.bat *.reg) do (
 		echo %%g >> xcopy_exclude.txt
 		)
 	goto :eof
