@@ -97,7 +97,7 @@ def available():
 
 #@+node:maphew.20100223163802.3720: *3* ball
 def ball ():
-    '''print tarball name'''
+    '''print full path name of package archive'''
     print get_ball ()
 
 #@+node:maphew.20100223163802.3721: *3* download
@@ -110,7 +110,7 @@ def download ():
 
 #@+node:maphew.20100223163802.3722: *3* find
 def find ():
-    '''package containing file'''
+    '''package containing file (from installed packages)'''
     global packagename
     regexp = re.sub ('^%s/' % root, '/', packagename)
     hits = []
@@ -241,7 +241,7 @@ def requires ():
 
 #@+node:maphew.20100223163802.3731: *3* search
 def search ():
-    '''search package list'''
+    '''search package list for X'''
     global packagename
     regexp = packagename
     packages = []
@@ -269,7 +269,7 @@ def search ():
 
 #@+node:maphew.20100223163802.3732: *3* setup
 def setup ():
-    '''cygwin environment'''
+    '''skeleton installed packages environment'''
     if not os.path.isdir (root):
         sys.stderr.write ('Root dir not found, creating %s\n' % root)
         os.makedirs (root)
@@ -321,7 +321,7 @@ def upgrade ():
 
 #@+node:maphew.20100223163802.3735: *3* url
 def url ():
-    '''print tarball url'''
+    '''print package archive path, relative to mirror root'''
     print get_url ()[0]
 
 #@+node:maphew.20100223163802.3736: *3* version
@@ -877,7 +877,8 @@ def do_build ():
 
 #@+node:maphew.20100223163802.3769: *3* build
 def build ():
-    '''build package from source in CWD'''
+    # commented docstring hides this unused function from usage message
+    # '''build package from source in CWD'''
     global packagename
     if not packagename:
         packagename = os.path.basename (CWD)
@@ -885,7 +886,8 @@ def build ():
 
 #@+node:maphew.20100223163802.3770: *3* source
 def source ():
-    '''download, build and install'''
+    # commented docstring hides this unused function from usage message    
+    # '''download, build and install'''
     global packagename
     # let's not do dependencies
     #for packagename in missing.keys ():
