@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #@+leo-ver=5-thin
-#@+node:maphew.20100510140007.7282: * @thin apt.py
+#@+node:maphew.20100310210915.1371: * @file o4w\apt\apt.py
 #@@first
 #@+<<docstring>>
 #@+node:maphew.20100307230644.3846: ** <<docstring>>
@@ -236,9 +236,13 @@ def remove ():
 
 #@+node:maphew.20100223163802.3730: *3* requires
 def requires ():
-    '''print requires: for package'''
-    print string.join (get_requires (), '\n')
-
+    '''report package dependencies'''
+    depends = get_requires()
+    depends.sort()
+    # display as vertical list, one item per line.
+    print string.join(depends, '\n')
+    ## display as horizontal list, all on one line
+    #print string.join (depends)
 #@+node:maphew.20100223163802.3731: *3* search
 def search ():
     '''search package list for X'''
@@ -266,7 +270,6 @@ def search ():
         if d:
             s += ' - %s' % d[1:-1]
         print s
-
 #@+node:maphew.20100223163802.3732: *3* setup
 def setup ():
     '''skeleton installed packages environment'''
