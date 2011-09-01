@@ -16,8 +16,8 @@
   beginning July 2008 
 
 '''
-svn_version = '$Revision: 1174$'
-svn_date = '$LastChangedDate$'
+svn_version = '$Rev$'
+svn_date = '$Date$'
 #@-<<docstring>>
 #@@language python
 #@@tabwidth -4
