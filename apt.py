@@ -16,6 +16,8 @@
   beginning July 2008 
 
 '''
+svn_version = '$Revision: 1174$'
+svn_date = '$LastChangedDate$'
 #@-<<docstring>>
 #@@language python
 #@@tabwidth -4
@@ -44,6 +46,7 @@ def usage ():
     global setup_ini
     global mirror
     global root
+    print '-={ apt %s - %s }=-\n'% (svn_version, svn_date)    
     # FIXME: list only usable command line parameters, not all functions
     # SOLVED: omit '''comment''' after function name, only those are listed
       # better:  use parsopt instead, #53 http://trac.osgeo.org/osgeo4w/ticket/53
