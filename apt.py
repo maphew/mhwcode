@@ -46,7 +46,7 @@ def usage ():
     global setup_ini
     global mirror
     global root
-    print '-={ apt %s (%s) }=-\n'% (svn_version, svn_id)    
+    print '-={ %s }=-\n'% (str.strip(svn_id, ' $'))    
     # FIXME: list only usable command line parameters, not all functions
     # SOLVED: omit '''comment''' after function name, only those are listed
       # better:  use parsopt instead, #53 http://trac.osgeo.org/osgeo4w/ticket/53
