@@ -1,0 +1,302 @@
+------------------------------------------------------------------------------
+mhw * 20-Dec-2k
+
+backup: "orig.{file.apr}"
+:s = Search, :r = Replace
+
+gvim: A unix based text editor which has been ported to Win32. Vim can be used in scritps for automatic execution.
+	v:\apps\editors\*vim*
+
+------------------------------------------------------------------------------
+X:\rgn_update\dcooley\C\kienzler\Tombstone\TOMSTONE\hiproj.apr
+
+:s	c:/kienzler/
+:r	x:/rgn_update/dcooley/C/kienzler/
+
+:s	d:/rrgis/arcdata/250k/base/
+:r	z:/arcdata/250k/base/
+
+:s	qwtr
+:r	qwtc
+
+Opens successfully (excepting AV extensions not installed on my computer)
+
+
+--- Initial Conclusions ---
+
+Simply replacing the paths and cover names allows the project to be open more or less successfully.
+
+
++Problems+
+
+'Single Symbol' themes are okay but none of the other legend types are. For example:
+
+	Old Qctr has these attribs:
+
+		shape fnode tnode lpoly# rpoly# length qctr# qctr-id z feature encode excode alt1
+
+	New Qctr has exactly the same attributes, with the same definitions, plus a few more:
+
+		con_date map_number z_metric
+
+	The project opens with no error messages, the QCTR cover is in the legend (type: grad. colour) however the QCTR cover does not display in the View window. Changing the legend type to Single does not work - the theme must be added anew.
+
+------------------------------------------------------------------------------
+X:\rgn_update\dcooley\C\ACTIVE\DAWSON REGION\mooseTrend\2000\moose00.apr
+
+:s 	c:/active
+:r	x:/rgn_update/dcooley/C/active
+
+:s	d:/rrgis
+:r	z:/
+
+:s	"rr250.access"
+:r	"base 250k.transportation"
+
+:s 	"rr250.river"
+:r	"base 250k.watercourse"
+
+:s	"rr250.water"
+:r	"base 250k.waterbody"
+
+:s	"rr250k.contour"
+:r	"base 250k.elevation"
+
+:s	"rr250k.forest"
+:r	"base 250k.forest"
+
+
+Good news! Themes accessed via libraries are *not* susceptible to the attribute mismatch problem encountered above. Even the layouts apear to complete and intact.
+
++Problems+
+
+  -APR cannot be opened via 2x-click ("project cannot be opened"). Is okay via File > Open Project tho'
+
+  -Theme:Waterbodies changed to solid green - at least I think it changed, I can't picture them using green instead of blue.
+
+      Q: How can we verify the new/altered legends are the same as the old when we can't open the projects in their original condition?
+
+
+
+------------------------------------------------------------------------------
+02-Jan-2001 * mhw
+
+X:\rgn_update\dcooley\c\kienzler\tombstone\tomstone\imported files\tombstone.apr
+
+_gvimrc:
+	set ic #ignore case on
+
+gvim:
+	#substitute 'c:/' with 'x:/rgn_update/dcooley/c/'
+	:s/Path:\t"c:\//Path:\t"x:\/rgn_update\/dcooley\/c\/
+
+	#substitute 'd:/rrgis' with 'z:'
+	:s/Path:\t"d:\/rrgis/z:/
+
+	:s/rr250.access/base\ 250k.transportation/
+
+no libraries present, no changes made.
+
++Problems+
+
+  -the .apr references covers (c:/kienzler/mail/...) which either
+  	a) no longer exists on Dorothy's machine, or
+  	b) was not copied from Dorothy's machine to our server
+
+    Q: How do we (automagically) determine which case, A or B, applies?
+    Q: Do we leave an .apr with missing data as broken or attempt to fix?
+
+------------------------------------------------------------------------------
+x:\rgn_update\dcooley\C\active\dawson region\outfitters\camap.apr
+
+gvim:
+   # open file
+   :e x:\rgn_update\dcooley\C\active\dawson region\outfitters\camap.apr
+
+   # backup file
+   :w x:\rgn_update\dcooley\C\active\dawson region\outfitters\orig.camap.apr
+
+   # execute replacement script
+   :source! x:\rgn_update\replace.vim
+
+	# contents of replace.vim script:
+	:%sno/Path:\t"c\:\//Path:\t"x:\/rgn_update\/dcooley\/c\/
+	:%sno/Path:\t"d:\/rrgis/Path:\t"z:/
+	:%sno/"rr250\.water/"base\ 250k\.waterbody/
+	:%sno/"rr250\.access/"base\ 250k\.transportation/
+	:%sno/"rr250\.river/"base\ 250k\.watercourse/
+	:%sno/"rr250\.contour/"base\ 250k\.elevation/
+	:%sno/"rr250\.forest/"base\ 250k\.forest/
+	:%sno/"rr1000\.coast/"base\ 1000k\.coast/
+	:%sno/"rr1000\.water/"base\ 1000k\.water/
+	:%sno/"rr1000\.river/"base\ 1000k\.river/
+	:%sno/"rr1000\.ice/"base\ 1000k\.ice/
+	:%sno/"rr1000\.contour/"base\ 1000k\.contour/
+	:%sno/"rr1000\.hypsometry/"base\ 1000k\.hypsometry/
+	:%sno/"rr1000\.access/"base\ 1000k\.access/
+	:%sno/"rr1000\.places/"base\ 1000k\.places/
+	:%sno/"rr1000\.ocean/"base\ 1000k\.ocean/
+
+   # save changes
+   :w x:\rgn_update\dcooley\C\active\dawson region\outfitters\camap.apr
+
+
++Problems+
+
+  -this .apr references the *2nd to last* RRGIS library
+
+   Q: Do we attempt to fix this, break it, or leave it alone?
+
+      a) Fixing it would basically mean a complete iteration of what we are already doing, but one level deeper/older. I don't like the idea.
+
+      b) break it: change D:/OLDRRGIS path references to Z:/. These themes will now be un-openable (user will be prompted with the "Where is..." dialog box).
+
+      c) leave it: make sure we don't change any D:/OLDRRGIS path references. The project file should open normally on the user's machine, however we won't be able to test it here (we will get the "where is...")
+
+  -further changes in data structure: 1mill covers have been changed to standard naming convention (border => mborder, codist => mcodist, ...)
+
+
+  - APRs which contain references to the 'oldrrgis' data can be found in x:\rgn_update\dcooley\oldrrgis.txt.
+  Generated with:
+
+	for /f %a  in (apr-list-rrgis.txt) do find "oldrrgis" %a >>oldrrgis.txt
+
+  and then empty finds manually removed.
+
+
+------------------------------------------------------------------------------
+10-Jan-2001 * mhw
+x:\rgn_update\dcooley\C\active\dawson region\tombstone\moose\momar00.apr
+
+gvim:
+	:e x:\rgn_update\dcooley\C\active\dawson region\tombstone\moose\momar00.apr
+	:w x:\rgn_update\dcooley\C\active\dawson region\tombstone\moose\orig.momar00.apr
+	:source! x:\rgn_update\replace.vim
+
+and project opens successfully!
+
+------------------------------------------------------------------------------
+10-Jan-2001 * mhw
+
+backed up all project files at once with:
+
+   X:\rgn_update\dcooley>for /r %a in (*.apr) do copy "%~fa" "%~dpna.orig.apr"
+
+------------------------------------------------------------------------------
+10-Jan-2001 * mhw
+x:\rgn_update\dcooley\C\active\dawson region\tombstone\tscnotes\basemap.apr
+
+attempted automated replace with:
+   gvim "{path}\basemap.apr" -s ..\replace.vim
+
++Problems+
+   -project is already broken, references cchrlocs.dbf in current dir while the dbf file is in a subdir.
+
+      Q: Is it better leave these as broken or attempt to fix them?
+
+   -project references "lib250", which I assume is another 2nd to last library.
+
+   **project references "d:/rrgis/250k/qpark" instead of "d:/rrgis/250k/boundaries/qpark".
+   Same is true for for all of the admin boundaries. This must mean this machine has an intermediate library structure (eg: not last, not 2nd-to-last, but somewhere in the middle. Before the /250k/boundary/ dir structure was implemented.)
+
+      -modified script to change '/50k/q*' to '250k/boundary/q*',
+       'lib250' to '250k'.
+
+       seems to work.
+
+------------------------------------------------------------------------------
+10-Jan-2001 * mhw
+x:\rgn_update\dcooley\C\active\fortymile caribou\harvest plans\yukon\ytharv.apr
+
+gvim "{path}\ytharv.apr" -s ..\replace2.vim
+
+works
+
+------------------------------------------------------------------------------
+10-Jan-2001 * mhw
+x:\rgn_update\dcooley\C\active\fortymile caribou\newmaps\avdata\historic.apr
+
+previously broken project.
+
+
+------------------------------------------------------------------------------
+15-Jan-2001 * mhw
+x:\rgn_update\modonahue\c\My Documents\AV_Files\Bonnet Plume\avProject\vegetation plots 1999.apr
+
+-ran 'gvim {path\projectfile.apr} -s ..\replace2.vim'
+
++Problems+
+
+   -project references toponomy shapefiles which don't exist in new repository
+   (z:/arcdata/arcview/common/1000k/base/toponymy/mountains.shp)
+
+      opt1: leave pointing to d:\rrgis\...
+
+      opt2: change to Z: and leave project as broken
+
+      opt:3 ??
+
+
+------------------------------------------------------------------------------
+22-February-2001 * mhw * (Vince Fraser, Mayo)
+x:\rgn_update\vfraser 
+
+	c:\vince\> for /r %a in (*.apr) do copy "%a" "%a.orig"
+	c:\vince\> start x:\rgn_update\set-vim.bat
+	c:\vince\> for /r %a in (*.apr) do vim -s //x/rgn_update/replace.vim "%a"
+	
+Success! All of the project files saved in the last month open properly!
+
+x:\rgn_update\modonahue
+
+all of the above, and .... it works! 
+
+	(oops! a little too hasty there! it's broke :(()
+
+
+------------------------------------------------------------------------------
+20-March-2001 * mhw * 
+
+okay, I think I've found a way to make this work on all machines. All you *should* have to do is run the batch file x:\upgrade-all.bat like this:
+
+	x:\set-vim.bat
+	c:
+	cd \av-stuff
+	x:\upgrade-all
+
+which will upgrade all .apr's under current the directory.
+
+ -X: needs to be mapped to \\killerbee\rgn_update
+
+ 	net use x: /delete
+ 	net use x: \\killerbee\rgn_update
+
+-The new script makes it's own .orig backup so you don't need to do the "for ...do"  thing anymore (in addition to the regular ~ backup files)
+
+-there is a new file x:\build-replace.vim which is what replaces "for...do". It is annotated, comments begin with :"
+
+-x:\replace.vim should only have :w at the end, otherwise only the first file in the todo list is processed. So :q now lives in build-replace.vim.
+
+Look for .apr's which get missed. It's possible that funny characters in the filename may cause problems (eg: &$^ etc.).
+	-confirmed, number sign (#) causes problems, fixed.
+
+
+From NT cmd, this will restore the original APR, and delete the backups:
+
+	for /r %a in (*.*~) do del "%a"
+	for /r %a in (*.orig) do echo y|copy "%a" "%~dpna" & del "%a"
+	
+	
+
+	
+
+------------------------------------------------------------------------------
+TODO
+------------------------------------------------------------------------------
+
+- access to a win95 machine to test the upgrade-all batch file
+
+- better performance may be gained by copying \\killerbee\rgn_update to a local server and mapping X: to it. (the user backup directories can be safely excluded).
+
+- write batch file for only processing a single APR at a time. (maybe not really necessary since a person could just drill down to the end of their directory tree and run upgrade-all.bat from there).
+

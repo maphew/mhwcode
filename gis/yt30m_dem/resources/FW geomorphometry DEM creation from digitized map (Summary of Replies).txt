@@ -1,0 +1,447 @@
+From:	Marcus.Waterreus
+Sent:	04 January 2001 10:03
+To:	Gerry.Perrier; Matt.Wilkie
+Subject:	FW: [geomorphometry] DEM creation from digitized map (Summary of Replies)
+
+Follow Up Flag:	Follow up
+Flag Status:	Flagged
+Here's a DEM discussion that snowballed. Thought you might be interested. Are you guys already tuned into the Geomorphometry discussion group? If so I won't forward any more stuff.
+Marcus
+
+-----Original Message-----
+From:	Gallant, John (CLW, Canberra) [SMTP:John.Gallant@cbr.clw.csiro.au]
+Sent:	Sunday, December 17, 2000 3:12 PM
+To:	'geomorphometry@egroups.com'
+Subject:	RE: [geomorphometry] DEM creation from digitized map (Summary of Replies)
+
+ -----Original Message-----
+ From: abedini@succ.shirazu.ac.ir [mailto:abedini@succ.shirazu.ac.ir]
+ Sent: Sunday, 17 December 2000 22:46
+ To: geomorphometry@egroups.com
+ Subject: [geomorphometry] DEM creation from digitized map
+ 
+Dear all
+ 
+ I was wondering if anyone out there has any experience with 
+ preparation of
+ DEM from digitized map. By this, I mean if someone digitized 
+ a map, how
+ could it be possible to convert the resulting file into a DEM 
+ file for the
+ area under consideration? The original map was a contour map 
+ for the area
+ 
+ Thanks
+ Abedini
+
+************************************************************************************
+Dear Abedini,
+
+Turning contours into a grid DEM is fairly routine exercise and there
+are a number of programs that will do it. I am familiar with ANUDEM
+(also available in Arc/Info as the TOPOGRID command), which does a
+good job of interpolating between contours and maintaining stream
+connectivity. ANUDEM can also make use of directed stream lines to
+indicate which way the surface drains which is particularly useful
+when contour lines are widely spaced in flat areas. ANUDEM is one of
+the products of the Centre for Resource and Environmental Studies,
+http://cres.anu.edu.au/outputs/software.html.
+
+I think most GISs can do interpolation from contours. There are many 
+algorithms available, but some are better than others. Inverse distance 
+weighting is simple and quick but is of lower quality than kriging or 
+spline-based methods. Terrain-specific methods (such as ANUDEM) that 
+preserve ridge and valley lines and maintain drainage connectivity are
+generally better than general purpose interpolation methods.
+
+Regards,
+
+--
+John Gallant                                   John.Gallant@cbr.clw.csiro.au
+Butler Laboratory
+CSIRO Land and Water, GPO Box 1666,            Phone   +61 2 6246 5734
+Canberra, ACT, 2601, AUSTRALIA                 Fax     +61 2 6246 5965
+
+*****************************************************************************************
+Dear List-Members,
+
+I admit, that I have an axe to grind on this one, but I suggest couple of
+references concerning this particular case:
+
+Oksanen, J. & Jaakkola, O. (2000). Interpolation and accuracy of
+contour-based raster DEMs. Reports of the Finnish Geodetic Institute 2000:2.
+32 p.
+
+Jaakkola, O & Oksanen, J. (2000). Interpolation techniques which save
+terrain morphology: Creating DEMs from contour lines. GIM International, 14:
+9, 46-49.
+
+From these you'll find comparisons of several contour-based DEM
+interpolation techniques and their suitability especially for Finnish
+topography (= old shield are carved by the latest glaciation).
+
+> -----Original Message-----
+> From: Gallant, John (CLW, Canberra)
+> ...I think most GISs can do interpolation from contours. There are many
+> algorithms available, but some are better than others. Inverse distance
+> weighting is simple and quick but is of lower quality than kriging or
+> spline-based methods...
+
+This is the most common mistake, that people do when they start the
+contour-DEM interpolation. The methods that John listed (eg. IDW or SPLINE)
+are CONTOURING techniques for POINT data. But, sparse point data is much
+worse descriptor of surface, than the contour lines. For example: a one
+contour pair makes a clear restriction of "legal" elevation values between
+them, point data does not include any restriction like this. Therefore, the
+point interpolation techniques should not be used with contour lines. Of
+course it is possible to take sample of points from contours, but then we
+throw away a lot of surface specific information, such as aspects and
+steepest slopes.
+
+You should also be very careful with spline-based techniques, such as
+TOPOGRID (or ANUDEM algorithm), because in certain topography, the
+undershoot and overshoot errors might not be acceptable. Steep slope close
+to flat terrain is very dangerous... (seven meter undershoot error in one of
+our test areas, source data has 2.5 m contour interval!)
+
+Sincerely Yours,
+
+--------------------------------------------------------------------
+Mr. Juha Oksanen (M.Sc.)                tel.   +358-9-2955 5283
+Finnish Geodetic Institute              fax.   +358-9-2955 5200
+Dept. of Cartography & Geoinformatics   email: Juha.Oksanen@fgi.fi
+
+
+******************************************************************************************
+Further to the email exchange below - I have done quite a lot of research
+comparing different methods of creating DEMs from contours - the most recent
+results were reported in :
+
+Wise S.M. (2000) Assessing the quality for hydrological applications of
+digital elevation models derived from contours. Hydrological Processes 14,
+1909-1929
+
+I can certainly confirm what John says about the superiority of
+ANUDEM/TopoGrid over general purpose methods. Triangulation-based methods
+would be good, if you could get a decent triangulation - unfortunately there
+are several well known problems with triangulating contours which means that
+a good triangulation is difficult to achieve.
+
+I didn't actually use kriging in my tests - I assumed that the results would
+be the same as inverse distance weighting, since this is how kriging
+actually interpolates - the only difference is that the weights are based on
+the input data. However the problems with these approaches when applied to
+contours are that most heights are interpolated from points on the two
+bounding contours, which results in a 'wedding-cake' like DEM. I assume this
+would be the same for kriging - can anyone confirm this?
+
+Cheers
+
+Steve
+
+
+----------------------------------------------------------------------------
+---
+Stephen Wise
+Department of Geography
+University of Sheffield
+Sheffield S10 2TN
++44 114 222 7940 (direct)
++44 114 279 7912 (fax)
+http://www.shef.ac.uk/geography/staff/smw/smw.html
+
+********************************************************************************************
+There have been a number of replies to this question on interpolation of
+contours to generate a DEM.  I too am part of a team which has been,
+and still is, looking at better methods for terrain reconstruction using, in
+part, contours.  Of course, there is nothing special about contours, but
+they tend to be common.
+
+I think an important point to realise is that there is no ultimate "best DEM"
+that you can generate from contours.  The "best DEM" depends on how
+you want to use the DEM that's generated.  If you're interested in
+maintaining an assumed network of hydrology, then methods such as
+ANUDEM probably will give a more acceptable result than, say, TIN. 
+Then again, this advantage tends to be more obvious in low-relief
+topography (if I am generalising, say Australia) than in topographic
+regimes where the hydrology is very strongly constrained by the strong
+slopes, as is certainly the case in a lot of areas in New Zealand (for
+instance).  Then again, if maintaining the hydrological networks is not
+something you absolutely MUST follow, then ANUDEM might not be the
+best answer.  For instance, we have shown that ANUDEM gives an
+inferior result (expressed in terms of error bias and rms error from an
+independent gold standard reference DEM) compared to a DEM
+generated when the hydrological constraints are withdrawn and linear
+interpolator of our own design is used.  Then again, such a simple linear
+terrain interpolation might not be good for some visualisation work since it
+introduces visual artifacts.
+
+So, I don't think it's a matter of finding the best technique, it's a matter of
+asking really searching questions about what you want to use the DEM
+for, what information you can add to the DEM generation problem, and
+what constraints in the DEM interpolation process you are prepared to
+sacrifice to get the best result, given your constraints.  Unfortunately,
+many reviews of interpolation techniques have implicit assumptions
+about how these constraints are weighted, and it makes a comparison
+between methods difficult, sometimes impossible.
+
+Stephen
+-----
+Dr Stephen McNeill
+Landcare Research
+Box 69
+Lincoln
+New Zealand
+
+Phone:   +64-3-325 6701 extension 2226
+FAX:     +64-3-325 2418
+Email:   mcneills@landcare.cri.nz
+WWW: http://www.landcare.cri.nz
+
+**********************************************************************************************
+I've already had one go at this topic, but I hope you can tolerate a 
+couple of follow-up comments.
+
+Juha Oksanen's comment about pairs of contour lines specifying a bound
+on elevations is a good point, and this should be respected by a good
+quality interpolation method. ANUDEM/TOPOGRID does not do this and it
+does indeed have problems with overshoot at abrupt changes in slope,
+because of the continuity assumptions of the underlying spline model.
+Steve Wise's paper shows an example of this. The other thing Steve's
+paper illustrates is the problem of biasing towards contour elevations,
+which is quite noticeable in ANUDEM/TOPOGRID (but not as bad as some 
+other methods). I believe Mike Hutchinson is revising ANUDEM to deal
+with that now.
+
+Juha's other point about contour lines containing more information than
+just elevation is also worth reinforcing. Contours are not just a 
+collection of spot heights, they also directly encode aspect and
+plan curvature, and indirectly represent ridge and valley lines.
+ANUDEM/TOPOGRID enforces linear interpolation along ridge and valley
+lines inferred from contour shape to improve the representation of
+those terrain features.
+
+At this stage there isn't (to my knowledge) any perfect method, and
+as Stephen McNeill pointed out the best DEM depends on what you want
+to do with it. It seems most of the problems have been solved by
+different people, so maybe DEM users should be encouraging the
+DEM program developers to get together and pool their knowledge and 
+experience to overcome the known deficiencies in the existing methods.
+
+--
+John Gallant                                   John.Gallant@cbr.clw.csiro.au
+Butler Laboratory
+CSIRO Land and Water, GPO Box 1666,            Phone   +61 2 6246 5734
+Canberra, ACT, 2601, AUSTRALIA                 Fax     +61 2 6246 5965
+
+**************************************************************************************************
+This is an interesting discussion and one that seems to emphasise the useful
+role of e-lists. the comment regarding the application of a DEM being
+integral in its quality is important.  Those of us who use Synthetic
+Aperture Radar have to use DEMs to radiometrically correct our satellite
+data. However if you look in the literature then you will see the use of
+'50m DEMs' (in itself poor terminology presumably mean a DEM with a 50m
+pixel size)...when you have 12.5m pixels in a satellite image then your 50m
+DEM will not correct for the topographic effects of a pixel with any degree
+of accuracy unless you terrain is regular.  DEM generation is therefore
+important.  The use of digitised maps can only muliply potential errors and
+the discussion here is a useful highlight of the issues (thanks).  Would any
+happen to know of a recent review article? Or oucld someone summarise some
+useful papers I could follow up with.
+Cheers
+Ian
+
+***********************************************************************************************
+SAR is one of the few cases I can think of where terrain slope
+reconstruction accuracy is probably as important as height accuracy, if
+not more so, since the slope affects the bulk radiometry and the
+polarisation phase response so much.  Of course, an analagous problem
+also arises in the optical BRDF, but the issue is exacerbated in the SAR
+case.  The literature is deparately thin on the inter-relationship between
+terrain height and slope errors (and errors at higher order) and most
+RS/GIS systems are in the dark ages in the algorithms they use for the
+estimation of slope.  We're doing some work on slope reconstruction
+now, mainly stimulated by our use of multi-polarisation SAR in hilly
+terrain, but it's a can of worms.
+
+Stephen
+-----
+Dr Stephen McNeill
+Landcare Research
+Box 69
+Lincoln
+New Zealand
+
+Phone:   +64-3-325 6701 extension 2226
+FAX:     +64-3-325 2418
+Email:   mcneills@landcare.cri.nz
+WWW: http://www.landcare.cri.nz
+
+***********************************************************************************************
+Hi Folks,
+
+I've been watching the discussion on the generation of DTMs from contours with
+interest. When I was a student (of land surveying) the quality guidelines for
+contours was plus or minus 0.25 * the interval. I'd be very interested if 
+anyone had investigated generation of a "fuzzy" DTM taking this factor into
+account.
+
+Regards
+
+Richard
+
+****************************************************************************************************
+Thanks for the comment about the accuracy of contours. In my work I have
+deliberatley not considered the accuracy of the contours themselves. I have
+simply focused on the extent to which the DTM reflects the terrain as
+described by the original contours - many interpolation methods produce a
+DTM which doesn't agree with the original contours in some cases (e.g.
+overshoots in the case of spline based methods). It would be a fairly simple
+matter to add in a variation of 25% of the contour interval and see the
+effect.
+
+25% seems a huge variation to me - I'm sure that in some cases ths will
+translate to an enormous range of possible horizontal positions for a
+contour in an area of low slope
+
+Steve
+----------------------------------------------------------------------------
+---
+Stephen Wise
+Department of Geography
+University of Sheffield
+Sheffield S10 2TN
++44 114 222 7940 (direct)
++44 114 279 7912 (fax)
+http://www.shef.ac.uk/geography/staff/smw/smw.html
+
+**************************************************************************************************
+DTMs can be smoothed or small amounts of error added to improve surface
+representation for specific uses. One example is presented by Peter Burrough
+et al. in a paper on landform classification using fuzzy clustering -- Fuzzy
+Sets and Systems (2000) 113:37-52. I recommend this paper and also the one
+by MacMillan et al. in the same issue (pp81-109) of that journal to readers
+of this list interested in landform generation using DEMs.
+
+I've never seen anyone adding 25% error to a contour-derived DEM.
+
+Brian Slater
+School of Natural Resources
+The Ohio State University
+2021 Coffey Road, Columbus OH 43210
+Phone 614/292-5891 Fax 614/292-7432
+slater.39@osu.edu
+
+**********************************************************************************************
+> When I was a student (of land surveying) the quality guidelines for
+> contours was plus or minus 0.25 * the interval. I'd be very interested if 
+> anyone had investigated generation of a "fuzzy" DTM taking this factor
+> into account.
+
+We've thought about it, but it is more dificult than it seems.  First, as
+someone pointed out, a shift of quarter of a contour interval could
+drastically alter the apparent position of features in low-slope areas,
+when we *know* those features are pretty fixed.  Second, we've
+generally found the traditional surveying guidelines to be a conservative
+description of error that doesn't match the true statistical description of
+contour error, and it follows that a reconstruction solely based on this
+approach is likely to be erroneous.
+
+Having said this, we are trying a few methods to see what comes out of
+allowing "fuzz" in the contours - at least to see what artifacts turn up. 
+No conclusions yet.
+
+This is turning out to be quite an interesting little topic line isn't it ?
+
+Stephen
+-----
+Dr Stephen McNeill
+Landcare Research
+Box 69
+Lincoln
+New Zealand
+
+Phone:   +64-3-325 6701 extension 2226
+FAX:     +64-3-325 2418
+Email:   mcneills@landcare.cri.nz
+WWW: http://www.landcare.cri.nz
+
+*******************************************************************************************
+Hi there,
+
+This contour line discussion is great, let me add my contribution.
+Sometime ago, I came across a paper written at the Technical University of
+Vienna about the improvement of DEM extracted from contour lines. I
+thought that was an interesting one. You can look it up at:
+http://www.ipf.tuwien.ac.at/veroeffentlichungen/dh_p_isprs98/dh_p_isprs98.html
+
+Happy Christmas to all of you, and keep talking about line issues, they
+are very interesting.
+
+Thomas
+
+********************************************************************************************************
+This is turning out to be quite an interesting little topic line isn't it ?
+
+
+Here's a link to work done on interpolating DTM's from contour lines
+conducted at UZürich:
+
+http://www.geo.unizh.ch/~benni/b_3.html
+
+*********************************************************************************************************
+> I've been watching the discussion on the generation of DTMs from contours with
+> interest. When I was a student (of land surveying) the quality guidelines for
+> contours was plus or minus 0.25 * the interval. I'd be very interested if 
+> anyone had investigated generation of a "fuzzy" DTM taking this factor into
+> account.
+
+Hunter & Goodchild, 1993, took the USGS standard: "90% of elevations 
+values will be within 1/2 of a contour interval" to define a theoretical 
+model of elevation magnitude uncertainty. That paper was fleshed out in 
+Hunter & Goodchild (1995). The other two citations show models of 
+representing elevation uncertainty. These four papers use statistical 
+models to represent elevation magnitude uncertainty.
+
+When Richard was asking for "fuzzy DTM", did he specifically desire a 
+DTM representation that could be used in a fuzzy logic environment? The 
+research I've read proposing fuzzy logic DTM models have only created 
+representations of magnitude. Statistical models dovetail nicely with 
+geostatistical methods allowing both magnitude and pattern 
+representations of DTM.
+
+sincerely, chuck
+
+"Visualizing Spatial Data Uncertainty Using Animation," by Charles R. Ehlschlaeger,
+
+Ashton M. Shortridge, and Michael F. Goodchild. Computers in GeoSciences: Published 
+
+Vol. 23, No 4, 1997, and at URL: http://geography.hunter.cuny.edu/~chuckCGFinal/paper.htm 
+
+and http://www.elsevier.nl/locate/cgvis/
+
+
+"Modeling Uncertainty in Elevation Data for Geographical Analysis," by Charles R. 
+
+Ehlschlaeger, and Ashton M. Shortridge. Proceedings of the 7th International Symposium on 
+
+Spatial Data Handling, Delft, Netherlands, August 1996. 
+
+URL: http://geography.hunter.cuny.edu/~chuck/SDH96/paper.html
+
+Hunter G. J., M. F. Goodchild (1993). Managing Uncertainty in Spatial 
+Databases: Putting Theory into Practice, Proceedings, URISA '93 
+Conference, Atlanta GA.
+
+Hunter, G. J., and Goodchild, M. F., 1995, Dealing with Errors in 
+Spatial Databases: A Simple Case Study. Photogrammetric Engineering & 
+Remote Sensing, 61, 529-537.
+-- 
+Chuck Ehlschlaeger 212-772-5321
+Dep. of Geography  fax: 914-407-2029
+Hunter College     chuckre@home.com
+695 Park Ave.      secure: chuckre@hushmail.com
+New York, NY 10021 http://geography.hunter.cuny.edu/~chuck/
+
+"Everybody is in favor of the First Amendment, but we'd have a hell
+of a time ratifying it today." Senator (VT) Patrick J. Leahy
