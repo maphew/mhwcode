@@ -1,5 +1,5 @@
-#@+leo-ver=4-thin
-#@+node:maphew.20100428145300.1263:@file extract-pdf-img.py
+#@+leo-ver=5-thin
+#@+node:maphew.20100428145300.1263: * @file extract-pdf-img.py
 # Extract jpg's from pdf's. Quick and dirty.
 import sys
 
@@ -37,6 +37,4 @@ while True:
 
     njpg += 1
     i = iend
-#@nonl
-#@-node:maphew.20100428145300.1263:@file extract-pdf-img.py
 #@-leo
