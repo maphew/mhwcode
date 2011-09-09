@@ -1,9 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-#
+#@+leo-ver=5-thin
+#@+node:maphew.20110908163305.1242: * @file register-python.py
+#@@first
+#@@first
+#@@language python
+#@@tabwidth -4
+#@+others
+#@+node:maphew.20110908224431.1214: ** register-python declarations
 # script to register Python 2.0 or later for use with win32all
 # and other extensions that require Python registry settings
 #
-# written by Joakim L�w for Secret Labs AB / PythonWare
+# written by Joakim Löw for Secret Labs AB / PythonWare
 #
 # modified by Matt Wilkie for OSGeo4W
 #
@@ -30,9 +38,10 @@ pythonkey = "PythonPath"
 pythonpath = "%s;%s\\Lib\\;%s\\DLLs\\" % \
         (our_installpath, our_installpath, our_installpath)
 
+#@+node:maphew.20110908224431.1215: ** get_existing
 def get_existing(hkey, pycore_regpath):
     ''' retrieve existing python registrations '''
-    #TODO: retrieve install path, to know what program existing reg belong to
+
     if hkey == 'Current':
         try:
             key = OpenKey(HKEY_CURRENT_USER, pycore_regpath)
@@ -46,22 +55,19 @@ def get_existing(hkey, pycore_regpath):
             #print WindowsError()
             return
 
-    versions = []
-    version_path = {}
     i = 0
+    versions = {}
     while True:
         try:
-            versions.append (EnumKey (key, i))
-            ver = versions[i]   # e.g. '2.7'
-            install_path = QueryValue(key, ver + '\\installpath')   # e.g. HKLM/SOFTWARE/Python/PythonCore/2.7/InstallPath
-            version_path[ver] = install_path
-            #print install_path
+            ver = (EnumKey (key, i))                                      # e.g. '2.7'
+            install_path = QueryValue(key, ver + '\\installpath')  # e.g. HKLM\\SOFTWARE\\Python\\PythonCore\\2.7\\InstallPath
+            versions[ver] = install_path                                   # e.g. {'2.7' = 'C:\\Python27'}
             i += 1
-            print ver, version_path[ver]
+            # print versions
         except EnvironmentError:
             break
     return versions
-
+#@+node:maphew.20110908224431.1216: ** RegisterPy
 def RegisterPy(pycore_regpath, version):
     ''' put this python install into registry '''
     pycore_regpath = pycore_regpath + version
@@ -89,25 +95,29 @@ def RegisterPy(pycore_regpath, version):
     print "*** Unable to register!"
     print "*** You probably have another Python installation!"
 
+#@-others
 #---
 CurrentUser = get_existing('Current',pycore_regpath)
 AllUsers = get_existing('All',pycore_regpath)
 print '''
     Existing Current User python version(s):  %s
-    Existing All Users python version(s):\t  %s
-''' % (CurrentUser, AllUsers)
+    Existing All Users python version(s):     %s
+''' % (CurrentUser, AllUsers.keys())
 
 if CurrentUser:
     match = True if our_version in CurrentUser else False
+    versions = CurrentUser
 elif AllUsers:
     match = True if our_version in AllUsers else False
+    versions = AllUsers
 else:
     RegisterPy(pycore_regpath,our_version)
 
 try:
     if match:
-        print 'Our version (%s) already registered. Skipping...' % (our_version)
+        print 'Our version (%s) already registered to "%s". Skipping...' % (our_version, versions[our_version])
 except:
     pass
 
 #-- the end
+#@-leo
