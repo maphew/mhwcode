@@ -3,7 +3,7 @@
 # script to register Python 2.0 or later for use with win32all
 # and other extensions that require Python registry settings
 #
-# written by Joakim Löw for Secret Labs AB / PythonWare
+# written by Joakim Lï¿½w for Secret Labs AB / PythonWare
 #
 # modified by Matt Wilkie for OSGeo4W
 #
@@ -46,16 +46,21 @@ def get_existing(hkey, pycore_regpath):
             #print WindowsError()
             return
 
-    subkeys = []
+    versions = []
+    version_path = {}
     i = 0
     while True:
         try:
-            subkeys.append (EnumKey (key, i))
+            versions.append (EnumKey (key, i))
+            ver = versions[i]   # e.g. '2.7'
+            install_path = QueryValue(key, ver + '\\installpath')   # e.g. HKLM/SOFTWARE/Python/PythonCore/2.7/InstallPath
+            version_path[ver] = install_path
+            #print install_path
             i += 1
-            #print subkeys
+            print ver, version_path[ver]
         except EnvironmentError:
             break
-    return subkeys
+    return versions
 
 def RegisterPy(pycore_regpath, version):
     ''' put this python install into registry '''
