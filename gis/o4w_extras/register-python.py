@@ -109,10 +109,15 @@ def RegisterPy(pycore_regpath, version):
 CurrentUser = get_existing('Current',pycore_regpath)
 AllUsers = get_existing('All',pycore_regpath)
 
-print '''
-    Existing Current User python version(s):  %s
-    Existing All Users python version(s):     %s
-''' % (CurrentUser.keys(), AllUsers.keys())
+if CurrentUser:
+    print '\nFound in Current User:'
+    for key in CurrentUser:
+        print "\n\t%s - %s\n" % (key, CurrentUser[key])
+if AllUsers:
+    print '\nFound in All Users:'
+    for key in AllUsers:
+        print "\n\t%s - %s\n" % (key, AllUsers[key])
+                
 
 # see if any existing registrations match our python version
 # and if not, register ours
@@ -127,7 +132,7 @@ else:
 
 try:
     if match:
-        print 'Our version (%s) already registered to "%s". Skipping...' % (our_version, versions[our_version])
+        print '\nOur version (%s) already registered to "%s", skipping...' % (our_version, versions[our_version])
 except:
     pass
 
