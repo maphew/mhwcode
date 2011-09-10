@@ -4,10 +4,8 @@
 #@+node:maphew.20110908163305.1242: * @file register-python.py
 #@@first
 #@@first
-#@@language python
-#@@tabwidth -4
-#@+others
-#@+node:maphew.20110908224431.1214: ** register-python declarations
+#@+<<docstring>>
+#@+node:maphew.20110909213512.1219: ** <<docstring>>
 # script to register Python 2.0 or later for use with win32all
 # and other extensions that require Python registry settings
 #
@@ -24,20 +22,30 @@
 #   Doesn't detect existing python registrations on 64bit machines,
 #   see http://www.mail-archive.com/python-list@python.org/msg266397.html
 #
+
+#@-<<docstring>>
+#@@language python
+#@@tabwidth -4
+#@+<<imports>>
+#@+node:maphew.20110908224431.1214: ** <<imports>>
 import sys
 from _winreg import *
 
+#@-<<imports>>
+#@+others
+#@+node:maphew.20110909213512.1220: ** environment & variables
 # grab some details of python environment running this script
-# tweak as necessary
 our_version = sys.version[:3]
 our_installpath = sys.prefix
 
+# the registry key paths we'll be looking at & using
 pycore_regpath = "SOFTWARE\\Python\\Pythoncore\\"
 installkey = "InstallPath"
 pythonkey = "PythonPath"
+
 pythonpath = "%s;%s\\Lib\\;%s\\DLLs\\" % \
         (our_installpath, our_installpath, our_installpath)
-
+        
 #@+node:maphew.20110908224431.1215: ** get_existing
 def get_existing(hkey, pycore_regpath):
     ''' retrieve existing python registrations '''
@@ -96,14 +104,18 @@ def RegisterPy(pycore_regpath, version):
     print "*** You probably have another Python installation!"
 
 #@-others
-#---
+
+# look for existing python registrations
 CurrentUser = get_existing('Current',pycore_regpath)
 AllUsers = get_existing('All',pycore_regpath)
+
 print '''
     Existing Current User python version(s):  %s
     Existing All Users python version(s):     %s
-''' % (CurrentUser, AllUsers.keys())
+''' % (CurrentUser.keys(), AllUsers.keys())
 
+# see if any existing registrations match our python version
+# and if not, register ours
 if CurrentUser:
     match = True if our_version in CurrentUser else False
     versions = CurrentUser
