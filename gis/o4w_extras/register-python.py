@@ -33,6 +33,26 @@ from _winreg import *
 
 #@-<<imports>>
 #@+others
+#@+node:maphew.20110914213235.1221: ** parse command line
+__version__ = '2011-09-14.20:47'
+# print '-={ %s }=-\n'% (str.strip(svn_id, ' $'))    
+#@verbatim
+#@url http://www.doughellmann.com/PyMOTW/argparse/
+
+import argparse, sys
+
+# url http://stackoverflow.com/questions/4042452/display-help-message-with-python-argparse-when-script-is-called-without-any-argum
+# display the usage message when it is called with no arguments
+class MyParser(argparse.ArgumentParser):
+    def error(self, message):
+        sys.stderr.write('error: %s\n' % message)
+        self.print_help()
+        sys.exit(2)
+
+parser=MyParser()
+parser.add_argument('action', help='one of "install" or "remove" ')
+args = vars(parser.parse_args())
+
 #@+node:maphew.20110909213512.1220: ** environment & variables
 # grab some details of python environment running this script
 our_version = sys.version[:3]
@@ -105,36 +125,44 @@ def RegisterPy(pycore_regpath, version):
 
 #@-others
 
-# look for existing python registrations
-CurrentUser = get_existing('Current',pycore_regpath)
-AllUsers = get_existing('All',pycore_regpath)
+if args['action']=='install':
+    print args
+    # look for existing python registrations
+    CurrentUser = get_existing('Current',pycore_regpath)
+    AllUsers = get_existing('All',pycore_regpath)
+    
+    if CurrentUser:
+        print '\nFound in Current User:'
+        for key in CurrentUser:
+            print "\n\t%s - %s\n" % (key, CurrentUser[key])
+    if AllUsers:
+        print '\nFound in All Users:'
+        for key in AllUsers:
+            print "\n\t%s - %s\n" % (key, AllUsers[key])
+                    
+    
+    # see if any existing registrations match our python version
+    # and if not, register ours
+    if CurrentUser:
+        match = True if our_version in CurrentUser else False
+        versions = CurrentUser
+    elif AllUsers:
+        match = True if our_version in AllUsers else False
+        versions = AllUsers
+    else:
+        RegisterPy(pycore_regpath,our_version)
+    
+    try:
+        if match:
+            print '\nOur version (%s) already registered to "%s", skipping...' % (our_version, versions[our_version])
+    except:
+        pass
 
-if CurrentUser:
-    print '\nFound in Current User:'
-    for key in CurrentUser:
-        print "\n\t%s - %s\n" % (key, CurrentUser[key])
-if AllUsers:
-    print '\nFound in All Users:'
-    for key in AllUsers:
-        print "\n\t%s - %s\n" % (key, AllUsers[key])
-                
+if args['action']=='remove':
+    print args
 
-# see if any existing registrations match our python version
-# and if not, register ours
-if CurrentUser:
-    match = True if our_version in CurrentUser else False
-    versions = CurrentUser
-elif AllUsers:
-    match = True if our_version in AllUsers else False
-    versions = AllUsers
-else:
-    RegisterPy(pycore_regpath,our_version)
-
-try:
-    if match:
-        print '\nOur version (%s) already registered to "%s", skipping...' % (our_version, versions[our_version])
-except:
-    pass
-
+if not 'install' or 'remove' in args:
+    print 'jhlp'
+            
 #-- the end
 #@-leo
