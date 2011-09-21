@@ -41,7 +41,7 @@ __version__ = '2011-09-14.20:47'
 
 import argparse, sys
 
-# url http://stackoverflow.com/questions/4042452/display-help-message-with-python-argparse-when-script-is-called-without-any-argum
+# @url http://stackoverflow.com/questions/4042452/display-help-message-with-python-argparse-when-script-is-called-without-any-argum
 # display the usage message when it is called with no arguments
 class MyParser(argparse.ArgumentParser):
     def error(self, message):
@@ -95,6 +95,18 @@ def get_existing(hkey, pycore_regpath):
         except EnvironmentError:
             break
     return versions
+#@+node:maphew.20110920221105.1383: ** look for existing python registrations
+CurrentUser = get_existing('Current',pycore_regpath)
+AllUsers = get_existing('All',pycore_regpath)
+
+if CurrentUser:
+    print '\nFound in Current User:'
+    for key in CurrentUser:
+        print "\n\t%s - %s\n" % (key, CurrentUser[key])
+if AllUsers:
+    print '\nFound in All Users:'
+    for key in AllUsers:
+        print "\n\t%s - %s\n" % (key, AllUsers[key])
 #@+node:maphew.20110908224431.1216: ** RegisterPy
 def RegisterPy(pycore_regpath, version):
     ''' put this python install into registry '''
@@ -123,23 +135,67 @@ def RegisterPy(pycore_regpath, version):
     print "*** Unable to register!"
     print "*** You probably have another Python installation!"
 
-#@-others
+#@+node:maphew.20110920221105.1385: ** De-registerPy
+def deRegisterPy(pycore_regpath, version):
+    ''' remove this python install from registry '''
+    pycore_regpath = pycore_regpath + version
+    try:
+        reg = OpenKey(HKEY_LOCAL_MACHINE, pycore_regpath)
+        regVal = QueryValueEx(reg, installkey)[0]
+        print regVal
+    except EnvironmentError:
+        try:
+            # DeleteValue(reg, installkey)
+            # DeleteValue(reg, pythonkey)
+            print HKEY_LOCAL_MACHINE, pycore_regpath
+            reg = DeleteKey(HKEY_LOCAL_MACHINE, pycore_regpath)
+            CloseKey(reg)
+        except:
+            print "*** Unable to de-register!"
+            print WindowsError()
+            return
+        print "--- Python %s %s is now removed!" % (our_version, our_installpath)
+        return
+    if (QueryValue(reg, installkey) == our_installpath and
+        QueryValue(reg, pythonkey) == pythonpath):
+        CloseKey(reg)
+        print "=== Python %s is already registered!" % (our_version)
+        return
+    CloseKey(reg)
+    print "*** Unable to de-register!"
+    print "*** You probably have another Python installation!"
 
-if args['action']=='install':
-    print args
-    # look for existing python registrations
-    CurrentUser = get_existing('Current',pycore_regpath)
-    AllUsers = get_existing('All',pycore_regpath)
+#@+node:maphew.20110920221105.1381: ** do install
+def install():
+    print args                    
+    
+    # see if any existing registrations match our python version
+    # and if not, register ours
+    
+    print CurrentUser
+    print AllUsers
+    print our_version
     
     if CurrentUser:
-        print '\nFound in Current User:'
-        for key in CurrentUser:
-            print "\n\t%s - %s\n" % (key, CurrentUser[key])
-    if AllUsers:
-        print '\nFound in All Users:'
-        for key in AllUsers:
-            print "\n\t%s - %s\n" % (key, AllUsers[key])
-                    
+        match = True if our_version in CurrentUser else False
+        versions = CurrentUser
+        print 'current users', match
+    elif AllUsers:
+        match = True if our_version in AllUsers else False
+        versions = AllUsers
+        print 'allusers', match
+    else:
+        print 'elsing...'
+        RegisterPy(pycore_regpath,our_version)
+    
+    try:
+        if match:
+            print '\nOur version (%s) already registered to "%s", skipping...' % (our_version, versions[our_version])
+    except:
+        pass
+#@+node:maphew.20110920221105.1382: ** do remove
+def remove():
+    print args
     
     # see if any existing registrations match our python version
     # and if not, register ours
@@ -150,19 +206,22 @@ if args['action']=='install':
         match = True if our_version in AllUsers else False
         versions = AllUsers
     else:
-        RegisterPy(pycore_regpath,our_version)
+        print '\nOur version (%s) not registered to "%s", skipping...' % (our_version, versions[our_version])
     
     try:
         if match:
-            print '\nOur version (%s) already registered to "%s", skipping...' % (our_version, versions[our_version])
+            deRegisterPy(pycore_regpath,our_version)
     except:
-        pass
+        pass    
+#@-others
 
+# main
+if args['action']=='install':
+    install()
 elif args['action']=='remove':
-    print args
-
+    remove()
 else:
-    print 'Invalid action specified'
+    print '\nInvalid action specified. I only understand "install" and "remove". '
             
 #-- the end
 #@-leo
