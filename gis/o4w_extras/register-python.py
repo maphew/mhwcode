@@ -158,11 +158,11 @@ if args['action']=='install':
     except:
         pass
 
-if args['action']=='remove':
+elif args['action']=='remove':
     print args
 
-if not 'install' or 'remove' in args:
-    print 'jhlp'
+else:
+    print 'Invalid action specified'
             
 #-- the end
 #@-leo
