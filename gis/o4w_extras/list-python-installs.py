@@ -46,9 +46,20 @@ def list_keys():
         except EnvironmentError:
             continue
         for version_name in get_subkey_names(python_key):
+            
+            print 'version_name:', version_name
+            
             key = OpenKey(python_key, version_name)
             modification_date = QueryInfoKey(key)[2]
-            install_path = QueryValue(key, 'installpath')
+            
+            print key, modification_date
+            
+            install_path = QueryValue(key, version_name + '\\installpath')
+            # on Win7x64-pro fails with "WindowsError: [Error 2] The system cannot find the file specified"
+            # because should be opening wow6432 instead??
+            # to read: @url http://docs.python.org/library/_winreg.html#bit-specific
+            print install_path
+            
             L.append((modification_date, version_name, install_path))
     return L
 
