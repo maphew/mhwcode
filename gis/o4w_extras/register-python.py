@@ -167,14 +167,12 @@ def deRegisterPy(pycore_regpath, version):
 
 #@+node:maphew.20110920221105.1381: ** do install
 def install():
-    print args                    
+    ''' see if any existing registrations match our python version, and if not, register ours '''
     
-    # see if any existing registrations match our python version
-    # and if not, register ours
-    
-    print CurrentUser
-    print AllUsers
-    print our_version
+    print args
+    # print CurrentUser
+    # print AllUsers
+    # print our_version
     
     if CurrentUser:
         match = True if our_version in CurrentUser else False
