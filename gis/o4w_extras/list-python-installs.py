@@ -1,7 +1,15 @@
-#http://mail.python.org/pipermail/python-list/2006-January/001313.html
+#@+leo-ver=5-thin
+#@+node:maphew.20110908163305.1246: * @file list-python-installs.py
+#@@language python
+#@@tabwidth -4
+#@+others
+#@+node:maphew.20110919151420.1854: ** imports
+#@verbatim
+#@url http://mail.python.org/pipermail/python-list/2006-January/001313.html
 
 from _winreg import *
 
+#@+node:maphew.20110919151420.1855: ** get_subkey_names
 def get_subkey_names(reg_key):
     index = 0
     L = []
@@ -12,9 +20,13 @@ def get_subkey_names(reg_key):
             break
         index += 1
         L.append(name)
+    
+    print '\nget_subkey_names returning: %s\n' % (L)
+    
     return L
 
-def function_in_search_of_a_name():
+#@+node:maphew.20110919151420.1856: ** list_keys
+def list_keys():
     """
     Return a list with info about installed versions of Python.
 
@@ -40,4 +52,6 @@ def function_in_search_of_a_name():
             L.append((modification_date, version_name, install_path))
     return L
 
-function_in_search_of_a_name()
+#@-others
+list_keys()
+#@-leo
