@@ -135,32 +135,36 @@ def RegisterPy(pycore_regpath, version):
     print "*** Unable to register!"
     print "*** You probably have another Python installation!"
 
-#@+node:maphew.20110920221105.1385: ** De-registerPy
+#@+node:maphew.20110920221105.1385: ** deRegisterPy
 def deRegisterPy(pycore_regpath, version):
     ''' remove this python install from registry '''
-    pycore_regpath = pycore_regpath + version
+    pycore_regpath = pycore_regpath + version   # e.g. 'SOFTWARE\Python\Pythoncore\2.7'
     try:
         reg = OpenKey(HKEY_LOCAL_MACHINE, pycore_regpath)
-        regVal = QueryValueEx(reg, installkey)[0]
-        print regVal
+        # installpath = QueryValueEx(reg, installkey)[0] # win64
+        installpath = QueryValue(reg, installkey) # win32
+        print installpath
+        if installpath == our_installpath:
+            print 'existing python installpath matches ours (%s vs %s)' % (installpath, our_installpath)
+        print install_path, '<-- why wont this print?'
     except EnvironmentError:
         try:
-            # DeleteValue(reg, installkey)
-            # DeleteValue(reg, pythonkey)
             print HKEY_LOCAL_MACHINE, pycore_regpath
+            for subkey in ['\\InstallPath', '\\PythonPath']:
+                reg = DeleteKey(HKEY_LOCAL_MACHINE, pycore_regpath + subkey)
             reg = DeleteKey(HKEY_LOCAL_MACHINE, pycore_regpath)
             CloseKey(reg)
-        except:
-            print "*** Unable to de-register!"
+        except WindowsError:
+            print "Strange, we've hit an exception, perhaps the following will say why:"
             print WindowsError()
             return
         print "--- Python %s %s is now removed!" % (our_version, our_installpath)
         return
-    if (QueryValue(reg, installkey) == our_installpath and
-        QueryValue(reg, pythonkey) == pythonpath):
-        CloseKey(reg)
-        print "=== Python %s is already registered!" % (our_version)
-        return
+    # if (QueryValue(reg, installkey) == our_installpath and
+        # QueryValue(reg, pythonkey) == pythonpath):
+        # CloseKey(reg)
+        # print "=== Python %s is already registered!" % (our_version)
+        # return
     CloseKey(reg)
     print "*** Unable to de-register!"
     print "*** You probably have another Python installation!"
