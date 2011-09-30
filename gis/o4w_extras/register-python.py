@@ -34,11 +34,8 @@ from _winreg import *
 #@-<<imports>>
 #@+others
 #@+node:maphew.20110914213235.1221: ** parse command line
-__version__ = '2011-09-14.20:47'
-# print '-={ %s }=-\n'% (str.strip(svn_id, ' $'))    
 #@verbatim
 #@url http://www.doughellmann.com/PyMOTW/argparse/
-
 import argparse, sys
 
 # @url http://stackoverflow.com/questions/4042452/display-help-message-with-python-argparse-when-script-is-called-without-any-argum
@@ -144,12 +141,12 @@ def deRegisterPy(pycore_regpath, version):
         # installpath = QueryValueEx(reg, installkey)[0] # win64
         installpath = QueryValue(reg, installkey) # win32
         if installpath == our_installpath:
-            print 'existing python matches ours, removing...'
+            print '\nexisting python matches ours, removing...\n'
             # print '(%s vs %s)' % (installpath, our_installpath)
             for subkey in ['\\InstallPath', '\\PythonPath']:
                 DeleteKey(HKEY_LOCAL_MACHINE, pycore_regpath + subkey)
             DeleteKey(HKEY_LOCAL_MACHINE, pycore_regpath)
-            print "--- Python %s %s is now removed!" % (our_version, our_installpath)
+            print "--- Python %s, %s is now removed!" % (our_version, our_installpath)
         CloseKey(reg)
     except EnvironmentError:
         print 'EnvironmentError', EnvironmentError()
@@ -175,7 +172,7 @@ def deRegisterPy(pycore_regpath, version):
 def install():
     ''' see if any existing registrations match our python version, and if not, register ours '''
     
-    print args
+    # print args
     # print CurrentUser
     # print AllUsers
     # print our_version
@@ -189,7 +186,7 @@ def install():
         versions = AllUsers
         print 'allusers', match
     else:
-        print 'elsing...'
+        print '\nPutting python from environment into registry...\n'
         RegisterPy(pycore_regpath,our_version)
     
     try:
@@ -199,7 +196,7 @@ def install():
         pass
 #@+node:maphew.20110920221105.1382: ** do remove
 def remove():
-    print args
+    #print args
     
     # see if any existing registrations match our python version
     # and if not, register ours
