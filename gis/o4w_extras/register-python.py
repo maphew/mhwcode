@@ -143,32 +143,34 @@ def deRegisterPy(pycore_regpath, version):
         reg = OpenKey(HKEY_LOCAL_MACHINE, pycore_regpath)
         # installpath = QueryValueEx(reg, installkey)[0] # win64
         installpath = QueryValue(reg, installkey) # win32
-        print installpath
         if installpath == our_installpath:
-            print 'existing python installpath matches ours (%s vs %s)' % (installpath, our_installpath)
-        print install_path, '<-- why wont this print?'
-    except EnvironmentError:
-        try:
-            print HKEY_LOCAL_MACHINE, pycore_regpath
+            print 'existing python matches ours, removing...'
+            # print '(%s vs %s)' % (installpath, our_installpath)
             for subkey in ['\\InstallPath', '\\PythonPath']:
-                reg = DeleteKey(HKEY_LOCAL_MACHINE, pycore_regpath + subkey)
-            reg = DeleteKey(HKEY_LOCAL_MACHINE, pycore_regpath)
-            CloseKey(reg)
-        except WindowsError:
-            print "Strange, we've hit an exception, perhaps the following will say why:"
-            print WindowsError()
-            return
-        print "--- Python %s %s is now removed!" % (our_version, our_installpath)
+                DeleteKey(HKEY_LOCAL_MACHINE, pycore_regpath + subkey)
+            DeleteKey(HKEY_LOCAL_MACHINE, pycore_regpath)
+            print "--- Python %s %s is now removed!" % (our_version, our_installpath)
+        CloseKey(reg)
+    except EnvironmentError:
+        print 'EnvironmentError', EnvironmentError()
+        raise
         return
+    except WindowsError:
+        print "Strange, we've hit an exception, perhaps the following will say why:"
+        print WindowsError()
+        raise
+        return
+    # except:
+        # print 'oops. something else happened'
+        # raise
+    CloseKey(reg)
     # if (QueryValue(reg, installkey) == our_installpath and
         # QueryValue(reg, pythonkey) == pythonpath):
         # CloseKey(reg)
         # print "=== Python %s is already registered!" % (our_version)
         # return
-    CloseKey(reg)
-    print "*** Unable to de-register!"
-    print "*** You probably have another Python installation!"
-
+    # print "*** Unable to de-register!"
+    # print "*** You probably have another Python installation!"
 #@+node:maphew.20110920221105.1381: ** do install
 def install():
     ''' see if any existing registrations match our python version, and if not, register ours '''
