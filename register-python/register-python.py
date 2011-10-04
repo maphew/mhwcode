@@ -71,13 +71,15 @@ def get_existing(hkey, pycore_regpath):
         try:
             key = OpenKey(HKEY_CURRENT_USER, pycore_regpath)
         except WindowsError:
-            #print WindowsError()
+            print WindowsError()
+            # raise            
             return
     elif hkey == 'All':
         try:
             key = OpenKey(HKEY_LOCAL_MACHINE, pycore_regpath)
         except WindowsError:
-            #print WindowsError()
+            print WindowsError()
+            # raise
             return
 
     i = 0
@@ -92,18 +94,6 @@ def get_existing(hkey, pycore_regpath):
         except EnvironmentError:
             break
     return versions
-#@+node:maphew.20110920221105.1383: ** look for existing python registrations
-CurrentUser = get_existing('Current',pycore_regpath)
-AllUsers = get_existing('All',pycore_regpath)
-
-if CurrentUser:
-    print '\nFound in Current User:'
-    for key in CurrentUser:
-        print "\n\t%s - %s\n" % (key, CurrentUser[key])
-if AllUsers:
-    print '\nFound in All Users:'
-    for key in AllUsers:
-        print "\n\t%s - %s\n" % (key, AllUsers[key])
 #@+node:maphew.20110908224431.1216: ** RegisterPy
 def RegisterPy(pycore_regpath, version):
     ''' put this python install into registry '''
@@ -168,10 +158,22 @@ def deRegisterPy(pycore_regpath, version):
         # return
     # print "*** Unable to de-register!"
     # print "*** You probably have another Python installation!"
+#@+node:maphew.20110920221105.1383: ** do find existing registrations
+CurrentUser = get_existing('Current',pycore_regpath)
+AllUsers = get_existing('All',pycore_regpath)
+
+if CurrentUser:
+    print '\nFound in Current User:'
+    for key in CurrentUser:
+        print "\t%s - %s" % (key, CurrentUser[key])
+if AllUsers:
+    print '\nFound in All Users:'
+    for key in AllUsers:
+        print "\t%s - %s" % (key, AllUsers[key])
 #@+node:maphew.20110920221105.1381: ** do install
 def install():
     ''' see if any existing registrations match our python version, and if not, register ours '''
-    
+              
     # print args
     # print CurrentUser
     # print AllUsers
@@ -180,11 +182,11 @@ def install():
     if CurrentUser:
         match = True if our_version in CurrentUser else False
         versions = CurrentUser
-        print 'current users', match
+        # print 'current users', match
     elif AllUsers:
         match = True if our_version in AllUsers else False
         versions = AllUsers
-        print 'allusers', match
+        # print 'allusers', match
     else:
         print '\nPutting python from environment into registry...\n'
         RegisterPy(pycore_regpath,our_version)
@@ -193,13 +195,13 @@ def install():
         if match:
             print '\nOur version (%s) already registered to "%s", skipping...' % (our_version, versions[our_version])
     except:
-        pass
+        raise
+
 #@+node:maphew.20110920221105.1382: ** do remove
 def remove():
+    ''' see if any existing registrations match our python version and register ours if not '''
     #print args
-    
-    # see if any existing registrations match our python version
-    # and if not, register ours
+
     if CurrentUser:
         match = True if our_version in CurrentUser else False
         versions = CurrentUser
@@ -211,9 +213,11 @@ def remove():
     
     try:
         if match:
+            print '\nVersion matches ours, calling deRegisterPy...'
             deRegisterPy(pycore_regpath,our_version)
     except:
-        pass    
+        raise
+        
 #@-others
 
 # main
