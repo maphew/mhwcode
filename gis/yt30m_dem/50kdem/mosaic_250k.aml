@@ -1,0 +1,99 @@
+&severity &error &routine bail
+/* if there are commandline arguments, make them the TODO list
+&args quad:REST
+&ty --------------------------------------------------------------------------
+&ty   * [upcase %aml$file%] * Project: Updated LIMS 50k DEM * mhw * 06-Nov-2k
+&ty     ::Step 11::  (see scripts\__ReadMe.aml)
+&ty
+&ty     - mosaic NTS tiles into NTS Quads (50k => 250k)
+&ty     - resample to 90m pixels
+&ty     * make sure the tiles have been clipped to 100m buffer first! *
+&ty
+&ty     Autorun: &r %aml$file% {quad(s)}
+&ty --------------------------------------------------------------------------
+&if [null %quad%] &then &do
+   &s pause [response '<Enter> to continue, something else to abort']
+       &if not [null %pause%] &then &return %aml$file% exited by user request.
+   &end
+
+&if not [variable .library] &then &return &error Project Environment is not setup. Look for ./scripts/setenv.aml
+&workspace %.home%
+
+/* put header variables and other semi-global code here
+&set cellsize = 90
+
+/* make sure we are in GRID
+&if [locase[show program]] <> grid &then GRID
+
+/* check for quad commandline args
+&if [null %quad%] &then &set quad = [listfile * -directory]
+
+&do quad &list [unquote %quad%]
+  &workspace %quad%; &type ...entering %quad%
+
+      &set tile_list = [listfile * -workspace]
+      &CALL MAIN
+
+  &workspace  ..
+&end
+
+&if [locase[show program]] = grid &then QUIT /* exit GRID
+
+&RETURN ...[upcase %aml$fullfile%] finished normally.
+
+/*============================================================================
+&ROUTINE MAIN
+   /*-------mark workspace busy----------------------
+   &if [exists lock -file] &then &return
+   &set lockfile = [OPEN lock openstat -write]
+   &if  %openstat% = 0 &then &type ...workspace %quad% locked
+     &else &return Error %openstat% opening lockfile
+   /*------------------------------------------------
+      /* dems
+      &s tiles =
+      &if not [exists dem_30m -grid] &then &do
+         /* if flat lake dem exists, use that, else use the regular dem
+         &do grd &list [unquote %tile_list%]
+            &if not [exists %grd%\dem_flak -grid] &then
+               &s tiles = %grd%\dem,%tiles%
+               &else &s tiles = %grd%\dem_flak,%tiles%
+         &end
+         &s tiles = [trim %tiles% -right ,] /* strip trailing comma
+
+         &type ...mosaicking "%tiles%" into [upcase "%quad%\dem_30m"]
+         dem_30m = mosaic(%tiles%)
+         &end
+
+      &if not [exists dem_%cellsize%m -grid] &then &do
+         &type ...resampling to %cellsize% meter pixels
+         dem_%cellsize%m = resample(dem_30m,%cellsize%,bilinear)
+         &end
+
+      /* hillshades
+      &if not [exists shade_30m -grid] &then &do
+            &type ...building 30 meter hillshade
+            shade_%cellsize%m = hillshade(dem_%cellsize%m,315,70)
+            &end
+
+      &if not [exists shade_%cellsize%m -grid] &then &do
+            &type ...building %cellsize% meter hillshade
+            shade_%cellsize%m = hillshade(dem_%cellsize%m,315,70)
+            &end
+
+   /*-------mark workspace not busy-----------------
+   &if [close %lockfile%] = 0 &then
+     &type ...workspace %quad% unlocked
+     &else &return Error closing lockfile
+   &sys del lock
+   /*-----------------------------------------------
+&RETURN
+/*---------------------------------------------------------------------------
+/* other routines go here
+
+&routine bail
+   &if not [variable str] &then &s str Bailing out of %aml$file%...
+   &return; &return &warning %str%
+/*===========================================================================
+/* End Of MOASIAC_250K.aml
+/*===========================================================================
+
