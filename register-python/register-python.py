@@ -178,15 +178,16 @@ def install():
     # print CurrentUser
     # print AllUsers
     # print our_version
+    print '\n...installing'
     
     if CurrentUser:
         match = True if our_version in CurrentUser else False
         versions = CurrentUser
-        # print 'current users', match
+        print 'current users', match
     elif AllUsers:
         match = True if our_version in AllUsers else False
         versions = AllUsers
-        # print 'allusers', match
+        print 'Does our_version match Allusers version?', match
     else:
         print '\nPutting python from environment into registry...\n'
         RegisterPy(pycore_regpath,our_version)
@@ -194,6 +195,9 @@ def install():
     try:
         if match:
             print '\nOur version (%s) already registered to "%s", skipping...' % (our_version, versions[our_version])
+        else:
+            print '\nPutting python from environment into registry...\n'
+            RegisterPy(pycore_regpath,our_version)
     except:
         raise
 
