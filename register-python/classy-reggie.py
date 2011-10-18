@@ -21,8 +21,8 @@ class RegisteryKeyNotFound(Exception):
 
 class RegisteryKey(object):
     def __init__(self, key):
-        print '*** Self._key:', self._key
         self._key = key
+        print '*** Self._key:', self._key
 
     def _path_from(self, segments):
         if not isinstance(segments, tuple):
