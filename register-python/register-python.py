@@ -23,6 +23,21 @@
 #   see http://www.mail-archive.com/python-list@python.org/msg266397.html
 #
 
+"""
+When asked to install:
+
+If our python version and installpath is in registry: do nothing.
+If our python version and different installpath: do nothing.
+If our python is not there, add it.
+
+When asked to remove:
+
+If our python is not there: do nothing
+If our python version and different installpath: do nothing.
+If our python version and installpath is in registry: remove. 
+"""
+#@verbatim
+#@url http://codereview.stackexchange.com/questions/5217/all-tangled-up-in-if-and-elif-and-try
 #@-<<docstring>>
 #@@language python
 #@@tabwidth -4
@@ -222,6 +237,8 @@ def remove():
     except:
         raise
         
+#@+node:maphew.20111006153934.1404: ** scrapbook
+
 #@-others
 
 # main
