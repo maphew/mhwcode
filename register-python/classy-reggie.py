@@ -21,6 +21,7 @@ class RegisteryKeyNotFound(Exception):
 
 class RegisteryKey(object):
     def __init__(self, key):
+        print '*** Self._key:', self._key
         self._key = key
 
     def _path_from(self, segments):
@@ -65,9 +66,6 @@ class RegisteryKey(object):
 
     def __del__(self):
         _winreg.CloseKey(self._key)
-
-HIVE_LOCAL_MACHINE = RegisteryKey('HKEY_LOCAL_MACHINE')
-HIVE_CURRENT_USER = RegisteryKey('HKEY_CURRENT_USER')
 
 def get_existing(hive):
     ''' retrieve existing python registrations '''
@@ -169,6 +167,10 @@ def main():
         remove(all_versions)
     else:
         print '\nInvalid action specified. I only understand "install" and "remove". '
+
+
+HIVE_LOCAL_MACHINE = RegisteryKey(_winreg.HKEY_LOCAL_MACHINE)
+HIVE_CURRENT_USER = RegisteryKey(_winreg.HKEY_CURRENT_USER)
 
 if __name__ == '__main__':
     main()
