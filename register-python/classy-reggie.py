@@ -3,8 +3,8 @@
 # http://codereview.stackexchange.com/questions/5217/all-tangled-up-in-if-and-elif-and-try/5218#5218
 
 import sys
-from _winreg import *
-
+#from _winreg import *
+import _winreg
 import argparse, sys
 import os.path
 
@@ -20,7 +20,7 @@ class RegisteryKeyNotFound(Exception):
     pass
 
 class RegisteryKey(object):
-    def __init__(self, hive):
+    def __init__(self, key):
         self._key = key
 
     def _path_from(self, segments):
@@ -66,8 +66,8 @@ class RegisteryKey(object):
     def __del__(self):
         _winreg.CloseKey(self._key)
 
-HIVE_LOCAL_MACHINE = RegisteryKey(HKEY_LOCAL_MACHINE)
-HIVE_CURRENT_USER = RegisteryKey(HKEY_CURRENT_USER)
+HIVE_LOCAL_MACHINE = RegisteryKey('HKEY_LOCAL_MACHINE')
+HIVE_CURRENT_USER = RegisteryKey('HKEY_CURRENT_USER')
 
 def get_existing(hive):
     ''' retrieve existing python registrations '''
@@ -172,3 +172,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
