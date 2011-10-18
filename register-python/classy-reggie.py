@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# courtesy of Winston Ewert
+# http://codereview.stackexchange.com/questions/5217/all-tangled-up-in-if-and-elif-and-try/5218#5218
 
 import sys
 from _winreg import *
