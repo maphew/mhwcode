@@ -31,13 +31,13 @@ class RegisteryKey(object):
         return "\\".join(segments)
 
     def __getitem__(self, segments):
+        path = self._path_from(segments)
         try:
-            subkey = _winreg.OpenKey(self._key, self._path_from(segments))
+            subkey = _winreg.OpenKey(self._key, path)
         except WindowsError:
             # should really check the error
             # to make sure that key not found is the real problem
-            path = self._path_from(segments)
-            print '*** WindowsError exception reached\n\t self._key, self._path_from(segments):', self._key, path
+            print '*** WindowsError exception reached\n    self._key, self._path_from(segments):', self._key, path
             raise RegisteryKeyNotFound(path)
         return RegisteryKey(subkey)
 
@@ -47,6 +47,8 @@ class RegisteryKey(object):
 
 
     def value(self, segments):
+        print '*** RegisteryKey.value.self:', self._key, segments
+        print winreg.QueryValue(self._key, self._path_from(segments))
         return _winreg.QueryValue(self._key, self._path_from(segments))
 
     def delete(self, segments):
@@ -74,12 +76,14 @@ def get_existing(hive):
 
     try:
         key = hive[PYCORE_REGISTRY_PATH]
+        print '*** get_existing.key:', key
     except RegisteryKeyNotFound:
         return {}
 
     versions = {}
     for version in key:
-        versions[version] = version.value(INSTALL_KEY)                           # e.g. {'2.7' = 'C:\\Python27'}
+        print '*** version', version
+        versions[version] = version.value(INSTALL_KEY)  # e.g. {'2.7' = 'C:\\Python27'}
 
     return versions
 
