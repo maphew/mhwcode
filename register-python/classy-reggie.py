@@ -36,6 +36,8 @@ class RegisteryKey(object):
         except WindowsError:
             # should really check the error
             # to make sure that key not found is the real problem
+            path = self._path_from(segments)
+            print '*** WindowsError exception reached\n\t self._key, self._path_from(segments):', self._key, path
             raise RegisteryKeyNotFound(path)
         return RegisteryKey(subkey)
 
@@ -57,7 +59,7 @@ class RegisteryKey(object):
         index = 0
         while True:
             try:
-                yield RegisteryKey(EnumKey(key, index))
+                yield RegisteryKey(_winreg.EnumKey(self._key, index))
             except WindowsError:
                 # add check to make sure correct here was gotten
                 break
