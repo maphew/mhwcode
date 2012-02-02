@@ -38,6 +38,7 @@ env.workspace = wspace
 sideType = "OUTSIDE_ONLY"
 endType = "ROUND"
 dissolveType = "LIST"
+#dissolveFields = "NAME;TYPE"    # attributes we want to keep, adjust as needed 
 
 buffered_fcs = []
 for distance in distances:
