@@ -1,5 +1,5 @@
 #@+leo-ver=5-thin
-#@+node:maphew.20120201135209.1853: * @file arcplus/AttributedMultiRingBuffer.py
+#@+node:maphew.20120201135209.1853: * @file AttributedMultiRingBuffer.py
 ''' multi-ring-buffer.py: Create multiple ring buffers, keeping named attributes of parent feature class.
 
 Process:

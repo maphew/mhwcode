@@ -9,33 +9,70 @@ lightest = 80    # lowermost layer transparency %
 
 first_ring = ring_width                 # 1000
 
-
+#@+others
+#@+node:maphew.20120203121800.1759: ** get_transparency_dict
 def get_transparency_dict(darkest, lightest, steps):
     '''build dictionary of transparency percentages with specified number of steps
     Returns {0:50, 1:55, 2:60 ...}'''
     transparency_dict = {}
     stepsize = (lightest - darkest) / steps     # percent to lighten/darken each ring
     for e,i in enumerate(range(darkest, lightest, stepsize)):
-        print "Ring #",e+1, "transparency is", i
+        # print "Ring #",e+1, "transparency is", i
         transparency_dict[e + 1] = i
     return transparency_dict
-    
+#@-others
+
 transparency_dict = get_transparency_dict(darkest, lightest, num_rings)
 
-buffers = range(1,8)
-for buffer in buffers:
-    print "Buffer", buffer, transparency_dict[buffer]
-    
-    
-#def get_buffer_transparencies(first_ring, last_ring, ring_width)
+import arcpy
 
-#The plus 1 is to counteract range() which stops *at* the last number
-last_ring = ring_width * (num_rings + 1)  # 1000 * 8. 
+wspace = 'd:/s/default.gdb'
+in_fc = 'FNTT'
+out_fc = in_fc + '_buffers'
+num_rings = 7
+ring_width = 1000
+ring_type = 'INSIDE'
 
-for step,ring in enumerate(range(first_ring, last_ring, ring_width)):
-    #calc transparency for this ring (step)
-    my_transparency = transparency_dict[step+1]
+sideType = "OUTSIDE_ONLY"
+endType = "ROUND"
+dissolveType = "LIST"
+dissolveFields = "NAME;TYPE"    # attributes we want to keep, adjust as needed 
 
-    print step,"Buffer_{0} at width -{1} and transparency {2}".format(step+1, ring, my_transparency)
+arcpy.env.workspace = wspace
+
+buffered_fcs = []
+for current_ring in range(1, num_rings + 1):
+    transparency =  transparency_dict[current_ring]
+    width = str(ring_width * current_ring)
+    buf_fc = arcpy.ValidateTableName('xxx_' + out_fc + width)
     
+    print "...Buffer #{0:2d} width {1} transparency {2}".format(current_ring, width, transparency)
+    
+    if ring_type == 'INSIDE':
+        arcpy.Buffer_analysis(in_fc, buf_fc, '-'+width, sideType, endType, dissolveType, dissolveFields)
+    else:
+        arcpy.Buffer_analysis(in_fc, buf_fc, width, sideType, endType, dissolveType, dissolveFields)
+    
+    # store buffer width as attribute value
+    arcpy.AddField_management(buf_fc, 'Width', "TEXT", "", "", 16)
+    arcpy.CalculateField_management(buf_fc, 'Width', width, "PYTHON")
+    
+    # store transparency also
+    arcpy.AddField_management(buf_fc, 'Transparency', "SHORT")
+    arcpy.CalculateField_management(buf_fc, 'Transparency', transparency, "PYTHON")
+    
+    buffered_fcs.append(buf_fc)
+    
+# arrange buffers from largest to smallest width
+# so the draw order is correct after merging
+buffered_fcs.sort()
+buffered_fcs.reverse() 
+
+print("...Merging intermediate buffers into {0}".format(out_fc))
+arcpy.Merge_management(buffered_fcs, out_fc)
+
+# remove temporary intermediate files
+print("...Removing intermediate files")
+for fc in arcpy.ListFeatureClasses('xxx_*'):
+    arcpy.Delete_management(fc)
 #@-leo
