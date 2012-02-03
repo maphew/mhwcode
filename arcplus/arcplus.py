@@ -1,5 +1,5 @@
 #@+leo-ver=5-thin
-#@+node:maphew.20120201135209.1859: * @file arcplus/arcplus.py
+#@+node:maphew.20120201135209.1859: * @file arcplus.py
 ''' arcplus.py: functions missing from regular ol' arcpy module '''
 
 import os, arcgisscripting
