@@ -810,9 +810,8 @@ def post_install ():
                     lst.append(link)
 
                 for s in lst:
-                    # bin/bar.bat.tmpl --> bin/bar.bat in manifest
+                    # bin/bar.bat.tmpl --> both bin/bar.bat and bin/bar.bat.tmpl in manifest
                     if s.endswith('.tmpl'):
-                         lst.remove(s)
                          lst.append(s.replace('.tmpl',''))
                     # catch bat's which are made for py's post install
                     if s.startswith('bin/') and s.endswith('.py'):
