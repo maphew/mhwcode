@@ -440,7 +440,8 @@ def do_install ():
 def do_uninstall ():
     # ''' For package X: delete installed files & remove from manifest, remove from installed.db ''' 
     # TODO: remove empty dirs?
-
+    do_run_preremove(root, packagename)
+    
     # retrieve list of installed files
     lst = get_filelist ()
 
@@ -462,6 +463,19 @@ def do_uninstall ():
     del (installed[0][packagename])
     write_installed ()
 
+#@+node:maphew.20120222135111.1873: *3* do_run_preremove
+def do_run_preremove(root, packagename):
+    # ''' Run the etc/preremove batch files for this package '''
+    for bat in glob.glob ('%s/etc/remove/%s.bat' % (root, packagename)):
+        try:
+            retcode = subprocess.call (bat, shell=True)
+            if retcode < 0:
+                print >>sys.stderr, "Child was terminated by signal", retcode
+    
+            print >>sys.stderr, "Post_install complete, return code", retcode
+        
+        except OSError, e:
+            print >>sys.stderr, "Execution failed:", e
 #@+node:maphew.20100308085005.1380: ** Getters
 #@+node:maphew.20100223163802.3743: *3* get_ball
 def get_ball ():
