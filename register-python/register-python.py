@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-#
 #@+leo-ver=5-thin
-#@+node:maphew.20111018132336.1392: * @file register-python.py
+#@+node:maphew.20120311144705.1358: * @file B:/code/maphew/register-python/register-python.py
 #@@first
 #@@first
 #@+<<docstring>>
@@ -194,6 +194,8 @@ def install():
     # print AllUsers
     # print our_version
     print '\n...installing'
+    
+    match = False
     
     if CurrentUser:
         match = True if our_version in CurrentUser else False
