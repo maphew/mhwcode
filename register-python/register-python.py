@@ -81,7 +81,7 @@ pythonpath = "%s;%s\\Lib\\;%s\\DLLs\\" % \
 def usage():
     prog = sys.argv[0]
     print '''
-    Usage: %s {list, install, remove}\n
+    Usage: %s [list, install, remove]\n
     
         list    - report existing python installs in registry
         install - attempt to add this python to registry
@@ -218,10 +218,10 @@ def install():
     elif AllUsers:
         match = True if our_version in AllUsers else False
         versions = AllUsers
-        print 'Does our_version match Allusers version?', match
-    else:
-        print '\nPutting python from environment into registry...\n'
-        RegisterPy(pycore_regpath,our_version)
+        print '\nDoes our_version match Allusers version?', match
+    # else:
+        # print '\nPutting python from environment into registry...\n'
+        # RegisterPy(pycore_regpath,our_version)
     
     try:
         if match:
