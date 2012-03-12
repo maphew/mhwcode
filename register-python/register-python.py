@@ -42,23 +42,6 @@ from _winreg import *
 
 #@-<<imports>>
 #@+others
-#@+node:maphew.20110914213235.1221: ** parse command line
-#@verbatim
-#@url http://www.doughellmann.com/PyMOTW/argparse/
-import argparse
-
-# @url http://stackoverflow.com/questions/4042452/display-help-message-with-python-argparse-when-script-is-called-without-any-argum
-# display the usage message when it is called with no arguments
-class MyParser(argparse.ArgumentParser):
-    def error(self, message):
-        sys.stderr.write('error: %s\n' % message)
-        self.print_help()
-        sys.exit(2)
-
-# parser=MyParser()
-# actions = "list, install, remove"
-# parser.add_argument('action', help='one of: %s' % actions)
-# args = vars(parser.parse_args())
 #@+node:maphew.20110909213512.1220: ** environment & variables
 # grab some details of python environment running this script
 our_version = sys.version[:3]
@@ -240,7 +223,6 @@ def remove():
         match = True if our_version in AllUsers else False
         versions = AllUsers
     else:
-        # print '\nOur version (%s) not registered to "%s", skipping...' % (our_version, versions[our_version])
         print '\nOur version (%s, %s) not registered, skipping...' % (our_version, our_installpath)
     
     try:
@@ -265,14 +247,6 @@ if len(sys.argv) > 1:
         install()
     elif sys.argv[1] == 'remove':
         remove()
-
-    
-# if args['action']=='install':
-    # install()
-# elif args['action']=='remove':
-    # remove()
-# else:
-    # print '\nInvalid action specified. I only understand "install" and "remove". '
             
 #-- the end
 #@-leo
