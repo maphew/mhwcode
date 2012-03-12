@@ -124,11 +124,11 @@ def report_existing(CurrentUser, AllUsers):
     ''' Display existing python installs in registry '''
     print "Current python installs in registry:"
     if CurrentUser:
-        print '\nFound in Current User:'
+        print '\nCurrent User:'
         for key in CurrentUser:
             print "\t%s - %s" % (key, CurrentUser[key])
     if AllUsers:
-        print '\nFound in All Users:'
+        print '\nAll Users:'
         for key in AllUsers:
             print "\t%s - %s" % (key, AllUsers[key])
 #@+node:maphew.20110908224431.1216: *3* RegisterPy
@@ -168,7 +168,7 @@ def deRegisterPy(pycore_regpath, version):
         # installpath = QueryValueEx(reg, installkey)[0] # win64
         installpath = QueryValue(reg, installkey) # win32
         if installpath == our_installpath:
-            print '\nexisting python matches ours, removing...\n'
+            print 'Confirmed match of version# and install path, removing...\n'
             # print '(%s vs %s)' % (installpath, our_installpath)
             for subkey in ['\\InstallPath', '\\PythonPath']:
                 DeleteKey(HKEY_LOCAL_MACHINE, pycore_regpath + subkey)
@@ -203,7 +203,7 @@ def install():
     # print CurrentUser
     # print AllUsers
     # print our_version
-    print '\n...installing'
+    # print '\n...installing'
     
     match = False
     
@@ -214,10 +214,7 @@ def install():
     elif AllUsers:
         match = True if our_version in AllUsers else False
         versions = AllUsers
-        print '\nDoes our_version match Allusers version?', match
-    # else:
-        # print '\nPutting python from environment into registry...\n'
-        # RegisterPy(pycore_regpath,our_version)
+        # print '\nDoes our_version match Allusers version?', match
     
     try:
         if match:
@@ -248,7 +245,7 @@ def remove():
     
     try:
         if match:
-            print '\nVersion matches ours, calling deRegisterPy...'
+            print '\nVersion # matches ours, calling deRegisterPy...'
             deRegisterPy(pycore_regpath,our_version)
     except:
         raise
