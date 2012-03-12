@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-#
 #@+leo-ver=5-thin
-#@+node:maphew.20120311144705.1358: * @file register-python.py
+#@+node:maphew.20111018132336.1392: * @file register-python.py
 #@@first
 #@@first
 #@+<<docstring>>
@@ -151,6 +151,12 @@ def deRegisterPy(pycore_regpath, version):
         reg = OpenKey(HKEY_LOCAL_MACHINE, pycore_regpath)
         # installpath = QueryValueEx(reg, installkey)[0] # win64
         installpath = QueryValue(reg, installkey) # win32
+        
+        if not installpath == our_installpath:
+            print "\nInstall path differs, skipping removal.\n"
+            print "\tTheirs:\t%s \n\tOurs:\t%s" % (installpath, our_installpath)
+            return
+            
         if installpath == our_installpath:
             print 'Confirmed match of version# and install path, removing...\n'
             # print '(%s vs %s)' % (installpath, our_installpath)
@@ -168,17 +174,7 @@ def deRegisterPy(pycore_regpath, version):
         print WindowsError()
         raise
         return
-    # except:
-        # print 'oops. something else happened'
-        # raise
-    CloseKey(reg)
-    # if (QueryValue(reg, installkey) == our_installpath and
-        # QueryValue(reg, pythonkey) == pythonpath):
-        # CloseKey(reg)
-        # print "=== Python %s is already registered!" % (our_version)
-        # return
-    # print "*** Unable to de-register!"
-    # print "*** You probably have another Python installation!"
+    # CloseKey(reg)
 #@+node:maphew.20110920221105.1381: *3* do install
 def install():
     ''' see if any existing registrations match our python version, and if not, register ours '''
@@ -228,7 +224,7 @@ def remove():
     
     try:
         if match:
-            print '\nVersion # matches ours, calling deRegisterPy...'
+            print '\nVersion no. matches ours, calling deRegisterPy...'
             deRegisterPy(pycore_regpath,our_version)
     except:
         raise
