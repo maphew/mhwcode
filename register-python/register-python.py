@@ -39,8 +39,6 @@ If our python version and installpath is in registry: remove.
 #@verbatim
 #@url http://codereview.stackexchange.com/questions/5217/all-tangled-up-in-if-and-elif-and-try
 #@-<<docstring>>
-#@@language python
-#@@tabwidth -4
 #@+<<imports>>
 #@+node:maphew.20110908224431.1214: ** <<imports>>
 import sys
@@ -253,7 +251,8 @@ def remove():
         match = True if our_version in AllUsers else False
         versions = AllUsers
     else:
-        print '\nOur version (%s) not registered to "%s", skipping...' % (our_version, versions[our_version])
+        # print '\nOur version (%s) not registered to "%s", skipping...' % (our_version, versions[our_version])
+        print '\nOur version (%s, %s) not registered, skipping...' % (our_version, our_installpath)
     
     try:
         if match:
@@ -262,8 +261,6 @@ def remove():
     except:
         raise
         
-#@+node:maphew.20111006153934.1404: ** scrapbook
-
 #@-others
 
 # main
