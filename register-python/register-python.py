@@ -22,6 +22,7 @@ If our python version and installpath is in registry: remove.
 
 Original written by Joakim Löw for Secret Labs AB / PythonWare.
 Modified by Matt Wilkie for OSGeo4W
+    http://trac.osgeo.org/osgeo4w/ticket/114
 
 Adapted from:
   http://www.pythonware.com/products/works/articles/regpy20.htm
