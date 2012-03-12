@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-#
 #@+leo-ver=5-thin
-#@+node:maphew.20120311144705.1358: * @file B:/code/maphew/register-python/register-python.py
+#@+node:maphew.20120311144705.1358: * @file register-python.py
 #@@first
 #@@first
 #@+<<docstring>>
@@ -51,7 +51,7 @@ from _winreg import *
 #@+node:maphew.20110914213235.1221: ** parse command line
 #@verbatim
 #@url http://www.doughellmann.com/PyMOTW/argparse/
-import argparse, sys
+import argparse
 
 # @url http://stackoverflow.com/questions/4042452/display-help-message-with-python-argparse-when-script-is-called-without-any-argum
 # display the usage message when it is called with no arguments
@@ -61,10 +61,10 @@ class MyParser(argparse.ArgumentParser):
         self.print_help()
         sys.exit(2)
 
-parser=MyParser()
-parser.add_argument('action', help='one of "install" or "remove" ')
-args = vars(parser.parse_args())
-
+# parser=MyParser()
+# actions = "list, install, remove"
+# parser.add_argument('action', help='one of: %s' % actions)
+# args = vars(parser.parse_args())
 #@+node:maphew.20110909213512.1220: ** environment & variables
 # grab some details of python environment running this script
 our_version = sys.version[:3]
@@ -80,7 +80,8 @@ pythonpath = "%s;%s\\Lib\\;%s\\DLLs\\" % \
         
 #@+node:maphew.20110908224431.1215: ** get_existing
 def get_existing(hkey, pycore_regpath):
-    ''' retrieve existing python registrations '''
+    ''' Retrieve existing python registrations, 
+        returns dict like {'2.7': 'C:\\Python27'} '''
 
     if hkey == 'Current':
         try:
@@ -109,6 +110,18 @@ def get_existing(hkey, pycore_regpath):
         except EnvironmentError:
             break
     return versions
+#@+node:maphew.20110920221105.1383: ** report_existing
+def report_existing(CurrentUser, AllUsers):
+    ''' Display existing python installs in registry '''
+    print "Current python installs in registry:"
+    if CurrentUser:
+        print '\nFound in Current User:'
+        for key in CurrentUser:
+            print "\t%s - %s" % (key, CurrentUser[key])
+    if AllUsers:
+        print '\nFound in All Users:'
+        for key in AllUsers:
+            print "\t%s - %s" % (key, AllUsers[key])
 #@+node:maphew.20110908224431.1216: ** RegisterPy
 def RegisterPy(pycore_regpath, version):
     ''' put this python install into registry '''
@@ -173,18 +186,6 @@ def deRegisterPy(pycore_regpath, version):
         # return
     # print "*** Unable to de-register!"
     # print "*** You probably have another Python installation!"
-#@+node:maphew.20110920221105.1383: ** do find existing registrations
-CurrentUser = get_existing('Current',pycore_regpath)
-AllUsers = get_existing('All',pycore_regpath)
-
-if CurrentUser:
-    print '\nFound in Current User:'
-    for key in CurrentUser:
-        print "\t%s - %s" % (key, CurrentUser[key])
-if AllUsers:
-    print '\nFound in All Users:'
-    for key in AllUsers:
-        print "\t%s - %s" % (key, AllUsers[key])
 #@+node:maphew.20110920221105.1381: ** do install
 def install():
     ''' see if any existing registrations match our python version, and if not, register ours '''
@@ -222,6 +223,9 @@ def install():
 def remove():
     ''' see if any existing registrations match our python version and register ours if not '''
     #print args
+    
+    match = False
+    versions = {}
 
     if CurrentUser:
         match = True if our_version in CurrentUser else False
@@ -244,12 +248,23 @@ def remove():
 #@-others
 
 # main
-if args['action']=='install':
-    install()
-elif args['action']=='remove':
-    remove()
-else:
-    print '\nInvalid action specified. I only understand "install" and "remove". '
+CurrentUser = get_existing('Current',pycore_regpath)
+AllUsers = get_existing('All',pycore_regpath)
+report_existing(CurrentUser, AllUsers)
+
+if len(sys.argv) > 1:
+    if sys.argv[1] == 'install':
+        install()
+    elif sys.argv[1] == 'remove':
+        remove()
+        
+
+# if args['action']=='install':
+    # install()
+# elif args['action']=='remove':
+    # remove()
+# else:
+    # print '\nInvalid action specified. I only understand "install" and "remove". '
             
 #-- the end
 #@-leo
