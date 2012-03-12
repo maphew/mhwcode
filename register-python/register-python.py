@@ -45,10 +45,6 @@ import sys
 from _winreg import *
 
 #@-<<imports>>
-
-if len(sys.argv) == 1:
-    usage()
-
 #@+others
 #@+node:maphew.20110914213235.1221: ** parse command line
 #@verbatim
@@ -262,6 +258,9 @@ def remove():
         raise
         
 #@-others
+
+if len(sys.argv) == 1:
+    usage()
 
 # main
 CurrentUser = get_existing('Current',pycore_regpath)
