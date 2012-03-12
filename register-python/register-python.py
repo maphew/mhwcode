@@ -6,24 +6,8 @@
 #@@first
 #@+<<docstring>>
 #@+node:maphew.20110909213512.1219: ** <<docstring>>
-# script to register Python 2.0 or later for use with win32all
-# and other extensions that require Python registry settings
-#
-# written by Joakim Löw for Secret Labs AB / PythonWare
-#
-# modified by Matt Wilkie for OSGeo4W
-#
-# Adapted from:
-#   http://www.pythonware.com/products/works/articles/regpy20.htm
-#   http://effbot.org/zone/python-register.htm
-#   http://timgolden.me.uk/python-on-windows/programming-areas/registry.html
-#
-# Known problems:
-#   Doesn't detect existing python registrations on 64bit machines,
-#   see http://www.mail-archive.com/python-list@python.org/msg266397.html
-#
+""" Install or remove python from current environment into the Windows registry.
 
-"""
 When asked to install:
 
 If our python version and installpath is in registry: do nothing.
@@ -35,6 +19,18 @@ When asked to remove:
 If our python is not there: do nothing
 If our python version and different installpath: do nothing.
 If our python version and installpath is in registry: remove. 
+
+Original written by Joakim Löw for Secret Labs AB / PythonWare.
+Modified by Matt Wilkie for OSGeo4W
+
+Adapted from:
+  http://www.pythonware.com/products/works/articles/regpy20.htm
+  http://effbot.org/zone/python-register.htm
+  http://timgolden.me.uk/python-on-windows/programming-areas/registry.html
+
+Known problems:
+  Doesn't detect existing python registrations on 64bit machines,
+  see http://www.mail-archive.com/python-list@python.org/msg266397.html
 """
 #@verbatim
 #@url http://codereview.stackexchange.com/questions/5217/all-tangled-up-in-if-and-elif-and-try
