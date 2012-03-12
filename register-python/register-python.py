@@ -47,6 +47,10 @@ import sys
 from _winreg import *
 
 #@-<<imports>>
+
+if len(sys.argv) == 1:
+    usage()
+
 #@+others
 #@+node:maphew.20110914213235.1221: ** parse command line
 #@verbatim
@@ -78,7 +82,22 @@ pythonkey = "PythonPath"
 pythonpath = "%s;%s\\Lib\\;%s\\DLLs\\" % \
         (our_installpath, our_installpath, our_installpath)
         
-#@+node:maphew.20110908224431.1215: ** get_existing
+#@+node:maphew.20120311215800.1373: ** functions
+#@+node:maphew.20120311215800.1374: *3* usage
+def usage():
+    prog = sys.argv[0]
+    print '''
+    Usage: %s {list, install, remove}\n
+    
+        list    - report existing python installs in registry
+        install - attempt to add this python to registry
+        remove  - remove this python from registry
+        
+                  (this python is %s)
+    ''' % (prog, our_installpath)
+    sys.exit()
+        
+#@+node:maphew.20110908224431.1215: *3* get_existing
 def get_existing(hkey, pycore_regpath):
     ''' Retrieve existing python registrations, 
         returns dict like {'2.7': 'C:\\Python27'} '''
@@ -110,7 +129,7 @@ def get_existing(hkey, pycore_regpath):
         except EnvironmentError:
             break
     return versions
-#@+node:maphew.20110920221105.1383: ** report_existing
+#@+node:maphew.20110920221105.1383: *3* report_existing
 def report_existing(CurrentUser, AllUsers):
     ''' Display existing python installs in registry '''
     print "Current python installs in registry:"
@@ -122,7 +141,7 @@ def report_existing(CurrentUser, AllUsers):
         print '\nFound in All Users:'
         for key in AllUsers:
             print "\t%s - %s" % (key, AllUsers[key])
-#@+node:maphew.20110908224431.1216: ** RegisterPy
+#@+node:maphew.20110908224431.1216: *3* RegisterPy
 def RegisterPy(pycore_regpath, version):
     ''' put this python install into registry '''
     pycore_regpath = pycore_regpath + version
@@ -150,7 +169,7 @@ def RegisterPy(pycore_regpath, version):
     print "*** Unable to register!"
     print "*** You probably have another Python installation!"
 
-#@+node:maphew.20110920221105.1385: ** deRegisterPy
+#@+node:maphew.20110920221105.1385: *3* deRegisterPy
 def deRegisterPy(pycore_regpath, version):
     ''' remove this python install from registry '''
     pycore_regpath = pycore_regpath + version   # e.g. 'SOFTWARE\Python\Pythoncore\2.7'
@@ -186,7 +205,7 @@ def deRegisterPy(pycore_regpath, version):
         # return
     # print "*** Unable to de-register!"
     # print "*** You probably have another Python installation!"
-#@+node:maphew.20110920221105.1381: ** do install
+#@+node:maphew.20110920221105.1381: *3* do install
 def install():
     ''' see if any existing registrations match our python version, and if not, register ours '''
               
@@ -219,7 +238,7 @@ def install():
     except:
         raise
 
-#@+node:maphew.20110920221105.1382: ** do remove
+#@+node:maphew.20110920221105.1382: *3* do remove
 def remove():
     ''' see if any existing registrations match our python version and register ours if not '''
     #print args
@@ -257,8 +276,8 @@ if len(sys.argv) > 1:
         install()
     elif sys.argv[1] == 'remove':
         remove()
-        
 
+    
 # if args['action']=='install':
     # install()
 # elif args['action']=='remove':
