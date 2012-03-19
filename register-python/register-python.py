@@ -120,12 +120,12 @@ def RegisterPy(pycore_regpath, version):
     ''' put this python install into registry '''
     pycore_regpath = pycore_regpath + version
     try:
-        reg = OpenKey(HKEY_LOCAL_MACHINE, pycore_regpath)
+        reg = OpenKey(HKEY_CURRENT_USER, pycore_regpath)
         regVal = QueryValueEx(reg, installkey)[0]
         print regVal
     except EnvironmentError:
         try:
-            reg = CreateKey(HKEY_LOCAL_MACHINE, pycore_regpath)
+            reg = CreateKey(HKEY_CURRENT_USER, pycore_regpath)
             SetValue(reg, installkey, REG_SZ, our_installpath)
             SetValue(reg, pythonkey, REG_SZ, pythonpath)
             CloseKey(reg)
@@ -148,7 +148,7 @@ def deRegisterPy(pycore_regpath, version):
     ''' remove this python install from registry '''
     pycore_regpath = pycore_regpath + version   # e.g. 'SOFTWARE\Python\Pythoncore\2.7'
     try:
-        reg = OpenKey(HKEY_LOCAL_MACHINE, pycore_regpath)
+        reg = OpenKey(HKEY_CURRENT_USER, pycore_regpath)
         # installpath = QueryValueEx(reg, installkey)[0] # win64
         installpath = QueryValue(reg, installkey) # win32
         
@@ -161,8 +161,8 @@ def deRegisterPy(pycore_regpath, version):
             print 'Confirmed match of version# and install path, removing...\n'
             # print '(%s vs %s)' % (installpath, our_installpath)
             for subkey in ['\\InstallPath', '\\PythonPath']:
-                DeleteKey(HKEY_LOCAL_MACHINE, pycore_regpath + subkey)
-            DeleteKey(HKEY_LOCAL_MACHINE, pycore_regpath)
+                DeleteKey(HKEY_CURRENT_USER, pycore_regpath + subkey)
+            DeleteKey(HKEY_CURRENT_USER, pycore_regpath)
             print "--- Python %s, %s is now removed!" % (our_version, our_installpath)
         CloseKey(reg)
     except EnvironmentError:
