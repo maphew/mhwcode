@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #@+leo-ver=5-thin
-#@+node:maphew.20100310210915.1371: * @file o4w\apt\apt.py
+#@+node:maphew.20110428135158.2655: * @file apt.py
 #@@first
 #@+<<docstring>>
 #@+node:maphew.20100307230644.3846: ** <<docstring>>
@@ -589,6 +589,8 @@ def get_new ():
 def get_special_folder(intFolder):
     # ''' Fetch paths of Windows special folders: Program Files, Desktop, Startmenu, etc. '''
     #Written by Luke Pinner, 2010. Code is public domain, do with it what you will...
+    # todo: look at replacing with WinShell module by Tim Golden,
+    # http://winshell.readthedocs.org/en/latest/special-folders.html
     import ctypes
     from ctypes.wintypes import HWND , HANDLE ,DWORD ,LPCWSTR ,MAX_PATH , create_unicode_buffer
     SHGetFolderPath = ctypes.windll.shell32.SHGetFolderPathW
@@ -816,9 +818,13 @@ def post_install ():
 
                 # foo.bat --> foo.bat.done in manifest
                 lst = get_filelist()
-                lst.remove(bat)
-                lst.append(bat + '.done')
-
+                if bat in list:
+                    lst.remove(bat)
+                    lst.append(bat + '.done')
+                else:
+                    print """\nwarning: adding %s to install manifest failed.
+                    It will need to be removed manually when uninstalling or upgrading this package""" % done_bat
+    
                 # retrieve menu & desktop links from postinstall bats
                 for link in get_menu_links(done_bat):
                     lst.append(link)
