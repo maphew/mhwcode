@@ -103,8 +103,9 @@ def ball ():
     '''print full path name of package archive'''
     if not packagename:
             sys.stderr.write ('No package specified. Run "apt list" to see installed packages')
-    else:
-        print get_ball ()
+            return
+    
+    print get_ball ()
 
 #@+node:maphew.20100223163802.3721: *3* download
 def download ():
@@ -219,13 +220,17 @@ def listfiles ():
 #@+node:maphew.20100223163802.3726: *3* md5
 def md5 ():
     '''check md5 sum'''
+    if not packagename:
+        sys.stderr.write ('No package specified. Try running "apt list"')
+        return
+        
     url, md5 = get_url ()
     ball = os.path.basename (url)
     print '%s  %s - remote' % (md5, ball)
 
     # make sure we md5 the *file* not the *filename*
     # kudos to http://www.peterbe.com/plog/using-md5-to-check-equality-between-files
-    localFile = file(os.path.join(downloads, url), 'rb')
+    localFile = file(get_ball(), 'rb')
     my_md5 = hashlib.md5(localFile.read()).hexdigest()
 
     print '%s  %s - local' % (my_md5, ball)
