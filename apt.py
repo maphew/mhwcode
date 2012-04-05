@@ -239,7 +239,13 @@ def md5 ():
 
 #@+node:maphew.20100223163802.3727: *3* missing
 def missing ():
-    '''print missing dependencies'''
+    '''print missing dependencies for X'''
+    # FIXME: this would be more useful if it found missing for everything, 
+    # not just the named package
+    if not packagename:
+        sys.stderr.write ('No package specified. Try running "apt list"')
+        return
+    
     print string.join (get_missing (), '\n')
 
 #@+node:maphew.20100223163802.3728: *3* new
@@ -257,6 +263,8 @@ def remove ():
     global packagename
     if not packagename:
         sys.stderr.write ('No package specified. Run "apt list" to see installed packages')
+        return
+
     for packagename in files[1:]:
         if not installed[0].has_key (packagename):
             sys.stderr.write ('warning: %s not installed\n' % packagename)
@@ -269,6 +277,10 @@ def remove ():
 #@+node:maphew.20100223163802.3730: *3* requires
 def requires ():
     '''report package dependencies'''
+    if not packagename:
+        sys.stderr.write ('Please specify a package name.')
+        return
+    
     depends = get_requires()
     depends.sort()
     # display as vertical list, one item per line.
@@ -277,7 +289,7 @@ def requires ():
     #print string.join (depends)
 #@+node:maphew.20100223163802.3731: *3* search
 def search ():
-    '''search package list for X'''
+    '''search available packages list for X'''
     global packagename
     regexp = packagename
     packages = []
@@ -361,8 +373,20 @@ def url ():
 
 #@+node:maphew.20100223163802.3736: *3* version
 def version ():
-    '''print installed version'''
+    '''print installed version of X'''
     global packagename
+    if not packagename:
+        sys.stderr.write ('No package specified. Try running "apt list"')
+        return
+
+    print '%-20s%-12s' % (packagename,
+             version_to_string (get_installed_version ()))
+
+#@+node:mhw.20120404170129.1476: *3* versions
+def versions ():
+    '''print versions of all installed packages'''
+    global packagename
+            
     for packagename in sorted (installed[0].keys ()):
         if not installed[0].has_key (packagename):
             global distname
@@ -371,8 +395,6 @@ def version ():
             sys.exit (1)
         print '%-20s%-12s' % (packagename,
                  version_to_string (get_installed_version ()))
-
-
 #@+node:maphew.20100302221232.1485: ** Helper functions
 ###########################
 #Helper functions
