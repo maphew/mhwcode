@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #@+leo-ver=5-thin
-#@+node:maphew.20110428135158.2655: * @file apt.py
+#@+node:maphew.20100310210915.1371: * @file o4w\apt\apt.py
 #@@first
 #@+<<docstring>>
 #@+node:maphew.20100307230644.3846: ** <<docstring>>
@@ -194,6 +194,12 @@ def list ():
             s += '(%s)' % version_to_string (new)
         print s
 
+#@+node:mhw.20120404170129.1475: *3* listfiles
+def listfiles ():
+    '''installed with package X'''
+    for i in get_filelist():
+        print i
+    
 #@+node:maphew.20100223163802.3726: *3* md5
 def md5 ():
     '''check md5 sum'''
@@ -818,7 +824,7 @@ def post_install ():
 
                 # foo.bat --> foo.bat.done in manifest
                 lst = get_filelist()
-                if bat in list:
+                if bat in lst:
                     lst.remove(bat)
                     lst.append(bat + '.done')
                 else:
