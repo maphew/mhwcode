@@ -101,11 +101,17 @@ def available():
 #@+node:maphew.20100223163802.3720: *3* ball
 def ball ():
     '''print full path name of package archive'''
-    print get_ball ()
+    if not packagename:
+            sys.stderr.write ('No package specified. Run "apt list" to see installed packages')
+    else:
+        print get_ball ()
 
 #@+node:maphew.20100223163802.3721: *3* download
 def download ():
     '''download package'''
+    if not packagename:
+        sys.stderr.write ('No package specified. Try running "apt available"')
+    
     do_download ()
     ball ()
     print
@@ -115,6 +121,10 @@ def download ():
 def find ():
     '''package containing file (from installed packages)'''
     global packagename
+    if not packagename:
+        sys.stderr.write ('Find what? Enter a filename to look for (partial is ok).')
+        return
+    
     regexp = re.sub ('^%s/' % root, '/', packagename)
     hits = []
     for packagename in sorted (installed[0].keys ()):
@@ -136,6 +146,8 @@ def help ():
 def install ():
     '''download and install packages, including dependencies'''
     global packagename
+    if not packagename:
+        sys.stderr.write ('No package specified. Try running "apt available"')
     missing = {}
     for packagename in files[1:]:
         missing.update (dict (map (lambda x: (x, 0), get_missing ())))
@@ -197,6 +209,10 @@ def list ():
 #@+node:mhw.20120404170129.1475: *3* listfiles
 def listfiles ():
     '''installed with package X'''
+    if not packagename:
+        sys.stderr.write ('No package specified. Try running "apt list"')
+        return
+        
     for i in get_filelist():
         print i
     
@@ -234,6 +250,8 @@ def new ():
 def remove ():
     '''uninstall packages'''
     global packagename
+    if not packagename:
+        sys.stderr.write ('No package specified. Run "apt list" to see installed packages')
     for packagename in files[1:]:
         if not installed[0].has_key (packagename):
             sys.stderr.write ('warning: %s not installed\n' % packagename)
@@ -1066,6 +1084,8 @@ if __name__ == '__main__':
 
         if command and command in __main__.__dict__:
             __main__.__dict__[command] ()
+        else:
+            print '"%s" not understood, please run "apt help"' % command
     #@-<<run the commands>>
     #@+<<wrap up>>
     #@+node:maphew.20100307230644.3845: ** <<wrap up>>
