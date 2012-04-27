@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #@+leo-ver=5-thin
-#@+node:maphew.20100310210915.1371: * @file o4w\apt\apt.py
+#@+node:maphew.20110428135158.2655: * @file apt.py
 #@@first
 #@+<<docstring>>
 #@+node:maphew.20100307230644.3846: ** <<docstring>>
@@ -793,15 +793,47 @@ def join_ball (t):
     return t[0] + '-' + version_to_string (t[1])
 
 #@+node:maphew.20100223163802.3761: *3* split_ball
-def split_ball (p):
-    # ''' Parse version number from package archive name ''' 
-    # mc-4.6.0a-20030721-1.tar.bz2
-    #m = re.match ('^([^.]*)-([0-9][^-/]*-[0-9][0-9]*)(.tar.bz2)?$', p)
-    m = re.match ('^([^.]*)-([0-9].*-[0-9][0-9]*)(.tar.bz2)?$', p)
-    if not m:
-        print '\n\n*** Error parsing version numer from "%s"\n\n' % (p)
-    return (m.group (1), string_to_version (m.group (2)))
+def split_ball (filename):
+#    ''' Parse package archive name into a) package name and b) version numbers tuple (to feed into version_to_string)
+#
+#    mc-4.6.0a-20030721-12.tar.bz2
+#    
+#      mc              --> package name
+#      4.6.0a-20030721 --> upstream application version
+#      12              --> package version
+#
+#    python-numpy-2.7-1.5.1-1.tar.bz2
+#
+#      python-numpy  --> package name
+#      2.7-1.5.1     --> upstream application version
+#      1             --> package version
+#
+#      returns:
+#
+#           ('mc', (4, 6, 0a, 20030721, 12))
+#           ('python-numpy', (2, 7, 1, 5, 1, 1))
+#
+#      '''
 
+    ##m = re.match ('^([^.]*)-([0-9][^-/]*-[0-9][0-9]*)(.tar.bz2)?$', filename)    # original regex from cyg-apt
+    ##m = re.match ('^([^.]*)-([0-9].*-[0-9][0-9]*)(.tar.bz2)?$', filename)        # accept dash in app ver num
+    
+    # this regex pattern should be functionally identical to the line immediately above
+    regex = re.compile('''
+       ^       	    # beginning of line
+       ([^.]*) 	    # package name: any char except period, and any amount of them, "python-numpy"
+       -                # name/version delimiter
+       (
+           [0-9].*    # application version: any number followed by any char, any amount of them, "4.6.0a-20030721"
+           -[0-9]*    # package version: dash followed by number, "-12"
+           )
+       (\.tar\.bz2)?$
+       ''', re.VERBOSE)
+    
+    m = re.match(regex, filename)
+    if not m:
+        print '\n\n*** Error parsing version number from "%s"\n%s\n' % (filename, m)
+    return (m.group(1), string_to_version(m.group (2)))
 #@+node:maphew.20100223163802.3762: *3* string_to_version
 def string_to_version (s):
     # bash-2.05b-9
