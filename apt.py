@@ -827,6 +827,7 @@ def split_ball (filename):
            [0-9].*    # application version: any number followed by any char, any amount of them, "4.6.0a-20030721"
            -[0-9]*    # package version: dash followed by number, "-12"
            )
+       .*               # accept any trailing chars after the package version
        (\.tar\.bz2)?$
        ''', re.VERBOSE)
     
@@ -844,7 +845,7 @@ def string_to_version (s):
         if re.match ('^[0-9]*$', x):
             return string.atoi (x)
         return x
-    return tuple (map (try_atoi, (string.split (s, ' '))))
+    return tuple (map (try_atoi, (string.split (s))))
 
 #@+node:maphew.20100223163802.3763: *3* version_to_string
 def version_to_string (t):
