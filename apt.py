@@ -902,6 +902,10 @@ def post_install ():
 
                 # foo.bat --> foo.bat.done in manifest
                 lst = get_filelist()
+                
+                # ticket #281, ignore leading dot slash in filenames (./foo.bat --> foo.bat)
+                lst = [x.replace('./','') for x in lst]
+                
                 if bat in lst:
                     lst.remove(bat)
                     lst.append(bat + '.done')
