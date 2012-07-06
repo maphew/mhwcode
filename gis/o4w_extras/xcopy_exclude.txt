@@ -1,0 +1,8 @@
+.svn 
+tests 
+xcopy_exclude.txt 
+install-o4w-extras.bat 
+hkcu_py-reg_d-drive.reg 
+hklm_o4wpy-reg_23.reg 
+hklm_o4wpy-reg_d-drive.reg 
+py25_x32_default_install.reg 
