@@ -14,9 +14,10 @@ def install(*packages):
     
     import apt
     print 'apt install', ' '.join(packages)
-    apt.dists={'test': {}, 'curr': {}, 'prev' : {}}
-    apt.distname='curr'
+    apt.dists = {'test': {}, 'curr': {}, 'prev' : {}}
+    apt.distname = 'curr'
     apt.distnames = ('curr', 'test', 'prev')
+    apt.download_p = 0  # download only flag, 1=yes
     apt.files=packages
     # for p in packages:
         # apt.packagename=p
