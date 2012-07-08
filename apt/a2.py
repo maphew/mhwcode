@@ -4,31 +4,42 @@
     Adapted from the 'Fake version control system' example:
     http://plac.googlecode.com/hg/doc/plac.html#a-non-class-based-example '''
 
-import plac, apt, os
+import plac, apt, os, urllib
 
 commands = 'install','remove','update','setup'
 
 # """Set apt global variables"""
-apt.root = os.environ['OSGEO4W_ROOT']
+apt.INSTALL = 'install'
+apt.OSGEO4W_ROOT = os.environ['OSGEO4W_ROOT']
+apt.root = apt.OSGEO4W_ROOT
+apt.OSGEO4W_STARTMENU = 'OSGeo4W'
 apt.config = apt.root + '/etc/setup/'
 apt.setup_ini = apt.config + '/setup.ini'
 apt.setup_bak = apt.config + '/setup.bak'
 apt.installed_db = apt.config + '/installed.db'
 apt.installed_db_magic = 'INSTALLED.DB 2\n'
 
-apt.dists = {'test': {}, 'curr': {}, 'prev' : {}}
+apt.dists = 0
 apt.distname = 'curr'
 apt.distnames = ('curr', 'test', 'prev')
 apt.download_p = 0  # download only flag, 1=yes
+apt.depend_p = 0  # ignore dependencies flag, 1=yes
 apt.installed = 0
-apt.get_setup_ini()
+
+apt.mirror = apt.get_config('last-mirror')  # the url
+apt.mirror_dir = urllib.quote (apt.mirror, '').lower () # the local filesystem dir name
+apt.last_cache = apt.get_config('last-cache')
+apt.downloads = '%s/%s' % (apt.last_cache, apt.mirror_dir)
+
+apt.get_setup_ini() # parse setup.ini into package name, version, etc.
 apt.get_installed()
+
 
 @plac.annotations(packages='package(s) to operate on')
 def install(*packages):
     "install packages"
     
-    print 'apt install', ' '.join(packages)
+    print 'running apt install', ' '.join(packages)
     apt.files=packages
     for p in packages:
         apt.packagename=p
@@ -41,7 +52,6 @@ def remove(*packages):
     "Remove packages"
 
     print 'apt remove', ' '.join(packages)
-    # apt.installed = 0
     apt.files=packages
     for p in packages:
         apt.packagename=p
