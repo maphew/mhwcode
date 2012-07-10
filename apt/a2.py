@@ -40,6 +40,8 @@ def install(*packages):
     "install packages"
     
     print 'running apt install', ' '.join(packages)
+    packages = list(packages)
+    packages.insert(0, 'install')
     apt.files=packages
     for p in packages:
         apt.packagename=p
@@ -52,6 +54,8 @@ def remove(*packages):
     "Remove packages"
 
     print 'apt remove', ' '.join(packages)
+    packages = list(packages)
+    packages.insert(0, 'remove')
     apt.files=packages
     for p in packages:
         apt.packagename=p
