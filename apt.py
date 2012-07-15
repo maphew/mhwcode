@@ -99,24 +99,24 @@ def available():
         print '%-20s\t\t%s' % (key, value)
 
 #@+node:maphew.20100223163802.3720: *3* ball
-def ball ():
+def ball (packagename):
     '''print full path name of package archive'''
     if not packagename:
             sys.stderr.write ('No package specified. Run "apt list" to see installed packages')
             return
 
-    print get_ball ()
+    print get_ball (packagename)
 
 #@+node:maphew.20100223163802.3721: *3* download
-def download ():
+def download (packagename):
     '''download package'''
     if not packagename:
         sys.stderr.write ('No package specified. Try running "apt available"')
 
-    do_download ()
-    ball ()
+    do_download (packagename)
+    ball (packagename)
     print
-    md5 ()
+    md5 (packagename)
 
 #@+node:maphew.20100223163802.3722: *3* find
 def find ():
@@ -137,41 +137,41 @@ def find ():
 #@+node:maphew.20100223163802.3723: *3* help
 def help ():
     '''help COMMAND'''
-    if len (files) < 2:
+    if len (params) < 2:
         usage ()
         sys.exit (0)
 
     print  __main__.__dict__[packagename].__doc__
 
 #@+node:maphew.20100223163802.3724: *3* install
-def install ():
+def install (packages):
     '''download and install packages, including dependencies'''
-    global packagename
-    if not packagename:
-        sys.stderr.write ('No package specified. Try running "apt available"')
+##    global packagename
+    if not packages:
+        sys.stderr.write ('No package(s) specified. Try running "apt available"')
     missing = {}
 ##    # print files
     for packagename in packages:
 ##        # print packagename
-        missing.update (dict (map (lambda x: (x, 0), get_missing ())))
+        missing.update (dict (map (lambda x: (x, 0), get_missing (packagename))))
     if len (missing) > 1:
         sys.stderr.write ('to install: \n')
         sys.stderr.write ('    %s' % string.join (missing.keys ()))
         sys.stderr.write ('\n')
-    for packagename in missing.keys ():
-        download ()
+    for packagename in missing.keys (): # FIXME: re-use of `packagename` for different purpose is confusing
+        download (packagename)
     if download_p:
         sys.exit (0)
     install_next(missing.keys (), set([]), set([]))
 #@+node:maphew.20100510140324.2366: *4* install_next (missing_packages)
 def install_next (missing_packages, resolved, seen):
-    global packagename
+##    global packagename
     for miss_package in missing_packages:
         if miss_package in resolved:
             continue
         seen.add(miss_package)
         packagename = miss_package
-        dependences = get_missing()
+        dependences = get_missing(packagename)
         dependences.remove(miss_package)
         for dep in dependences:
             if dep in resolved:
@@ -186,12 +186,12 @@ def install_next (missing_packages, resolved, seen):
         if installed[0].has_key (miss_package):
             sys.stderr.write ('preparing to replace %s %s\n' \
                       % (miss_package,
-                         version_to_string (get_installed_version ())))
+                         version_to_string (get_installed_version (packagename))))
             do_uninstall ()
         sys.stderr.write ('installing %s %s\n' \
                   % (miss_package,
-                     version_to_string (get_version ())))
-        do_install ()
+                     version_to_string (get_version (packagename))))
+        do_install (packagename)
         resolved.add(miss_package)
 #@+node:maphew.20100223163802.3725: *3* list
 #plist = list
@@ -220,19 +220,19 @@ def listfiles ():
         print i
 
 #@+node:maphew.20100223163802.3726: *3* md5
-def md5 ():
+def md5 (packagename):
     '''check md5 sum'''
     if not packagename:
         sys.stderr.write ('No package specified. Try running "apt list"')
         return
 
-    url, md5 = get_url ()
+    url, md5 = get_url (packagename)
     ball = os.path.basename (url)
     print '%s  %s - remote' % (md5, ball)
 
     # make sure we md5 the *file* not the *filename*
     # kudos to http://www.peterbe.com/plog/using-md5-to-check-equality-between-files
-    localFile = file(get_ball(), 'rb')
+    localFile = file(get_ball(packagename), 'rb')
     my_md5 = hashlib.md5(localFile.read()).hexdigest()
 
     print '%s  %s - local' % (my_md5, ball)
@@ -260,21 +260,22 @@ def new ():
                       version_to_string (get_version ()))
 
 #@+node:maphew.20100223163802.3729: *3* remove
-def remove ():
+def remove (packages):
     '''uninstall packages'''
-    global packagename
-    if not packagename:
-        sys.stderr.write ('No package specified. Run "apt list" to see installed packages')
+##    global packagename
+    if not packages:
+        sys.stderr.write ('No package(s) specified. Run "apt list" to see installed packages')
         return
 
     for packagename in packages:
+        print packagename
         if not installed[0].has_key (packagename):
             sys.stderr.write ('warning: %s not installed\n' % packagename)
             continue
         sys.stderr.write ('removing %s %s\n' \
                   % (packagename,
-                     version_to_string (get_installed_version ())))
-        do_uninstall ()
+                     version_to_string (get_installed_version (packagename))))
+        do_uninstall (packagename)
 
 #@+node:maphew.20100223163802.3730: *3* requires
 def requires ():
@@ -424,17 +425,17 @@ def debug (s):
 
 #@+node:maphew.20100308085005.1379: ** Doers
 #@+node:maphew.20100223163802.3739: *3* do_download
-def do_download ():
+def do_download (packagename):
     # CHANGED: pythonized tar
     #        : only print % downloaded if > than last time (lpinner)
 
-    url, md5 = get_url ()   # md5 is retrieved but not used, remove from function?
+    url, md5 = get_url (packagename)   # md5 is retrieved but not used, remove from function?
 
     dir = '%s/%s' % (downloads, os.path.split (url)[0])
     srcFile = os.path.join (mirror + '/' + url)
     dstFile = os.path.join (downloads + '/' + url)
 
-    if not os.path.exists (get_ball ()): #or not check_md5 ():
+    if not os.path.exists (get_ball (packagename)): #or not check_md5 ():
         print '\nFetching %s' % srcFile
 
         if not os.path.exists (dir):
@@ -457,11 +458,11 @@ def down_stat(count, blockSize, totalSize):
         sys.stdout.flush()
     down_stat.last_percent=percent
 #@+node:maphew.20100223163802.3740: *3* do_install
-def do_install ():
+def do_install (packagename):
     # ''' Unpack the package in appropriate locations, write file list to installed manifest, run postinstall confguration. '''
 
     # retrieve local package (ball) and check md5
-    ball = get_ball ()
+    ball = get_ball (packagename)
 
     # unpack
     os.chdir (root)
@@ -478,7 +479,7 @@ def do_install ():
         raise 'urg'
 
    # record list of files installed
-    write_filelist (lst)
+    write_filelist (packagename, lst)
 
     # configure...
     if os.path.isdir ('%s/etc/postinstall' % root):
@@ -490,13 +491,13 @@ def do_install ():
     installed[0][packagename] = os.path.basename (ball)
     write_installed ()
 #@+node:maphew.20100223163802.3741: *3* do_uninstall
-def do_uninstall ():
+def do_uninstall (packagename):
     # ''' For package X: delete installed files & remove from manifest, remove from installed.db '''
     # TODO: remove empty dirs?
     do_run_preremove(root, packagename)
 
     # retrieve list of installed files
-    lst = get_filelist ()
+    lst = get_filelist (packagename)
 
     # delete files
     for i in lst:
@@ -510,7 +511,7 @@ def do_uninstall ():
                 sys.stdout.write('removed: %s\n' % file)
 
     # clear from manifest
-    write_filelist ([])
+    write_filelist (packagename, [])
 
     # remove package details from installed.db
     del (installed[0][packagename])
@@ -531,8 +532,8 @@ def do_run_preremove(root, packagename):
             print >>sys.stderr, "Execution failed:", e
 #@+node:maphew.20100308085005.1380: ** Getters
 #@+node:maphew.20100223163802.3743: *3* get_ball
-def get_ball ():
-    url, md5 = get_url ()
+def get_ball (packagename):
+    url, md5 = get_url (packagename)
     return '%s/%s' % (downloads, url)
 
 #@+node:maphew.20100223163802.3744: *3* get_field
@@ -544,7 +545,7 @@ def get_field (field, default=''):
     return default
 
 #@+node:maphew.20100223163802.3745: *3* get_filelist
-def get_filelist ():
+def get_filelist (packagename):
     # ''' Retrieve list of files installed for package X from manifest (/etc/setup/package.lst.gz)'''
     os.chdir (config)
     pipe = gzip.open (config + packagename + '.lst.gz', 'r')
@@ -566,7 +567,7 @@ def get_installed ():
     return installed
 
 #@+node:maphew.20100223163802.3747: *3* get_installed_version
-def get_installed_version ():
+def get_installed_version (packagename):
     return split_ball (installed[0][packagename])[1]
 
 #@+node:maphew.20100223163802.3749: *3* get_config
@@ -607,8 +608,8 @@ def get_mirror():
     return mirror
 
 #@+node:maphew.20100223163802.3752: *3* get_missing
-def get_missing ():
-    reqs = get_requires ()
+def get_missing (packagename):
+    reqs = get_requires (packagename)
     lst = []
     for i in reqs:
         if not installed[0].has_key (i):
@@ -616,8 +617,8 @@ def get_missing ():
     if lst and packagename not in lst:
         sys.stderr.write ('warning: missing packages: %s\n' % string.join (lst))
     elif installed[0].has_key (packagename):
-        ins = get_installed_version ()
-        new = get_version ()
+        ins = get_installed_version (packagename)
+        new = get_version (packagename)
         if ins >= new:
             sys.stderr.write ('%s is already the newest version\n' % packagename)
             #lst.remove (packagename)
@@ -653,7 +654,7 @@ def get_special_folder(intFolder):
     return auPathBuffer.value
 
 #@+node:maphew.20100223163802.3756: *3* get_url
-def get_url ():
+def get_url (packagename):
     if not dists[distname].has_key (packagename) \
        or not dists[distname][packagename].has_key (INSTALL):
         no_package ()
@@ -673,7 +674,7 @@ def get_url ():
     return file, md5
 
 #@+node:maphew.20100223163802.3757: *3* get_version
-def get_version ():
+def get_version (packagename):
     if not dists[distname].has_key (packagename) \
        or not dists[distname][packagename].has_key (INSTALL):
         no_package ()
@@ -687,7 +688,7 @@ def get_version ():
     return package['ver']
 
 #@+node:maphew.20100223163802.3759: *3* get_requires
-def get_requires ():
+def get_requires (packagename):
     # ''' identify dependencies of package'''
     dist = dists[distname]
     if not dists[distname].has_key (packagename):
@@ -737,7 +738,7 @@ def write_installed ():
         raise 'urg'
 
 #@+node:maphew.20100223163802.3766: *3* write_filelist
-def write_filelist (lst):
+def write_filelist (packagename, lst):
     # ''' Record installed files in package manifest (etc/setup/packagename.lst.gz) '''
     os.chdir(config)
     pipe = gzip.open (packagename + '.lst.gz','w')
@@ -1069,9 +1070,9 @@ if __name__ == '__main__':
     # and all following are package names
     packages = params[1:]
 
-    packagename = 0
-    if packages:
-        packagename = packages[0]
+    ##packagename = 0
+    ##if packages:
+    ##    packagename = packages[0]
     # if len (params) > 1:
         # packagename = params[1]
 
@@ -1165,7 +1166,7 @@ if __name__ == '__main__':
         get_installed ()
 
         if command and command in __main__.__dict__:
-            __main__.__dict__[command] ()
+            __main__.__dict__[command] (packages)
         else:
             print '"%s" not understood, please run "apt help"' % command
     #@-<<run the commands>>
