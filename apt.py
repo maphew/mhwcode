@@ -13,7 +13,7 @@
 
 
   Modified by Matt.Wilkie@gov.yk.ca for OSGeo4W,
-  beginning July 2008 
+  beginning July 2008
 
 '''
 svn_version = '$Rev: 1192 $'
@@ -46,7 +46,7 @@ def usage ():
     global setup_ini
     global mirror
     global root
-    print '-={ %s }=-\n'% (str.strip(svn_id, ' $'))    
+    print '-={ %s }=-\n'% (str.strip(svn_id, ' $'))
     # FIXME: list only usable command line parameters, not all functions
     # SOLVED: omit '''comment''' after function name, only those are listed
       # better:  use parsopt instead, #53 http://trac.osgeo.org/osgeo4w/ticket/53
@@ -77,7 +77,7 @@ Options:
 #@+node:maphew.20100223163802.3719: *3* available
 def available():
     ''' show packages available to be installed'''
-    # courtesy of Aaron Digulla, 
+    # courtesy of Aaron Digulla,
     # http://stackoverflow.com/questions/1524126/how-to-print-a-list-more-nicely
 
     # All packages mentioned in setup.ini
@@ -104,7 +104,7 @@ def ball ():
     if not packagename:
             sys.stderr.write ('No package specified. Run "apt list" to see installed packages')
             return
-    
+
     print get_ball ()
 
 #@+node:maphew.20100223163802.3721: *3* download
@@ -112,7 +112,7 @@ def download ():
     '''download package'''
     if not packagename:
         sys.stderr.write ('No package specified. Try running "apt available"')
-    
+
     do_download ()
     ball ()
     print
@@ -125,7 +125,7 @@ def find ():
     if not packagename:
         sys.stderr.write ('Find what? Enter a filename to look for (partial is ok).')
         return
-    
+
     regexp = re.sub ('^%s/' % root, '/', packagename)
     hits = []
     for packagename in sorted (installed[0].keys ()):
@@ -150,9 +150,9 @@ def install ():
     if not packagename:
         sys.stderr.write ('No package specified. Try running "apt available"')
     missing = {}
-    # print files
+##    # print files
     for packagename in packages:
-        print packagename
+##        # print packagename
         missing.update (dict (map (lambda x: (x, 0), get_missing ())))
     if len (missing) > 1:
         sys.stderr.write ('to install: \n')
@@ -215,17 +215,17 @@ def listfiles ():
     if not packagename:
         sys.stderr.write ('No package specified. Try running "apt list"')
         return
-        
+
     for i in get_filelist():
         print i
-    
+
 #@+node:maphew.20100223163802.3726: *3* md5
 def md5 ():
     '''check md5 sum'''
     if not packagename:
         sys.stderr.write ('No package specified. Try running "apt list"')
         return
-        
+
     url, md5 = get_url ()
     ball = os.path.basename (url)
     print '%s  %s - remote' % (md5, ball)
@@ -242,12 +242,12 @@ def md5 ():
 #@+node:maphew.20100223163802.3727: *3* missing
 def missing ():
     '''print missing dependencies for X'''
-    # FIXME: this would be more useful if it found missing for everything, 
+    # FIXME: this would be more useful if it found missing for everything,
     # not just the named package
     if not packagename:
         sys.stderr.write ('No package specified. Try running "apt list"')
         return
-    
+
     print string.join (get_missing (), '\n')
 
 #@+node:maphew.20100223163802.3728: *3* new
@@ -267,7 +267,7 @@ def remove ():
         sys.stderr.write ('No package specified. Run "apt list" to see installed packages')
         return
 
-    for packagename in files[1:]:
+    for packagename in packages:
         if not installed[0].has_key (packagename):
             sys.stderr.write ('warning: %s not installed\n' % packagename)
             continue
@@ -282,7 +282,7 @@ def requires ():
     if not packagename:
         sys.stderr.write ('Please specify a package name.')
         return
-    
+
     depends = get_requires()
     depends.sort()
     # display as vertical list, one item per line.
@@ -365,7 +365,7 @@ def update ():
 #@+node:maphew.20100223163802.3734: *3* upgrade
 def upgrade ():
     '''all installed packages'''
-    files[1:] = get_new ()
+    packages = get_new ()
     install ()
 
 #@+node:maphew.20100223163802.3735: *3* url
@@ -388,7 +388,7 @@ def version ():
 def versions ():
     '''print versions of all installed packages'''
     global packagename
-            
+
     for packagename in sorted (installed[0].keys ()):
         if not installed[0].has_key (packagename):
             global distname
@@ -491,10 +491,10 @@ def do_install ():
     write_installed ()
 #@+node:maphew.20100223163802.3741: *3* do_uninstall
 def do_uninstall ():
-    # ''' For package X: delete installed files & remove from manifest, remove from installed.db ''' 
+    # ''' For package X: delete installed files & remove from manifest, remove from installed.db '''
     # TODO: remove empty dirs?
     do_run_preremove(root, packagename)
-    
+
     # retrieve list of installed files
     lst = get_filelist ()
 
@@ -524,9 +524,9 @@ def do_run_preremove(root, packagename):
             retcode = subprocess.call (bat, shell=True)
             if retcode < 0:
                 print >>sys.stderr, "Child was terminated by signal", retcode
-    
+
             print >>sys.stderr, "Post_install complete, return code", retcode
-        
+
         except OSError, e:
             print >>sys.stderr, "Execution failed:", e
 #@+node:maphew.20100308085005.1380: ** Getters
@@ -586,11 +586,11 @@ def get_menu_links(bat):
     #
     # from 'xxmklink' lines grab first parameter, which is the link path
     # and interpret known variables.
-    # Relies on shlex module which splits on spaces, yet preserves 
+    # Relies on shlex module which splits on spaces, yet preserves
     # spaces within quotes (http://stackoverflow.com/questions/79968)
     links = []
     for line in open(bat,'r'):
-        if 'xxmklink' in line: 
+        if 'xxmklink' in line:
             link = shlex.split(line)[1]
             link = link.replace ('%OSGEO4W_ROOT%',OSGEO4W_ROOT)
             link = link.replace ('%OSGEO4W_STARTMENU%',OSGEO4W_STARTMENU)
@@ -754,7 +754,7 @@ def get_setup_ini ():
     global dists
     if dists:
        # best I can figure, this is to skip redundant parsing,
-       # however I don't see anywhere get_setup_ini() is 
+       # however I don't see anywhere get_setup_ini() is
        # called more than once; candidate for removal
        print 'dists defined, skipping parse of setup.ini'
        return
@@ -803,7 +803,7 @@ def split_ball (filename):
 #    ''' Parse package archive name into a) package name and b) version numbers tuple (to feed into version_to_string)
 #
 #    mc-4.6.0a-20030721-12.tar.bz2
-#    
+#
 #      mc              --> package name
 #      4.6.0a-20030721 --> upstream application version
 #      12              --> package version
@@ -823,7 +823,7 @@ def split_ball (filename):
 
     ##m = re.match ('^([^.]*)-([0-9][^-/]*-[0-9][0-9]*)(.tar.bz2)?$', filename)    # original regex from cyg-apt
     ##m = re.match ('^([^.]*)-([0-9].*-[0-9][0-9]*)(.tar.bz2)?$', filename)        # accept dash in app ver num
-    
+
     # this regex pattern should be functionally identical to the line immediately above
     regex = re.compile('''
        ^       	    # beginning of line
@@ -836,7 +836,7 @@ def split_ball (filename):
        .*               # accept any trailing chars after the package version
        (\.tar\.bz2)?$
        ''', re.VERBOSE)
-    
+
     m = re.match(regex, filename)
     if not m:
         print '\n\n*** Error parsing version number from "%s"\n%s\n' % (filename, m)
@@ -874,8 +874,8 @@ def no_package (s='error'):
 #    return lst
 #@+node:maphew.20100223163802.3765: ** post_install
 def post_install ():
-    # ''' Run postinstall batch files and update package manifest 
-    #     to catch those files not included in the package archive. 
+    # ''' Run postinstall batch files and update package manifest
+    #     to catch those files not included in the package archive.
     #     (manifest = etc/setup/pkg-foo.lst.gz) '''
     # adapted from "17.1.3.3 Replacing os.system()"
     # http://www.python.org/doc/2.5.2/lib/node536.html
@@ -892,7 +892,7 @@ def post_install ():
             if retcode < 0:
                 print >>sys.stderr, "Child was terminated by signal", -retcode
 
-            # then update manifest 
+            # then update manifest
             else:
                 # mark bat as completed
                 done_bat = bat + '.done'
@@ -908,17 +908,17 @@ def post_install ():
 
                 # foo.bat --> foo.bat.done in manifest
                 lst = get_filelist()
-                
+
                 # ticket #281, ignore leading dot slash in filenames (./foo.bat --> foo.bat)
                 lst = [x.replace('./','') for x in lst]
-                
+
                 if bat in lst:
                     lst.remove(bat)
                     lst.append(bat + '.done')
                 else:
                     print """\nwarning: adding %s to install manifest failed.
                     It will need to be removed manually when uninstalling or upgrading this package""" % done_bat
-    
+
                 # retrieve menu & desktop links from postinstall bats
                 for link in get_menu_links(done_bat):
                     lst.append(link)
@@ -1005,16 +1005,16 @@ def build ():
 
 #@+node:maphew.20100223163802.3770: *3* source
 def source ():
-    # commented docstring hides this unused function from usage message    
+    # commented docstring hides this unused function from usage message
     # '''download, build and install'''
     global packagename
     # let's not do dependencies
     #for packagename in missing.keys ():
     global INSTALL
     INSTALL = 'source'
-    for packagename in files[1:]:
+    for packagename in packages:
         download ()
-    for packagename in files[1:]:
+    for packagename in packages:
         do_unpack ()
         do_build ()
     if 1 or download_p:
