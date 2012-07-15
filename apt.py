@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #@+leo-ver=5-thin
-#@+node:maphew.20100310210915.1371: * @file apt.py
+#@+node:maphew.20120709214653.1534: * @file apt.py
 #@@first
 #@+<<docstring>>
 #@+node:maphew.20100307230644.3846: ** <<docstring>>
@@ -150,7 +150,9 @@ def install ():
     if not packagename:
         sys.stderr.write ('No package specified. Try running "apt available"')
     missing = {}
-    for packagename in files[1:]:
+    # print files
+    for packagename in packages:
+        print packagename
         missing.update (dict (map (lambda x: (x, 0), get_missing ())))
     if len (missing) > 1:
         sys.stderr.write ('to install: \n')
@@ -755,7 +757,7 @@ def get_setup_ini ():
        # however I don't see anywhere get_setup_ini() is 
        # called more than once; candidate for removal
        print 'dists defined, skipping parse of setup.ini'
-        return
+       return
     dists = {'test': {}, 'curr': {}, 'prev' : {}}
     chunks = string.split (open (setup_ini).read (), '\n\n@ ')
     for i in chunks[1:]:
@@ -1053,19 +1055,26 @@ if __name__ == '__main__':
     # the command (install, remove, etc.), consequently everywhere the list of package
     # names from cmdline is needed the cumbersome `files[1:]` is used.
     #
-    (options, files) = getopt.getopt (sys.argv[1:],
+    (options, params) = getopt.getopt (sys.argv[1:],
                       'dhi:m:r:t:s:x',
                       ('download', 'help', 'mirror=', 'root='
                        'ini=', 't=', 'start-menu=', 'no-deps'))
 
     command = 'help'
-    if len (files) > 0:
-        command = files[0]
+
+    # the first parameter is our action
+    if len (params) > 0:
+        command = params[0]
+
+    # and all following are package names
+    packages = params[1:]
 
     packagename = 0
-    if len (files) > 1:
-        packagename = files[1]
-    # -----
+    if packages:
+        packagename = packages[0]
+    # if len (params) > 1:
+        # packagename = params[1]
+
 
     distname = 'curr'
 
