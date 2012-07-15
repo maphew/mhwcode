@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #@+leo-ver=5-thin
-#@+node:maphew.20110428135158.2655: * @file apt.py
+#@+node:maphew.20100310210915.1371: * @file apt.py
 #@@first
 #@+<<docstring>>
 #@+node:maphew.20100307230644.3846: ** <<docstring>>
@@ -16,8 +16,8 @@
   beginning July 2008 
 
 '''
-svn_version = '$Rev$'
-svn_id = '$Id$'
+svn_version = '$Rev: 1192 $'
+svn_id = '$Id: apt.py 1192 2012-07-04 19:32:14Z maphew $'
 #@-<<docstring>>
 #@@language python
 #@@tabwidth -4
@@ -751,6 +751,10 @@ def get_setup_ini ():
     # '''Parse setup.ini into package name, description, version, dependencies, etc.'''
     global dists
     if dists:
+       # best I can figure, this is to skip redundant parsing,
+       # however I don't see anywhere get_setup_ini() is 
+       # called more than once; candidate for removal
+       print 'dists defined, skipping parse of setup.ini'
         return
     dists = {'test': {}, 'curr': {}, 'prev' : {}}
     chunks = string.split (open (setup_ini).read (), '\n\n@ ')
@@ -1045,6 +1049,10 @@ if __name__ == '__main__':
     #@-<<globals>>
     #@+<<parse command line>>
     #@+node:maphew.20100307230644.3842: ** <<parse command line>>
+    # FIXME: 'files' for a var name here is a misnomer, as the 1st element is actually
+    # the command (install, remove, etc.), consequently everywhere the list of package
+    # names from cmdline is needed the cumbersome `files[1:]` is used.
+    #
     (options, files) = getopt.getopt (sys.argv[1:],
                       'dhi:m:r:t:s:x',
                       ('download', 'help', 'mirror=', 'root='
@@ -1057,6 +1065,7 @@ if __name__ == '__main__':
     packagename = 0
     if len (files) > 1:
         packagename = files[1]
+    # -----
 
     distname = 'curr'
 
