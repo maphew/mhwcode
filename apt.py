@@ -107,11 +107,13 @@ def available(foo):
 #@+node:maphew.20100223163802.3720: *3* ball
 def ball (packagename):
     '''print full path name of package archive'''
-    if not packagename:
-            sys.stderr.write ('No package specified. Run "apt list" to see installed packages')
-            return
-
-    print get_ball (packagename)
+    
+    # FIXME: really need to find a better name for this command. Not so many
+    # understand 'ball' refers to 'tarball', a onetime common moniker for an
+    # archive file
+    
+    for p in packagename:
+        print "\n%s = %s" % (p, get_ball (p))
 
 #@+node:maphew.20100223163802.3721: *3* download
 def download (packagename):
@@ -663,7 +665,10 @@ def get_special_folder(intFolder):
 def get_url (packagename):
     if not dists[distname].has_key (packagename) \
        or not dists[distname][packagename].has_key (INSTALL):
-        no_package ()
+ ##       no_package ()
+        # moved here from no_package(), part of remove-globals refactoring
+        sys.stderr.write ("%s: %s not in [%s]\n" % ('error', packagename, distname))
+
         install = 0
         for d in distnames:
             if dists[d].has_key (packagename) \
@@ -676,8 +681,8 @@ def get_url (packagename):
             sys.exit (1)
     else:
         install = dists[distname][packagename][INSTALL]
-    file, size, md5 = string.split (install)
-    return file, md5
+    filename, size, md5 = string.split (install)
+    return filename, md5
 
 #@+node:maphew.20100223163802.3757: *3* get_version
 def get_version (packagename):
