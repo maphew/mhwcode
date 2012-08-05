@@ -77,12 +77,12 @@ Options:
 #@+node:maphew.20100223163802.3719: *3* available
 def available(foo):
     ''' show packages available to be installed'''
-    
+
     # TODO: this function requires a parameter only because of the command calling
      # structure of the module. The parameter is not used. When the command
      # structure is fixed remove the parameter (or perhaps make it useful by
      # saying (available(at_url_of_package_mirror_x)`
-    
+
     # courtesy of Aaron Digulla,
     # http://stackoverflow.com/questions/1524126/how-to-print-a-list-more-nicely
 
@@ -107,17 +107,27 @@ def available(foo):
 #@+node:maphew.20100223163802.3720: *3* ball
 def ball (packagename):
     '''print full path name of package archive'''
-    
+
     # FIXME: really need to find a better name for this command. Not so many
     # understand 'ball' refers to 'tarball', a onetime common moniker for an
     # archive file
-    
-    for p in packagename:
-        print "\n%s = %s" % (p, get_ball (p))
+
+##    # bug: function is getting a single package, but this next bit splits the name into characters. I don't know why it ever worked. Whatever the case, now it's broken.
+##    for p in packagename:
+##        print "\n%s = %s" % (p, get_ball (p))
+
+    # fix found courtesy of http://stackoverflow.com/questions/1952464/in-python-how-do-i-determine-if-a-variable-is-iterable
+    try:
+        for p in packagename:
+            print "\n%s = %s" % (p, get_ball (p))
+    except:
+        print "\n%s = %s" % (packagename, get_ball (packagename))
 
 #@+node:maphew.20100223163802.3721: *3* download
 def download (packagename):
     '''download package'''
+
+    # deadweight, not used; equiv feedback should be given by parameter checking earlier
     if not packagename:
         sys.stderr.write ('No package specified. Try running "apt available"')
 
@@ -125,6 +135,8 @@ def download (packagename):
     ball (packagename)
     print
     md5 (packagename)
+
+    print '=== made it to end of download()' # debug
 
 #@+node:maphew.20100223163802.3722: *3* find
 def find ():
@@ -155,21 +167,28 @@ def help ():
 def install (packages):
     '''download and install packages, including dependencies'''
 ##    global packagename
-    if not packages:
-        sys.stderr.write ('No package(s) specified. Try running "apt available"')
+    ## dead weight, this doesn't get activated at all now
+    ## if not packages:
+        ## sys.stderr.write ('No package(s) specified. Try running "apt available"')
     missing = {}
-##    # print files
+    print '=== pkgs:', packages # debug
     for packagename in packages:
-##        # print packagename
+        print packagename
         missing.update (dict (map (lambda x: (x, 0), get_missing (packagename))))
     if len (missing) > 1:
         sys.stderr.write ('to install: \n')
         sys.stderr.write ('    %s' % string.join (missing.keys ()))
         sys.stderr.write ('\n')
+
     for packagename in missing.keys (): # FIXME: re-use of `packagename` for different purpose is confusing
+        print '=== pkg according to install(): ... missing.keys():', packagename
         download (packagename)
-    if download_p:
+    #bug: we don't get to this line after download(). why?
+    print '===xx ', missing.keys()
+
+    if download_p:  # quit if download only flag is set
         sys.exit (0)
+
     install_next(missing.keys (), set([]), set([]))
 #@+node:maphew.20100510140324.2366: *4* install_next (missing_packages)
 def install_next (missing_packages, resolved, seen):
@@ -191,6 +210,7 @@ def install_next (missing_packages, resolved, seen):
                 )
             install_next(dependences, resolved, seen)
         packagename = miss_package
+        print '=== packagename according to install_next():', packagename # debug
         if installed[0].has_key (miss_package):
             sys.stderr.write ('preparing to replace %s %s\n' \
                       % (miss_package,
@@ -402,7 +422,7 @@ def versions ():
         if not installed[0].has_key (packagename):
             global distname
             distname = 'installed'
-            no_package ()
+            no_package ('no_package() activated in versions()')
             sys.exit (1)
         print '%-20s%-12s' % (packagename,
                  version_to_string (get_installed_version ()))
@@ -541,6 +561,7 @@ def do_run_preremove(root, packagename):
 #@+node:maphew.20100308085005.1380: ** Getters
 #@+node:maphew.20100223163802.3743: *3* get_ball
 def get_ball (packagename):
+    print '=== pkg according to get_ball():', packagename
     url, md5 = get_url (packagename)
     return '%s/%s' % (downloads, url)
 
@@ -677,7 +698,7 @@ def get_url (packagename):
                 sys.stderr.write ("warning: using [%s]\n" % d)
                 break
         if not install:
-            sys.stderr.write ("error: %s no install\n" % packagename)
+            sys.stderr.write ("error: %s not installed\n" % packagename)
             sys.exit (1)
     else:
         install = dists[distname][packagename][INSTALL]
