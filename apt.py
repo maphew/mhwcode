@@ -202,16 +202,16 @@ def install_next (missing_packages, resolved, seen):
         do_install (packagename)
         resolved.add(miss_package)
 #@+node:maphew.20100223163802.3725: *3* list
-#plist = list
-def list ():
+def list (foo):
     '''installed packages'''
-    global packagename
+    # fixme: once again, 'foo' defined but not used. fix after calling structure is refactored
+    ## global packagename
     for packagename in sorted (installed[0].keys ()):
-        ins = get_installed_version ()
+        ins = get_installed_version (packagename)
         new = 0
         if dists[distname].has_key (packagename) \
            and dists[distname][packagename].has_key (INSTALL):
-            new = get_version ()
+            new = get_version (packagename)
         s = '%-20s%-15s' % (packagename, version_to_string (ins))
         if new and new != ins:
             s += '(%s)' % version_to_string (new)
