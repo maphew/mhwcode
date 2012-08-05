@@ -112,11 +112,8 @@ def ball (packagename):
     # understand 'ball' refers to 'tarball', a onetime common moniker for an
     # archive file
 
-##    # bug: function is getting a single package, but this next bit splits the name into characters. I don't know why it ever worked. Whatever the case, now it's broken.
-##    for p in packagename:
-##        print "\n%s = %s" % (p, get_ball (p))
-
-    # fix found courtesy of http://stackoverflow.com/questions/1952464/in-python-how-do-i-determine-if-a-variable-is-iterable
+    # when called from another function, pkg is likely a list
+    # when called as a command, pkg is likely a string,
     try:
         for p in packagename:
             print "\n%s = %s" % (p, get_ball (p))
@@ -135,9 +132,6 @@ def download (packagename):
     ball (packagename)
     print
     md5 (packagename)
-
-    print '=== made it to end of download()' # debug
-
 #@+node:maphew.20100223163802.3722: *3* find
 def find ():
     '''package containing file (from installed packages)'''
@@ -166,14 +160,10 @@ def help ():
 #@+node:maphew.20100223163802.3724: *3* install
 def install (packages):
     '''download and install packages, including dependencies'''
-##    global packagename
-    ## dead weight, this doesn't get activated at all now
-    ## if not packages:
-        ## sys.stderr.write ('No package(s) specified. Try running "apt available"')
     missing = {}
-    print '=== pkgs:', packages # debug
+    # print '=== pkgs:', packages # debug
     for packagename in packages:
-        print packagename
+        # print packagename
         missing.update (dict (map (lambda x: (x, 0), get_missing (packagename))))
     if len (missing) > 1:
         sys.stderr.write ('to install: \n')
@@ -181,10 +171,7 @@ def install (packages):
         sys.stderr.write ('\n')
 
     for packagename in missing.keys (): # FIXME: re-use of `packagename` for different purpose is confusing
-        print '=== pkg according to install(): ... missing.keys():', packagename
         download (packagename)
-    #bug: we don't get to this line after download(). why?
-    print '===xx ', missing.keys()
 
     if download_p:  # quit if download only flag is set
         sys.exit (0)
@@ -210,7 +197,6 @@ def install_next (missing_packages, resolved, seen):
                 )
             install_next(dependences, resolved, seen)
         packagename = miss_package
-        print '=== packagename according to install_next():', packagename # debug
         if installed[0].has_key (miss_package):
             sys.stderr.write ('preparing to replace %s %s\n' \
                       % (miss_package,
@@ -422,7 +408,7 @@ def versions ():
         if not installed[0].has_key (packagename):
             global distname
             distname = 'installed'
-            no_package ('no_package() activated in versions()')
+            no_package ()
             sys.exit (1)
         print '%-20s%-12s' % (packagename,
                  version_to_string (get_installed_version ()))
@@ -561,7 +547,6 @@ def do_run_preremove(root, packagename):
 #@+node:maphew.20100308085005.1380: ** Getters
 #@+node:maphew.20100223163802.3743: *3* get_ball
 def get_ball (packagename):
-    print '=== pkg according to get_ball():', packagename
     url, md5 = get_url (packagename)
     return '%s/%s' % (downloads, url)
 
