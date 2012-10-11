@@ -38,34 +38,17 @@ apt.get_installed()
 @plac.annotations(packages='package(s) to operate on')
 def install(*packages):
     "install packages"
-
     print '-' *10 + ' running apt install', ' '.join(packages)
     packages = list(packages)
-    #packages.insert(0, 'install')
-    apt.packages = packages
-    # for p in packages:
-        # apt.packagename=p
-    apt.packagename = packages[0]
     apt.install(packages)
-
     return('-' *10 + ' Install complete', '')
 
 @plac.annotations(packages='package(s) to operate on')
 def remove(*packages):
     "Remove packages"
-
-    print '-' *10 + ' apt remove', ' '.join(packages)
+    print '-' *10 + ' running apt remove', ' '.join(packages)
     packages = list(packages)
-    # packages.insert(0, 'remove')
-    # apt.files=packages
-    apt.packages = packages
-    # for p in packages:
-        # apt.packagename=p
-        # apt.remove()
-    # apt.packagename=0
-    # apt.remove()
     apt.remove(packages)
-
     return('-' *10 + ' Remove complete', '')
 
 @plac.annotations(message=('commit message', 'option'))
