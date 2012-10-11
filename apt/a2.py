@@ -23,7 +23,7 @@ apt.dists = 0
 apt.distname = 'curr'
 apt.distnames = ('curr', 'test', 'prev')
 apt.download_p = 0  # download only flag, 1=yes
-apt.depend_p = 0  # ignore dependencies flag, 1=yes
+apt.depend_p = 0  # ignore dependencies flag, 1=ignore
 apt.installed = 0
 
 apt.mirror = apt.get_config('last-mirror')  # the url
@@ -38,7 +38,7 @@ apt.get_installed()
 @plac.annotations(packages='package(s) to operate on')
 def install(*packages):
     "install packages"
-    
+
     print '-' *10 + ' running apt install', ' '.join(packages)
     packages = list(packages)
     #packages.insert(0, 'install')
@@ -46,8 +46,8 @@ def install(*packages):
     # for p in packages:
         # apt.packagename=p
     apt.packagename = packages[0]
-    apt.install()
-        
+    apt.install(packages)
+
     return('-' *10 + ' Installing ', packages)
 
 @plac.annotations(packages='package(s) to operate on')
@@ -59,13 +59,12 @@ def remove(*packages):
     # packages.insert(0, 'remove')
     # apt.files=packages
     apt.packages = packages
-    for p in packages:
-        apt.packagename=p
-        apt.remove()
+    # for p in packages:
+        # apt.packagename=p
+        # apt.remove()
     # apt.packagename=0
     # apt.remove()
-        
-    return('-' *10  + 'Removing ', '  '.join(packages))
+    apt.remove(packages)
 
 @plac.annotations(message=('commit message', 'option'))
 def update(message):
@@ -82,7 +81,7 @@ def __missing__(name):
 
 def __exit__(etype, exc, tb):
     "Will be called automatically at the end of the interpreter loop"
-    if etype in (None, GeneratorExit):  # success    
+    if etype in (None, GeneratorExit):  # success
         print('ok')
 
 main = __import__(__name__) # the module imports itself!
@@ -90,5 +89,5 @@ main = __import__(__name__) # the module imports itself!
 if __name__=='__main__':
     import plac
     for out in plac.call(main): print(out)
-            
+
 #@-leo
