@@ -48,7 +48,7 @@ def install(*packages):
     apt.packagename = packages[0]
     apt.install(packages)
 
-    return('-' *10 + ' Installing ', packages)
+    return('-' *10 + ' Install complete', '')
 
 @plac.annotations(packages='package(s) to operate on')
 def remove(*packages):
@@ -65,6 +65,8 @@ def remove(*packages):
     # apt.packagename=0
     # apt.remove()
     apt.remove(packages)
+
+    return('-' *10 + ' Remove complete', '')
 
 @plac.annotations(message=('commit message', 'option'))
 def update(message):
