@@ -112,26 +112,28 @@ def ball (packagename):
     # understand 'ball' refers to 'tarball', a onetime common moniker for an
     # archive file
 
-    # when called from another function, pkg is likely a list
-    # when called as a command, pkg is likely a string,
-    try:
+    # when called as a command, e.g. "apt ball iconv", pkg is a list
+    # when called from another function pkg is a string
+    if type(packagename) == str:
+        print "\n%s = %s" % (packagename, get_ball (packagename))
+    else:
         for p in packagename:
             print "\n%s = %s" % (p, get_ball (p))
-    except:
-        print "\n%s = %s" % (packagename, get_ball (packagename))
 
 #@+node:maphew.20100223163802.3721: *3* download
 def download (packagename):
     '''download package'''
+    # print sys.argv[0], ": in download() with", packagename
 
-    # deadweight, not used; equiv feedback should be given by parameter checking earlier
-    if not packagename:
-        sys.stderr.write ('No package specified. Try running "apt available"')
+    # # deadweight, not used; equiv feedback should be given by parameter checking earlier
+    # if not packagename:
+        # sys.stderr.write ('No package specified. Try running "apt available"')
 
     do_download (packagename)
     ball (packagename)
     print
     md5 (packagename)
+    
 #@+node:maphew.20100223163802.3722: *3* find
 def find ():
     '''package containing file (from installed packages)'''
@@ -442,6 +444,8 @@ def debug (s):
 def do_download (packagename):
     # CHANGED: pythonized tar
     #        : only print % downloaded if > than last time (lpinner)
+    
+    # print sys.argv[0], ": in do_download() with", packagename
 
     url, md5 = get_url (packagename)   # md5 is retrieved but not used, remove from function?
 
@@ -623,6 +627,7 @@ def get_mirror():
 
 #@+node:maphew.20100223163802.3752: *3* get_missing
 def get_missing (packagename):
+    # print sys.argv[0], ": in get_missing with", packagename
     reqs = get_requires (packagename)
     lst = []
     for i in reqs:
