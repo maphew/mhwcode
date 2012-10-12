@@ -1,0 +1,89 @@
+#@+leo-ver=5-thin
+#@+node:maphew.20121011215813.1567: * @file Notes.txt
+
+#@+others
+#@+node:maphew.20121011215813.1569: ** Expected test results
+#@+node:maphew.20121011215813.1568: *3* apt install iconv curl
+B:\code\maphew\apt>apt install iconv curl
+to install:
+    iconv curl
+
+iconv = d:/temp/o4w-cache/setup/http%3a%2f%2fdownload.osgeo.org%2fosgeo4w/./rele
+ase/iconv/iconv-1.9.1-1.tar.bz2
+
+b9f7db00b8fd33a5fe821788b1029791  iconv-1.9.1-1.tar.bz2 - remote
+b9f7db00b8fd33a5fe821788b1029791  iconv-1.9.1-1.tar.bz2 - local
+
+curl = d:/temp/o4w-cache/setup/http%3a%2f%2fdownload.osgeo.org%2fosgeo4w/./relea
+se/curl/curl-7.15.1-2.tar.bz2
+
+97327843d4f00ec70bd08739336083c9  curl-7.15.1-2.tar.bz2 - remote
+97327843d4f00ec70bd08739336083c9  curl-7.15.1-2.tar.bz2 - local
+installing iconv 1.9.1-1
+installing curl 7.15.1-2
+#@+node:maphew.20121011215813.1570: *3* apt remove iconv curl
+B:\code\maphew\apt>apt remove iconv curl
+iconv
+removing iconv 1.9.1-1
+removed: O:\bin\iconv.dll
+removed: O:\include\iconv.h
+removed: O:\lib\iconv.lib
+curl
+removing curl 7.15.1-2
+removed: O:\bin\curl.exe
+removed: O:\bin\libcurl.dll
+removed: O:\bin\zlib1.dll
+removed: O:\include\curl\curl.h
+removed: O:\include\curl\curlver.h
+removed: O:\include\curl\easy.h
+removed: O:\include\curl\mprintf.h
+removed: O:\include\curl\multi.h
+removed: O:\include\curl\stdcheaders.h
+removed: O:\include\curl\types.h
+removed: O:\lib\libcurl_imp.lib
+#@+node:maphew.20121011215813.1571: *3* a2 install iconv curl
+B:\code\maphew\apt>a2 install iconv curl
+---------- running apt install iconv curl
+to install:
+    iconv curl
+
+iconv = d:/temp/o4w-cache/setup/http%3a%2f%2fdownload.osgeo.org%2fosgeo4w/./rele
+ase/iconv/iconv-1.9.1-1.tar.bz2
+
+b9f7db00b8fd33a5fe821788b1029791  iconv-1.9.1-1.tar.bz2 - remote
+b9f7db00b8fd33a5fe821788b1029791  iconv-1.9.1-1.tar.bz2 - local
+
+curl = d:/temp/o4w-cache/setup/http%3a%2f%2fdownload.osgeo.org%2fosgeo4w/./relea
+se/curl/curl-7.15.1-2.tar.bz2
+
+97327843d4f00ec70bd08739336083c9  curl-7.15.1-2.tar.bz2 - remote
+97327843d4f00ec70bd08739336083c9  curl-7.15.1-2.tar.bz2 - local
+installing iconv 1.9.1-1
+installing curl 7.15.1-2
+---------- Install complete
+#@+node:maphew.20121011215813.1572: *3* a2 remove iconv curl
+B:\code\maphew\apt>a2 remove iconv curl
+---------- running apt remove iconv curl
+iconv
+removing iconv 1.9.1-1
+removed: O:\bin\iconv.dll
+removed: O:\include\iconv.h
+removed: O:\lib\iconv.lib
+curl
+removing curl 7.15.1-2
+removed: O:\bin\curl.exe
+removed: O:\bin\libcurl.dll
+removed: O:\bin\zlib1.dll
+removed: O:\include\curl\curl.h
+removed: O:\include\curl\curlver.h
+removed: O:\include\curl\easy.h
+removed: O:\include\curl\mprintf.h
+removed: O:\include\curl\multi.h
+removed: O:\include\curl\stdcheaders.h
+removed: O:\include\curl\types.h
+removed: O:\lib\libcurl_imp.lib
+---------- Remove complete
+#@+node:maphew.20121011215813.1573: *3* apt update
+#@+node:maphew.20121011215813.1574: *3* a2 update
+#@-others
+#@-leo
