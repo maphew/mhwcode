@@ -51,10 +51,14 @@ def remove(*packages):
     apt.remove(packages)
     return('-' *10 + ' Remove complete', '')
 
-@plac.annotations(message=('commit message', 'option'))
-def update(message):
-    "download latest packages info from mirror"
-    return ('update ', message)
+@plac.annotations(mirror=('alternate url to use', 'option'))
+def update(mirror):
+    "download latest packages info from mirror"    
+    print '-' *10 + ' running apt update', mirror
+   
+    apt.update()
+    
+    return (10*'-'+ 'Update finished ', '')
 
 @plac.annotations(quiet=('summary information', 'flag', 'q'))
 def setup(quiet):
