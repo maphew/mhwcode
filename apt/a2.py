@@ -26,15 +26,16 @@ apt.download_p = 0  # download only flag, 1=yes
 apt.depend_p = 0  # ignore dependencies flag, 1=ignore
 apt.installed = 0
 
-apt.mirror = apt.get_config('last-mirror')  # the url
-apt.mirror_dir = urllib.quote (apt.mirror, '').lower () # the local filesystem dir name
-apt.last_cache = apt.get_config('last-cache')
-apt.downloads = '%s/%s' % (apt.last_cache, apt.mirror_dir)
-
-apt.get_setup_ini() # parse setup.ini into package name, version, etc.
-apt.get_installed()
-
-
+try:
+    apt.mirror = apt.get_config('last-mirror')  # the url
+    apt.mirror_dir = urllib.quote (apt.mirror, '').lower () # the local filesystem dir name
+    apt.last_cache = apt.get_config('last-cache')
+    apt.downloads = '%s/%s' % (apt.last_cache, apt.mirror_dir)
+    apt.get_setup_ini() # parse setup.ini into package name, version, etc.
+    apt.get_installed()
+except:
+    print '-' *10, 'Error reading last-mirror, last-cache, downloads dir, installed packages'
+        
 @plac.annotations(packages='package(s) to operate on')
 def install(*packages):
     "install packages"
@@ -63,7 +64,9 @@ def update(mirror):
 @plac.annotations(quiet=('summary information', 'flag', 'q'))
 def setup(quiet):
     "create Osgeo4w filesystem skeleton"
-    return ('setup ', quiet)
+    print '-' *10 + ' running apt setup'
+    apt.setup()
+    return ('-' *10 + 'setup ', quiet)
 
 def __missing__(name):
     return('Command %r does not exist' % name,)

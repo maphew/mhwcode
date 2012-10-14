@@ -85,5 +85,8 @@ removed: O:\lib\libcurl_imp.lib
 ---------- Remove complete
 #@+node:maphew.20121011215813.1573: *3* apt update
 #@+node:maphew.20121011215813.1574: *3* a2 update
+B:\code\maphew\apt>a2 update
+---------- running apt update None
+...100%  ----------Update finished
 #@-others
 #@-leo
