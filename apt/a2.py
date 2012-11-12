@@ -29,11 +29,14 @@ apt.mirror = apt.get_mirror()  # the url
 apt.mirror_dir = urllib.quote (apt.mirror, '').lower () # the local filesystem dir name
 apt.last_cache = apt.get_config('last-cache')
 apt.downloads = '%s/%s' % (apt.last_cache, apt.mirror_dir)
-apt.get_setup_ini() # parse setup.ini into package name, version, etc.
-apt.get_installed()
-# try:
-# except:
-    # print '-' *10, 'Error reading last-mirror, last-cache, downloads dir, installed packages'
+
+try:
+    apt.get_setup_ini() # parse setup.ini into package name, version, etc.
+    apt.get_installed()
+        
+except:
+    print 'Error retreiving installed package info. Has "apt setup" been run yet?\n'
+    # apt.check_setup(apt.installed_db, apt.setup_ini) # verify skeleton file structure exists
         
 @plac.annotations(packages='package(s) to operate on')
 def install(*packages):
