@@ -64,7 +64,21 @@ def update(mirror):
 @plac.annotations(path_root='full path to use for Osgeo4W root')
 def setup(path_root):
     "create Osgeo4w filesystem skeleton"
-    print '-' *10 + ' running apt setup'
+    print '-' *10 + ' running apt setup', path_root
+    
+    apt.OSGEO4W_ROOT = path_root
+    os.environ['OSGEO4W_ROOT'] = path_root
+ 
+    # (re)set globals expected by apt
+    apt.OSGEO4W_ROOT = os.environ['OSGEO4W_ROOT']   
+    apt.root = apt.OSGEO4W_ROOT
+    apt.OSGEO4W_STARTMENU = 'OSGeo4W'
+    apt.config = apt.root + '/etc/setup/'
+    apt.setup_ini = apt.config + '/setup.ini'
+    apt.setup_bak = apt.config + '/setup.bak'
+    apt.installed_db = apt.config + '/installed.db'
+    apt.installed_db_magic = 'INSTALLED.DB 2\n'
+        
     apt.setup()
     return ('-' *10 + 'setup ', '')
 
