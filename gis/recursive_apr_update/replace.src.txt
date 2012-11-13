@@ -1,0 +1,82 @@
+# this file is not kept up to date
+# ----------------------------------------------------------------------
+# -delete blank lines
+#	/^$
+#	dd
+# -spaces and periods must be escaped with a backslash, eg: "\ "
+#
+# -search&replace "/" to "\/"
+#	:%sno/\//\\\//g
+# -remove spaces not preceded by a backslash
+#	:%sno/ //
+# -insert at beginning of line: :%sno/
+#	:%sno/^/:%sno\//
+# -replace double tabs with single
+#	:%sno/		/	/g
+# replace tabs with "/"
+#	:%sno/	/\//g
+#
+# Libraries Available:
+# ====================
+#  Base 1000k
+#  Forest Inventory 50k
+#  Bathymetry 50k
+#  Base 250k
+#  Base 50k
+#  av 250k text
+#  av 50k text
+#
+#
+# find			replace
+# ----------------------------------------------------------------------
+#
+# this line is only necessary for processing the backup/test copies of
+# the user .apr files on our local network.
+# Path:\t"c:/		Path:\t"x:/rgn_update/dcooley/c
+
+d:/rrgis/250k/q		z:/arcdata/250k/boundary/q
+d:/rrgis/250k/info/q	z:/arcdata/250k/boundary/info/q
+
+d:/rrgis/250k/boundary	z:/arcdata/250k/boundary
+d:/rrgis/1000k/boundary	z:/arcdata/1000k/boundary
+
+d:/rrgis/1000k/theme	z:/arcdata/1000k/theme
+d:/rrgis/250k/theme	z:/arcdata/250k/theme
+d:/rrgis/50k/theme	z:/arcdata/50k/theme
+
+d:/rrgis		z:/arcdata_old
+
+z:/arcdata/lib250	z:/arcdata_old/250k
+z:/arcdata/arcdata	z:/arcdata
+
+/1000k/boundary/border	/1000k/boundary/mborder
+/1000k/boundary/codist	/1000k/boundary/mcodist
+/1000k/boundary/fntt	/1000k/boundary/mfntt
+/1000k/boundary/gma	/1000k/boundary/mgma
+/1000k/boundary/oa	/1000k/boundary/moa
+/1000k/boundary/park	/1000k/boundary/mpark
+/1000k/boundary/rtc	/1000k/boundary/mrtc
+
+/1000k/boundary/info/border	/1000k/boundary/info/mborder
+/1000k/boundary/info/codist	/1000k/boundary/info/mcodist
+/1000k/boundary/info/fntt	/1000k/boundary/info/mfntt
+/1000k/boundary/info/gma	/1000k/boundary/info/mgma
+/1000k/boundary/info/oa		/1000k/boundary/info/moa
+/1000k/boundary/info/park	/1000k/boundary/info/mpark
+/1000k/boundary/info/rtc	/1000k/boundary/info/mrtc
+
+"rr1000\.coast		"base\ 1000k\.coast
+"rr1000\.water		"base\ 1000k\.water
+"rr1000\.river		"base\ 1000k\.river
+"rr1000\.ice		"base\ 1000k\.ice
+"rr1000\.contour	"base\ 1000k\.contour
+"rr1000\.hypsometry	"base\ 1000k\.hypsometry
+"rr1000\.access		"base\ 1000k\.access
+"rr1000\.places		"base\ 1000k\.places
+"rr1000\.ocean		"base\ 1000k\.ocean
+
+"rr250			"rr250-old
+"rr50			"rr50-old
+
+z:/arcdata/250k/base	z:/arcdata_old/250k/base
+z:/arcdata/50k/base	z:/arcdata_old/50k/base

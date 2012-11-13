@@ -1,0 +1,35 @@
+&severity &error &routine bail
+/* ------------------------------------------------------------------------
+&args out-dem cmdfile logfile overwrite tile
+/* ------------------------------------------------------------------------
+&if [null %cmdfile%] | [null %logfile%] &then
+   &return ...USAGE: &r %aml$file% {out-dem} {cmdfile} {logfile} {overwrite}
+
+&set anudem = x:\anudem\bin\anudemc.exe
+
+&if %overwrite% = overwrite &then &do
+   &sys del %out-dem%               >nul
+   &sys del %tile%.hdr              >nul
+   &sys attrib +r %tile%-dem.cmd    >nul
+   &sys del %tile%-dem.*            >nul
+   &sys attrib -r %tile%-dem.cmd    >nul
+   &end
+
+&if [exists %out-dem% -file] &then &return ...%out-dem% already exists.
+
+&type ...building ANUDEM dem
+   &do arced &list [listfile *.gz -file]
+      &sys gunzip %arced%
+   &end
+      &if not [null %logfile%] &then ~
+         &sys %anudem% <%cmdfile% 1>%logfile%
+         &else &sys %anudem% <%cmdfile%
+      &sys cat %logfile% >>%.home%\global-%logfile%
+      &sys tail -23 %logfile%
+   &sys gzip *.gen
+&return
+/* ------------------------------------------------------------------------
+&routine bail
+   &if not [variable str] &then &s str Bailing out of %aml$file%...
+   &return; &return &warning %str%
+/*===========================================================================
