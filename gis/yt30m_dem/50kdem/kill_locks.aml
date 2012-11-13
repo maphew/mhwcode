@@ -1,0 +1,51 @@
+&severity &error &routine bail
+&args quad tile:REST
+&ty --------------------------------------------------------------------------
+&ty   * [upcase %aml$file%] * Project: Updated LIMS 50k DEM * mhw * 02-Aug-2k
+&ty     ::Step *::  (see scripts\__ReadMe.aml)
+&ty
+&ty     - Walk directory tree and remove all lock files from workspaces...
+&ty       (lockfiles which are marked open are skipped quietly)
+&ty --------------------------------------------------------------------------
+&if [null %quad%] &then &do
+    &s pause [response '<Enter> to continue, something else to abort']
+    &if not [null %pause%] &then &return %aml$file% exited by user request.
+    &end
+
+&if not [variable .library] &then &return &error Project Environment is not setup. Look for ./scripts/setenv.aml
+&workspace %.home%
+
+/* put header variables and other semi-global code here
+
+/* follow ...\<quad>\<tile>\  (...\115h\115h12\)  pattern
+/* check for quad placeholder (allows "&r aml_prog . 105d11 105d12 105d13")
+&if %quad% = . &then &set quad = [listfile * -directory]
+/* check for quad commandline args
+&if [null %quad%] &then &set quad = [listfile * -directory]
+/* check for tile argument
+&if not [null %tile%] &then &set tile_arg = yes
+
+&do quad &list [unquote %quad%]
+  &workspace %quad%; &type ...entering %quad%
+
+        &do tile &list [listfile * -workspace]
+            &call main
+        &end
+
+  &workspace  ..
+&end
+
+&RETURN ...[upcase %aml$fullfile%] finished normally.
+
+/* ============================================================================
+&ROUTINE MAIN
+    &severity &error &ignore /* so it won't stop when it encounters an active session
+
+    &if [exists %tile%\lock -file] &then &type ...deleting  %tile%\lock
+    &if [exists %tile%\lock -file] &then &sys del %tile%\lock
+&RETURN
+
+&routine bail
+   &if not [variable str] &then &s str Bailing out of %aml$file%...
+   &return; &return &warning %str%
+/*===========================================================================
