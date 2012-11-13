@@ -70,6 +70,13 @@ Options:
     -x,--no-deps           ignore dependencies
     -s,--start-menu=NAME   set the start menu name (OSGeo4W)
 ''' % {'setup_ini':setup_ini,'mirror':mirror,'root':root}) #As they were just printing as "%(setup_ini)s" etc...
+#@+node:maphew.20121111221942.1497: ** check_setup
+def check_setup(installed_db, setup_ini):
+    for i in (installed_db, setup_ini):
+        if not os.path.isfile (i):
+            sys.stderr.write ('error: %s no such file\n' % i)
+            sys.stderr.write ('error: set OSGEO4W_ROOT and run "apt setup"\n')
+            sys.exit (2)
 #@+node:maphew.20100302221232.1487: ** Commands
 ###########################
 #COMMANDS
@@ -1178,11 +1185,7 @@ if __name__ == '__main__':
         help ()
 
     else:
-        for i in (installed_db, setup_ini):
-            if not os.path.isfile (i):
-                sys.stderr.write ('error: %s no such file\n' % i)
-                sys.stderr.write ('error: set OSGEO4W_ROOT and run "apt setup"\n')
-                sys.exit (2)
+        check_setup(installed_db, setup_ini)
 
         get_setup_ini ()
         get_installed ()
