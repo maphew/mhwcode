@@ -61,12 +61,12 @@ def update(mirror):
     apt.update()
     return (10*'-'+ 'Update finished ', '')
 
-@plac.annotations(quiet=('summary information', 'flag', 'q'))
-def setup(quiet):
+@plac.annotations(path_root='full path to use for Osgeo4W root')
+def setup(path_root):
     "create Osgeo4w filesystem skeleton"
     print '-' *10 + ' running apt setup'
     apt.setup()
-    return ('-' *10 + 'setup ', quiet)
+    return ('-' *10 + 'setup ', '')
 
 def __missing__(name):
     return('Command %r does not exist' % name,)
@@ -81,4 +81,3 @@ main = __import__(__name__) # the module imports itself!
 if __name__=='__main__':
     import plac
     for out in plac.call(main): print(out)
-
