@@ -8,6 +8,7 @@ commands = 'install','remove','update','setup'
 
 # """Set apt global variables"""
 apt.INSTALL = 'install'
+apt.check_env() # verify osgeo4w_root is set
 apt.OSGEO4W_ROOT = os.environ['OSGEO4W_ROOT']
 apt.root = apt.OSGEO4W_ROOT
 apt.OSGEO4W_STARTMENU = 'OSGeo4W'

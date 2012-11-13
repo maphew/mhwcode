@@ -2,6 +2,24 @@
 #@+node:maphew.20121011215813.1567: * @file Notes.txt
 
 #@+others
+#@+node:maphew.20121113004545.1578: ** a2
+I've done pretty good so far, using the a2 wrapper to slowly go over apt and piece by piece move procedural code into functions, and still keep both programs working. I'm nearing the end of the easy stuff though, and now the mass of globals in a2 are starting to get in the way.
+
+The problem of the moment is that check for the O4W root takes place before plac, so all that nice help formatting goes right out the window, yet *not* doing the check means we get a key error when processing the globals:
+
+    B:\code\maphew\apt>a2
+    Traceback (most recent call last):
+      File "a2.py", line 11, in <module>
+        apt.OSGEO4W_ROOT = os.environ['OSGEO4W_ROOT']
+      File "B:\o4w\\apps\Python27\lib\os.py", line 423, in __getitem__
+        return self.data[key.upper()]
+    KeyError: 'OSGEO4W_ROOT'
+
+sigh.
+
+This may mean the end of moving apt furniture about. We've tidied things up, there's some organization, but to go any further means ripping some walls out and moving structural elements. It could all come crashing down next, but hey! that's why we're using version control with smart and easy merging and branching, right? 
+
+(now if only I knew how to use it! :)
 #@+node:maphew.20121011215813.1569: ** Expected test results
 #@+node:maphew.20121113004545.1562: *3* apt setup
 B:\code\maphew\apt>apt setup
