@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #@+leo-ver=5-thin
-#@+node:maphew.20120709214653.1534: * @file apt.py
+#@+node:maphew.20120709214653.1686: * @file apt.py
 #@@first
 #@+<<docstring>>
 #@+node:maphew.20100307230644.3846: ** <<docstring>>
@@ -70,8 +70,20 @@ Options:
     -x,--no-deps           ignore dependencies
     -s,--start-menu=NAME   set the start menu name (OSGeo4W)
 ''' % {'setup_ini':setup_ini,'mirror':mirror,'root':root}) #As they were just printing as "%(setup_ini)s" etc...
+#@+node:maphew.20121113004545.1577: ** check_env
+def check_env():
+    #'''Verify we're runnining in an Osgeo4W ready shell'''
+    OSGEO4W_ROOT = ''
+    if 'OSGEO4W_ROOT' in os.environ.keys ():
+        OSGEO4W_ROOT = os.environ['OSGEO4W_ROOT']
+        os.putenv('OSGEO4W_ROOT_MSYS', OSGEO4W_ROOT) # textreplace.exe needs this (post_install)
+        OSGEO4W_ROOT = string.replace(OSGEO4W_ROOT, '\\', '/') # convert 2x backslash to foreslash
+    else:
+       sys.stderr.write ('error: Please set OSGEO4W_ROOT\n')
+       sys.exit (2)
 #@+node:maphew.20121111221942.1497: ** check_setup
 def check_setup(installed_db, setup_ini):
+    #'''Look to see if the installed packages db and setup.ini are avialable'''
     for i in (installed_db, setup_ini):
         if not os.path.isfile (i):
             sys.stderr.write ('error: %s no such file\n' % i)
@@ -1059,15 +1071,8 @@ if __name__ == '__main__':
 
     #@+<<globals>>
     #@+node:maphew.20100307230644.3841: ** <<globals>>
-    OSGEO4W_ROOT = ''
-    if 'OSGEO4W_ROOT' in os.environ.keys ():
-        OSGEO4W_ROOT = os.environ['OSGEO4W_ROOT']
-        os.putenv('OSGEO4W_ROOT_MSYS', OSGEO4W_ROOT) # textreplace.exe needs this (post_install)
-        OSGEO4W_ROOT = string.replace(OSGEO4W_ROOT, '\\', '/') # convert 2x backslash to foreslash
-    else:
-       sys.stderr.write ('error: Please set OSGEO4W_ROOT\n')
-       sys.exit (2)
-
+    check_env() # verify OSGEO4W_ROOT is set
+        
     CWD = os.getcwd ()
     INSTALL = 'install'
     installed = 0
