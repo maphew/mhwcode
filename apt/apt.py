@@ -81,6 +81,8 @@ def check_env():
     else:
        sys.stderr.write ('error: Please set OSGEO4W_ROOT\n')
        sys.exit (2)
+       
+    return OSGEO4W_ROOT
 #@+node:maphew.20121111221942.1497: ** check_setup
 def check_setup(installed_db, setup_ini):
     #'''Look to see if the installed packages db and setup.ini are avialable'''
@@ -1071,7 +1073,7 @@ if __name__ == '__main__':
 
     #@+<<globals>>
     #@+node:maphew.20100307230644.3841: ** <<globals>>
-    check_env() # verify OSGEO4W_ROOT is set
+    OSGEO4W_ROOT = check_env() # verify OSGEO4W_ROOT is set
         
     CWD = os.getcwd ()
     INSTALL = 'install'
