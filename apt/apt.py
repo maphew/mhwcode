@@ -524,7 +524,7 @@ def do_install (packagename):
     if os.path.isdir ('%s/etc/postinstall' % root):
         post = glob.glob ('%s/etc/postinstall/*.bat' % root)
         if post:
-            post_install ()
+            post_install (packagename)
 
     #update package details in installed.db
     installed[0][packagename] = os.path.basename (ball)
@@ -917,7 +917,7 @@ def no_package (s='error'):
 #    plist.sort (lst)
 #    return lst
 #@+node:maphew.20100223163802.3765: ** post_install
-def post_install ():
+def post_install (packagename):
     # ''' Run postinstall batch files and update package manifest
     #     to catch those files not included in the package archive.
     #     (manifest = etc/setup/pkg-foo.lst.gz) '''
@@ -951,7 +951,7 @@ def post_install ():
                 bat = bat.replace ('/etc/', 'etc/')  # strip leading slash
 
                 # foo.bat --> foo.bat.done in manifest
-                lst = get_filelist()
+                lst = get_filelist(packagename)
 
                 # ticket #281, ignore leading dot slash in filenames (./foo.bat --> foo.bat)
                 lst = [x.replace('./','') for x in lst]
@@ -977,7 +977,7 @@ def post_install ():
                         out = p.sub(r'bin/\1.bat', s)
                         lst.append(out)
 
-                write_filelist (lst)
+                write_filelist (packagename, lst)
 
                 print >>sys.stderr, "Post_install complete, return code", retcode
 
