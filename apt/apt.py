@@ -735,7 +735,7 @@ def get_requires (packagename):
     # ''' identify dependencies of package'''
     dist = dists[distname]
     if not dists[distname].has_key (packagename):
-        no_package ('warning')
+        no_package (packagename, distname)
         #return []
         sys.exit (1)
     if depend_p:
@@ -909,8 +909,8 @@ def version_to_string (t):
               t[-1])
 
 #@+node:maphew.20100223163802.3758: ** no_package
-def no_package (s='error'):
-    sys.stderr.write ("%s: %s not in [%s]\n" % (s, packagename, distname))
+def no_package (packagename, distname, s='error'):
+    sys.stderr.write ("Warning: %s not in distribution [%s]\n" % (packagename, distname))
 
 #@+node:maphew.20100302221232.1486: ** psort (disabled)
 #def psort (lst): #Raises "AttributeError: 'function' object has no attribute 'sort'" use sorted() instead
