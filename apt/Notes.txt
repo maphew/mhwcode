@@ -3,7 +3,8 @@
 
 #@+others
 #@+node:maphew.20130122175214.1530: ** bugs
-#@+node:maphew.20130122175214.1531: *3* a2 install bad-pkg-name
+#@+node:maphew.20130122175214.1532: *3* fixed
+#@+node:maphew.20130122175214.1531: *4* a2 install bad-pkg-name
 todo: Have apt report nicely when the packagename is not recognized
 
 B:\code\maphew\apt>a2 install iconvcurl
@@ -28,6 +29,11 @@ me
     sys.stderr.write ("%s: %s not in [%s]\n" % (s, packagename, distname))
 NameError: global name 'packagename' is not defined
 #@+node:maphew.20121113004545.1578: ** a2
+2013-Jan-21
+
+Next thing I'd like to do is make it easier to test install of packages, either by passing a particular tarball on the command line or by pointing to an alternate local cache directory. I think the tarball route might be easier.
+
+--------------
 I've done pretty good so far, using the a2 wrapper to slowly go over apt and piece by piece move procedural code into functions, and still keep both programs working. I'm nearing the end of the easy stuff though, and now the mass of globals in a2 are starting to get in the way.
 
 The problem of the moment is that check for the O4W root takes place before plac, so all that nice help formatting goes right out the window, yet *not* doing the check means we get a key error when processing the globals:
