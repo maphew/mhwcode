@@ -39,7 +39,7 @@ except:
     print 'Error retreiving installed package info. Has "apt setup" been run yet?\n'
     # apt.check_setup(apt.installed_db, apt.setup_ini) # verify skeleton file structure exists
         
-@plac.annotations(packages='package(s) to operate on')
+@plac.annotations(packages='list of one or more packages to install')
 def install(*packages):
     "install packages"
     print '-' *10 + ' running apt install', ' '.join(packages)
