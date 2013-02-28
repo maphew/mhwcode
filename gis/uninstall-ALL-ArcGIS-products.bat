@@ -4,7 +4,10 @@ echo.
 echo.           Uninstall all ArcGIS products from v8.2 to v10.1
 echo.
 echo. ---------------------------------------------------------------------------
-if not "%1"=="go" goto :NotReady
+echo.
+rem if not "%1"=="go" goto :NotReady
+set /p _verify="Are you sure you want to continue? [y/N] " || set _verify=N
+if /i not "%_verify%"=="Y" goto :eof
 
 :: msiexec optional parameters here
 :: remove '/passive' to hide the pop-up progress window and run silently
@@ -32,7 +35,7 @@ goto :eof
 :: ---------------------------------------------------------------------------
 :uninstall
   :: %1 = product code
-  msiexec.exe /x %1 /qn /norestart /l*+ %temp%\%~n0-%COMPUTERNAME%.log %_opt%
+  %SystemRoot%\System32\msiexec.exe /x %1 /qn /norestart /l*+ %temp%\%~n0-%COMPUTERNAME%.log %_opt%
   goto :eof
 
 :NotReady
@@ -226,4 +229,3 @@ goto :eof
   {B4436C83-F8C0-4F35-887A-D301955A39A3} ^
   ) do call :uninstall %%a
   goto :eof
-  
