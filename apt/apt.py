@@ -544,8 +544,11 @@ def do_uninstall (packagename):
         if not os.path.exists (file):
             sys.stderr.write ('warning: %s no such file\n' % file)
         elif not os.path.isdir (file):
-            if os.remove (file):
-                raise 'urg'
+            try:
+                os.remove(file)
+            except WindowsError:
+                os.chmod(file, 0777) # remove readonly flag and try again
+                os.remove (file)
             else:
                 sys.stdout.write('removed: %s\n' % file)
 
