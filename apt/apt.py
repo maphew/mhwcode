@@ -288,13 +288,13 @@ def missing ():
     print string.join (get_missing (), '\n')
 
 #@+node:maphew.20100223163802.3728: *3* new
-def new ():
+def new (dummy):
     '''list available upgrades to currently installed packages'''
     print '\nThe following packages are newer than the installed version:'
     global packagename
     for packagename in sorted (get_new ()):
         print '%-20s%-12s' % (packagename,
-                      version_to_string (get_version ()))
+                      version_to_string (get_version (packagename)))
 
 #@+node:maphew.20100223163802.3729: *3* remove
 def remove (packages):
