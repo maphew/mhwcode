@@ -224,7 +224,7 @@ def install_next (missing_packages, resolved, seen):
             sys.stderr.write ('preparing to replace %s %s\n' \
                       % (miss_package,
                          version_to_string (get_installed_version (packagename))))
-            do_uninstall ()
+            do_uninstall (packagename)
         sys.stderr.write ('installing %s %s\n' \
                   % (miss_package,
                      version_to_string (get_version (packagename))))
@@ -401,10 +401,10 @@ def update ():
     ini.close
 
 #@+node:maphew.20100223163802.3734: *3* upgrade
-def upgrade ():
+def upgrade (dummy):
     '''all installed packages'''
     packages = get_new ()
-    install ()
+    install (packages)
 
 #@+node:maphew.20100223163802.3735: *3* url
 def url ():
@@ -675,8 +675,8 @@ def get_new ():
     global packagename
     lst = []
     for packagename in installed[0].keys ():
-        new = get_version ()
-        ins = get_installed_version ()
+        new = get_version (packagename)
+        ins = get_installed_version (packagename)
         if new > ins:
             debug (" %s > %s" % (new, ins))
             lst.append (packagename)
