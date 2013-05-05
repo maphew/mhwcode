@@ -28,7 +28,7 @@ goto :eof
   echo. These can be placed anywhere in PATH.
   echo.
   echo @"%pyexe%" "%~dp0\launchLeo.py" %%* > leoc.bat
-  echo @"%pywexe%" "%~dp0\launchLeo.py" %%* > leo.bat
+  echo @start /b "Leo" "%pywexe%" "%~dp0\launchLeo.py" %%* > leo.bat
   goto :eof
 
 :register
@@ -39,8 +39,8 @@ goto :eof
     echo.
     echo. Setting .leo filetype and registering association with Windows
     echo.
-    ftype LeoFile=%pywexe% "%~dp0\launchLeo.py" %%*
-    assoc .leo=LeoFile
+    assoc .leo=Leo.File
+    ftype Leo.File=%pywexe% "%~dp0\launchLeo.py" %%*
    ) else (
     echo. Error: Can't set filetype and register association.
     echo. Please run from elevated shell to do that.
