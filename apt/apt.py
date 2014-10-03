@@ -274,7 +274,7 @@ def md5 (packagename):
 
     print '%s  %s - local' % (my_md5, ball)
     if md5 != my_md5:
-        raise 'file md5 does not match for ' + ball
+        raise TypeError('file md5 does not match for ' + ball)
 
 #@+node:maphew.20100223163802.3727: *3* missing
 def missing ():
@@ -515,7 +515,7 @@ def do_install (packagename):
     pipe.extractall()
     pipe.close()
     if pipe.close ():
-        raise 'urg'
+        raise TypeError('urg')
 
    # record list of files installed
     write_filelist (packagename, lst)
@@ -593,7 +593,7 @@ def get_filelist (packagename):
     pipe = gzip.open (config + packagename + '.lst.gz', 'r')
     lst = map (string.strip, pipe.readlines ())
     if pipe.close ():
-        raise 'urg'
+        raise TypeError('urg')
     return lst
 
 #@+node:maphew.20100223163802.3746: *3* get_installed
@@ -772,7 +772,7 @@ def save_config(fname,values):
     for i in values:
         pipe.write (i)
     if pipe.close ():
-        raise 'urg'
+        raise TypeError('urg')
 #@+node:maphew.20100223163802.3764: *3* write_installed
 def write_installed ():
     # ''' Record package in install.db '''
@@ -781,8 +781,7 @@ def write_installed ():
     file.writelines (map (lambda x: '%s %s 0\n' % (x, installed[0][x]),
                   installed[0].keys ()))
     if file.close ():
-        raise 'urg'
-
+        raise TypeError('urg')
 #@+node:maphew.20100223163802.3766: *3* write_filelist
 def write_filelist (packagename, lst):
     # ''' Record installed files in package manifest (etc/setup/packagename.lst.gz) '''
@@ -793,7 +792,7 @@ def write_filelist (packagename, lst):
         pipe.write (i)
         pipe.write ('\n')
     if pipe.close ():
-        raise 'urg'
+        raise TypeError('urg')
 #@+node:maphew.20100308085005.1382: ** Parsers
 #@+node:maphew.20100223163802.3754: *3* get_setup_ini
 def get_setup_ini ():
@@ -831,7 +830,7 @@ def get_setup_ini ():
                       string.split (lines[j], ': ', 1))
             except:
                 print lines[j]
-                raise 'URG'
+                raise TypeError('urg')
             if value[0] == '"' and value.find ('"', 1) == -1:
                 while 1:
                     j = j + 1
@@ -1011,20 +1010,20 @@ def do_unpack ():
     pipe = os.popen ('tar -C %s -xjvf %s' % (SRC, ball), 'r')
     lst = map (string.strip, pipe.readlines ())
     if pipe.close ():
-        raise 'urg1'
+        raise TypeError('urg1')
     print ('%s/%s' % (SRC, packagename))
     if not os.path.exists ('%s/%s' % (SRC, packagename)):
-        raise 'urg2'
+        raise TypeError('urg2')        
 
 #@+node:maphew.20100223163802.3768: *3* do_build
 def do_build ():
     src = '%s/%s' % (SRC, packagename)
     if not os.path.exists (src):
-        raise 'urg'
-
+        raise TypeError('urg')
+        
     m = re.match ('^(.*)-([0-9]*)$', packagename)
     if not m:
-        raise 'urg'
+        raise TypeError('urg')
     namever = m.group (1)
 
     package = split_ball (packagename)
