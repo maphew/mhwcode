@@ -40,6 +40,24 @@ Fix with
     copy etc\setup\setup.bak etc\setup\setup.ini
     
 hunch: has something to with mirror settings, .../x86/...
+#@+node:maphew.20141002090256.2028: *3* Access denied to .pyd
+We should exit with a graceful error in the case where Apt is trying to upgrade
+the python in active use.
+
+
+    preparing to replace python-core 2.7.4-2
+    Traceback (most recent call last):
+      File "b:\code\maphew\apt\apt.py", line 1203, in <module>
+        __main__.__dict__[command] (packages)
+      File "b:\code\maphew\apt\apt.py", line 407, in upgrade
+        install (packages)
+      File "b:\code\maphew\apt\apt.py", line 202, in install
+        install_next(missing.keys (), set([]), set([]))
+      File "b:\code\maphew\apt\apt.py", line 227, in install_next
+        do_uninstall (packagename)
+      File "b:\code\maphew\apt\apt.py", line 551, in do_uninstall
+        os.remove (file)
+    WindowsError: [Error 5] Access is denied: 'B:\\o4w\\apps\\Python27\\DLLs\\bz2.pyd'
 #@+node:maphew.20130122175214.1532: *3* fixed
 #@+node:maphew.20130122175214.1531: *4* a2 install bad-pkg-name
 todo: Have apt report nicely when the packagename is not recognized
