@@ -1,6 +1,9 @@
 #@+leo-ver=5-thin
 #@+node:maphew.20121011215813.1567: * @file Notes.txt
 #@+others
+#@+node:maphew.20140905201312.1893: ** 2014 Sept
+new magic bullet discovered: click
+@url http://click.pocoo.org/3/quickstart
 #@+node:maphew.20140905022205.1895: ** Too many apts
     B:\code\apt\r183\gis\o4w_extras\bin\apt.py
     B:\code\apt\r262\apt\apt.py
@@ -11,21 +14,32 @@
     B:\code\o4w\apt\apt.py
     B:\Projects\o4w\matt_release\apt\bin\apt.py
     
-This, is ridiculous. I don't know where to begin looking to catch up to myself, what to keep, what to throw away. It is the perfect exemplar for source code version control (management), yet I *am* using SCM in each of these -- just not the _same_ one for each...
+This, is ridiculous. I don't know where to begin looking to catch up to myself, what to keep, what to throw away. It is the perfect exemplar for source code version control (management), yet I *am* using SCM in all 8 these -- just not the _same_ one for each...
 
 Gak. what a mess.
 
 By date of commit messages, `maphew-apt` is most current (Spring 2013).
 
-apt-r### are largely experimental and near duplicates. I seem to recall something about them being an attempt to sort out and fix a broken branching operation. (Fall 2012)
+apt-r### are largely experimental and near duplicates. I seem to recall something about them being an attempt to sort out and fix a broken branching operation. (Fall 2012) DELETED
 
-apt-hg is Osgeo4w, using hg-subversion plugin. So most out of date (but matching current .exe release).
-
-
-
-
-
+apt-hg is Osgeo4w, using hg-subversion plugin. So most out of date (but matching current .exe release). RENAMED to `o4w-apt-hg`.
 #@+node:maphew.20130122175214.1530: ** bugs
+#@+node:maphew.20141002090256.2026: *3* IOError: invalid data stream
+    B:\o4w>python b:\code\maphew\apt\apt.py update
+    ...100%  Traceback (most recent call last):
+      File "b:\code\maphew\apt\apt.py", line 1190, in <module>
+        update ()
+      File "b:\code\maphew\apt\apt.py", line 396, in update
+        uncompressedData = bz2.BZ2File(archive).read()
+    IOError: invalid data stream
+
+
+After which etc\setup\setup.ini no longer exists.
+Fix with
+
+    copy etc\setup\setup.bak etc\setup\setup.ini
+    
+hunch: has something to with mirror settings, .../x86/...
 #@+node:maphew.20130122175214.1532: *3* fixed
 #@+node:maphew.20130122175214.1531: *4* a2 install bad-pkg-name
 todo: Have apt report nicely when the packagename is not recognized
@@ -51,6 +65,23 @@ me
   File "B:\code\maphew\apt\apt.py", line 913, in no_package
     sys.stderr.write ("%s: %s not in [%s]\n" % (s, packagename, distname))
 NameError: global name 'packagename' is not defined
+#@+node:maphew.20141002090256.2027: *4* TypeError: exceptions must be...
+B:\o4w>apt-dev install python-shapely
+
+...
+
+b282b1a891031cb7d2f4da52ce9f7607  python-shapely-1.2.18-1.tar.bz2 - remote
+9f6e3f15254db968fa3014bb62e7d0a3  python-shapely-1.2.18-1.tar.bz2 - local
+Traceback (most recent call last):
+  File "B:\o4w\bin\apt-dev.py", line 1150, in <module>
+    __main__.__dict__[command] ()
+  File "B:\o4w\bin\apt-dev.py", line 160, in install
+    download ()
+  File "B:\o4w\bin\apt-dev.py", line 119, in download
+    md5 ()
+  File "B:\o4w\bin\apt-dev.py", line 238, in md5
+    raise 'file md5 does not match for ' + ball
+TypeError: exceptions must be old-style classes or derived from BaseException, not str
 #@+node:maphew.20121113004545.1578: ** a2
 2013-Jan-21
 
