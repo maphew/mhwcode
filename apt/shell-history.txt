@@ -1,0 +1,1291 @@
+
+OSGEO4W home is C:\o4w\
+
+                   -={ OSGeo4W Shell Commands }=-
+
+       apt                listgeo            raw2tiff
+       bmp2tiff           nad2bin            rgb2ycbcr
+       cs2cs              ncdump             rpcgen
+       curl               ncgen              rpcinfo
+       dllupdate          nearblack          testepsg
+       fax2ps             nircmd             textreplace
+       fax2tiff           nircmdc            thumbnail
+       gdaladdo           ogdi_import        tiff2bw
+       gdalbuildvrt       ogdi_info          tiff2pdf
+       gdaldem            ogr2ogr            tiff2ps
+       gdalenhance        ogrinfo            tiff2rgba
+       gdalinfo           ogrlineref         tiffcmp
+       gdallocationinfo   ogrtindex          tiffcp
+       gdalmanage         opj_compress       tiffcrop
+       gdalserver         opj_decompress     tiffdither
+       gdalsrsinfo        opj_dump           tiffdump
+       gdaltindex         osgeo4w-setup      tiffinfo
+       gdaltransform      pal2rgb            tiffmedian
+       gdalwarp           portmap            tiffset
+       gdal_contour       ppm2tiff           tiffsplit
+       gdal_grid          proj               w9xpopen
+       gdal_rasterize     psql               xmlcatalog
+       gdal_translate     pylupdate4         xmllint
+       geod               pyrcc4             xxmklink
+       geotifcp           python
+       gif2tiff           pythonw
+       gltpd              ras2tiff
+
+
+       make-bat-for-py   pyuic4
+       o-help            setup-test
+       o4w_env           setup
+
+GDAL 1.11.0, released 2014/04/16
+
+C:\o4w>python
+Python 2.7.4 (default, Apr  6 2013, 19:54:46) [MSC v.1500 32 bit (Intel)] on win
+32
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import apt
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+RuntimeError: unable to get file status from 'b:\code\gcode\apt\apt.py'
+>>> ^Z
+
+
+C:\o4w>cd \apps\leo-editor
+
+C:\apps\leo-editor>pip install --editable .
+Obtaining file:///C:/apps/leo-editor
+  Running setup.py (path:C:/apps/leo-editor\setup.py) egg_info for package from
+file:///C:/apps/leo-editor
+
+    warning: no previously-included files matching '*.pyc' found under directory
+ 'leo'
+    warning: no previously-included files matching '*.pyo' found under directory
+ 'leo'
+    warning: no files found matching '*.tix' under directory 'leo'
+    warning: no files found matching '*.dbm' under directory 'leo'
+    warning: no files found matching '*.conf' under directory 'leo'
+    warning: no files found matching '*.TXT' under directory 'leo'
+    warning: no files found matching '*.def' under directory 'leo'
+    warning: no files found matching '*.six' under directory 'leo'
+    warning: no files found matching '*.cat' under directory 'leo'
+    warning: no files found matching '*.pro' under directory 'leo'
+    warning: no files found matching '*.xsl' under directory 'leo'
+    warning: no files found matching '*.rix' under directory 'leo'
+    warning: no files found matching '*.alg' under directory 'leo'
+    warning: no files found matching '*.iix' under directory 'leo'
+    no previously-included directories found matching 'leo\plugins\test'
+    no previously-included directories found matching 'leo\__pycache__'
+    no previously-included directories found matching 'leo\*\__pycache__'
+Installing collected packages: leo
+  Running setup.py develop for leo
+
+    warning: no previously-included files matching '*.pyc' found under directory
+ 'leo'
+    warning: no previously-included files matching '*.pyo' found under directory
+ 'leo'
+    warning: no files found matching '*.tix' under directory 'leo'
+    warning: no files found matching '*.dbm' under directory 'leo'
+    warning: no files found matching '*.conf' under directory 'leo'
+    warning: no files found matching '*.TXT' under directory 'leo'
+    warning: no files found matching '*.def' under directory 'leo'
+    warning: no files found matching '*.six' under directory 'leo'
+    warning: no files found matching '*.cat' under directory 'leo'
+    warning: no files found matching '*.pro' under directory 'leo'
+    warning: no files found matching '*.xsl' under directory 'leo'
+    warning: no files found matching '*.rix' under directory 'leo'
+    warning: no files found matching '*.alg' under directory 'leo'
+    warning: no files found matching '*.iix' under directory 'leo'
+    no previously-included directories found matching 'leo\plugins\test'
+    no previously-included directories found matching 'leo\__pycache__'
+    no previously-included directories found matching 'leo\*\__pycache__'
+    Creating c:\o4w\apps\python27\lib\site-packages\leo.egg-link (link to .)
+    Adding leo 4.11-final to easy-install.pth file
+    Installing leoc-script.py script to C:\o4w\apps\Python27\Scripts
+    Installing leoc.exe script to C:\o4w\apps\Python27\Scripts
+    Installing leoc.exe.manifest script to C:\o4w\apps\Python27\Scripts
+    Installing leo-script.pyw script to C:\o4w\apps\Python27\Scripts
+    Installing leo.exe script to C:\o4w\apps\Python27\Scripts
+    Installing leo.exe.manifest script to C:\o4w\apps\Python27\Scripts
+    Installing leo-install.py script to C:\o4w\apps\Python27\Scripts
+
+    Installed c:\apps\leo-editor
+Successfully installed leo
+Cleaning up...
+
+C:\apps\leo-editor>b:
+
+B:\>cd code\apt
+The system cannot find the path specified.
+
+B:\>cd code\gcode\apt
+
+B:\code\gcode\apt>leo
+
+B:\code\gcode\apt>python c:\apps\leo-editor\launchLeo.py
+^CTerminate batch job (Y/N)? y
+
+B:\code\gcode\apt>leo.exe
+
+B:\code\gcode\apt>del c:\apps\leo.bat
+
+B:\code\gcode\apt>leo
+
+B:\code\gcode\apt>leo
+
+B:\code\gcode\apt>pip install --editable .
+Obtaining file:///B:/code/gcode/apt
+  Running setup.py (path:B:/code/gcode/apt\setup.py) egg_info for package from f
+ile:///B:/code/gcode/apt
+    error in AptInstaller setup command: ('Invalid module name', 'apt,')
+    Complete output from command python setup.py egg_info:
+    error in AptInstaller setup command: ('Invalid module name', 'apt,')
+
+----------------------------------------
+Cleaning up...
+Command python setup.py egg_info failed with error code 1 in B:/code/gcode/apt
+Storing debug log for failure in B:\pip\pip.log
+
+B:\code\gcode\apt>pip install --editable .
+Obtaining file:///B:/code/gcode/apt
+  Running setup.py (path:B:/code/gcode/apt\setup.py) egg_info for package from f
+ile:///B:/code/gcode/apt
+
+    file dapt.py (for module dapt) not found
+Requirement already satisfied (use --upgrade to upgrade): Click in c:\o4w\apps\p
+ython27\lib\site-packages (from AptInstaller==0.3)
+Installing collected packages: AptInstaller
+  Running setup.py develop for AptInstaller
+
+    file dapt.py (for module dapt) not found
+    Creating c:\o4w\apps\python27\lib\site-packages\AptInstaller.egg-link (link
+to .)
+    AptInstaller 0.3 is already the active version in easy-install.pth
+    Installing dapt-script.py script to C:\o4w\apps\Python27\Scripts
+    Installing dapt.exe script to C:\o4w\apps\Python27\Scripts
+    Installing dapt.exe.manifest script to C:\o4w\apps\Python27\Scripts
+    Installing apt-script.py script to C:\o4w\apps\Python27\Scripts
+    Installing apt.exe script to C:\o4w\apps\Python27\Scripts
+    Installing apt.exe.manifest script to C:\o4w\apps\Python27\Scripts
+
+    Installed b:\code\gcode\apt
+Successfully installed AptInstaller
+Cleaning up...
+
+B:\code\gcode\apt>dapt
+Traceback (most recent call last):
+  File "C:\o4w\apps\Python27\Scripts\dapt-script.py", line 9, in <module>
+    load_entry_point('AptInstaller==0.3', 'console_scripts', 'dapt')()
+  File "C:\o4w\apps\Python27\lib\site-packages\pkg_resources.py", line 356, in l
+oad_entry_point
+    return get_distribution(dist).load_entry_point(group, name)
+  File "C:\o4w\apps\Python27\lib\site-packages\pkg_resources.py", line 2472, in
+load_entry_point
+    return ep.load()
+  File "C:\o4w\apps\Python27\lib\site-packages\pkg_resources.py", line 2186, in
+load
+    ['__name__'])
+ImportError: No module named dapt
+
+B:\code\gcode\apt>copy apt.py dapt.py
+        1 file(s) copied.
+
+B:\code\gcode\apt>copy apt.py dapt.py
+Overwrite dapt.py? (Yes/No/All): y
+        1 file(s) copied.
+
+B:\code\gcode\apt>dapt
+Traceback (most recent call last):
+  File "C:\o4w\apps\Python27\Scripts\dapt-script.py", line 9, in <module>
+    load_entry_point('AptInstaller==0.3', 'console_scripts', 'dapt')()
+TypeError: 'module' object is not callable
+
+B:\code\gcode\apt>apt
+-={ Id: apt.py 1192 2012-07-04 19:32:14Z maphew }=-
+
+apt [OPTION]... COMMAND [PACKAGE]...
+
+Commands:
+    available -  show packages available to be installed
+    ball - print full path name of package archive
+    download - download package
+    find - package containing file (from installed packages)
+    help - help COMMAND
+    install - download and install packages, including dependencies
+    list - installed packages
+    listfiles - installed with package X
+    md5 - check md5 sum
+    missing - print missing dependencies for X
+    new - list available upgrades to currently installed packages
+    remove - uninstall packages
+    requires - report package dependencies
+    search - search available packages list for X
+    setup - skeleton installed packages environment
+    update - setup.ini
+    upgrade - all installed packages
+    url - print package archive path, relative to mirror root
+    version - print installed version of X
+    versions - print versions of all installed packages
+
+Options:
+    -d,--download          download only
+    -i,--ini=FILE          use setup.ini [C:/o4w//etc/setup//setup.ini]
+    -m,--mirror=URL        use mirror [http://download.osgeo.org/osgeo4w]
+    -r,--root=DIR          set osgeo4w root [C:/o4w/]
+    -t,--t=NAME            set dist name (*curr*, test, prev)
+    -x,--no-deps           ignore dependencies
+    -s,--start-menu=NAME   set the start menu name (OSGeo4W)
+
+B:\code\gcode\apt>apt
+-={ Id: apt.py 1192 2012-07-04 19:32:14Z maphew }=-
+
+apt [OPTION]... COMMAND [PACKAGE]...
+
+Commands:
+    available -  show packages available to be installed
+    ball - print full path name of package archive
+    download - download package
+    find - package containing file (from installed packages)
+    help - help COMMAND
+    install - download and install packages, including dependencies
+    list - installed packages
+    listfiles - installed with package X
+    md5 - check md5 sum
+    missing - print missing dependencies for X
+    new - list available upgrades to currently installed packages
+    remove - uninstall packages
+    requires - report package dependencies
+    search - search available packages list for X
+    setup - skeleton installed packages environment
+    update - setup.ini
+    upgrade - all installed packages
+    url - print package archive path, relative to mirror root
+    version - print installed version of X
+    versions - print versions of all installed packages
+
+Options:
+    -d,--download          download only
+    -i,--ini=FILE          use setup.ini [C:/o4w//etc/setup//setup.ini]
+    -m,--mirror=URL        use mirror [http://download.osgeo.org/osgeo4w]
+    -r,--root=DIR          set osgeo4w root [C:/o4w/]
+    -t,--t=NAME            set dist name (*curr*, test, prev)
+    -x,--no-deps           ignore dependencies
+    -s,--start-menu=NAME   set the start menu name (OSGeo4W)
+
+B:\code\gcode\apt>dir
+ Volume in drive B is Acer
+ Volume Serial Number is 641B-FCCC
+
+ Directory of B:\code\gcode\apt
+
+27/09/2014  12:14 PM    <DIR>          .
+27/09/2014  12:14 PM    <DIR>          ..
+17/09/2014  02:37 PM                22 a1.bat
+17/09/2014  02:37 PM               835 a1.py
+17/09/2014  02:37 PM                22 a2.bat
+17/09/2014  02:37 PM             2,835 a2.py
+17/09/2014  02:37 PM                27 a3-subs.bat
+17/09/2014  02:37 PM             1,407 a3-subs.py
+27/09/2014  11:44 AM               195 appy.py
+17/09/2014  02:37 PM                21 apt-docopt.bat
+17/09/2014  02:37 PM               719 apt-docopt.py
+17/09/2014  02:37 PM                32 apt-skeleton.bat
+27/09/2014  11:00 AM             1,339 apt-skeleton.py
+27/09/2014  12:18 PM            42,663 apt.py
+27/09/2014  11:41 AM    <DIR>          AptInstaller.egg-info
+17/09/2014  02:37 PM               544 args.py
+19/09/2014  11:30 PM            42,703 dapt.py
+27/09/2014  12:14 PM            30,093 dapt.pyc
+17/09/2014  02:37 PM             7,527 Notes.txt
+17/09/2014  02:37 PM                40 set-root.bat
+27/09/2014  12:13 PM               247 setup.py
+27/09/2014  11:45 AM    <DIR>          t
+              18 File(s)        131,271 bytes
+               4 Dir(s)  194,013,319,168 bytes free
+
+B:\code\gcode\apt>path
+PATH=C:\o4w\\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Wind
+ows\System32\WindowsPowerShell\v1.0\;C:\Program Files\EgisTec MyWinLocker\x86;C:
+\Program Files\EgisTec MyWinLocker\x64;c:\apps;c:\o4w;C:\o4w\\apps\msys\bin;C:\o
+4w\\apps\Python27\Scripts
+
+B:\code\gcode\apt>dir c:\o4w
+ Volume in drive C is Acer
+ Volume Serial Number is 641B-FCCC
+
+ Directory of c:\o4w
+
+17/09/2014  06:17 PM    <DIR>          .
+17/09/2014  06:17 PM    <DIR>          ..
+17/09/2014  01:55 PM    <DIR>          apps
+27/09/2014  11:43 AM    <DIR>          bin
+25/07/2011  08:34 AM    <DIR>          etc
+05/07/2014  10:12 AM    <DIR>          include
+05/07/2014  10:12 AM    <DIR>          lib
+16/12/2012  09:33 PM               540 o4w.bat
+16/12/2012  09:33 PM               540 OSGeo4W.bat
+04/07/2008  03:50 PM             5,430 OSGeo4W.ico
+05/07/2014  10:11 AM    <DIR>          share
+17/09/2014  01:31 PM    <DIR>          var
+               3 File(s)          6,510 bytes
+               9 Dir(s)  194,013,319,168 bytes free
+
+B:\code\gcode\apt>del c:\o4w\bin\apt.exe
+
+B:\code\gcode\apt>apt
+Traceback (most recent call last):
+  File "C:\o4w\apps\Python27\Scripts\apt-script.py", line 9, in <module>
+    load_entry_point('AptInstaller==0.3', 'console_scripts', 'apt')()
+  File "C:\o4w\apps\Python27\lib\site-packages\pkg_resources.py", line 356, in l
+oad_entry_point
+    return get_distribution(dist).load_entry_point(group, name)
+  File "C:\o4w\apps\Python27\lib\site-packages\pkg_resources.py", line 2472, in
+load_entry_point
+    return ep.load()
+  File "C:\o4w\apps\Python27\lib\site-packages\pkg_resources.py", line 2186, in
+load
+    ['__name__'])
+RuntimeError: unable to get file status from 'b:\code\gcode\apt\apt.py'
+
+B:\code\gcode\apt>pip remove .
+ERROR: unknown command "remove"
+
+B:\code\gcode\apt>pip uninstall .
+
+B:\code\gcode\apt>apt
+Traceback (most recent call last):
+  File "C:\o4w\apps\Python27\Scripts\apt-script.py", line 9, in <module>
+    load_entry_point('AptInstaller==0.3', 'console_scripts', 'apt')()
+  File "C:\o4w\apps\Python27\lib\site-packages\pkg_resources.py", line 356, in l
+oad_entry_point
+    return get_distribution(dist).load_entry_point(group, name)
+  File "C:\o4w\apps\Python27\lib\site-packages\pkg_resources.py", line 2472, in
+load_entry_point
+    return ep.load()
+  File "C:\o4w\apps\Python27\lib\site-packages\pkg_resources.py", line 2186, in
+load
+    ['__name__'])
+RuntimeError: unable to get file status from 'b:\code\gcode\apt\apt.py'
+
+B:\code\gcode\apt>pip uninstall AptInstaller
+Uninstalling AptInstaller:
+  c:\o4w\apps\python27\lib\site-packages\aptinstaller.egg-link
+  c:\o4w\apps\python27\scripts\apt-script.py
+  c:\o4w\apps\python27\scripts\apt.exe
+  c:\o4w\apps\python27\scripts\apt.exe.manifest
+  c:\o4w\apps\python27\scripts\dapt-script.py
+  c:\o4w\apps\python27\scripts\dapt.exe
+  c:\o4w\apps\python27\scripts\dapt.exe.manifest
+Proceed (y/n)? y
+  Successfully uninstalled AptInstaller
+
+B:\code\gcode\apt>subst
+B:\: => C:\Users\matt\home
+
+B:\code\gcode\apt>c:
+
+C:\apps\leo-editor>cd \users\matt\home
+
+C:\Users\matt\home>dir
+ Volume in drive C is Acer
+ Volume Serial Number is 641B-FCCC
+
+ Directory of C:\Users\matt\home
+
+27/09/2014  12:13 PM    <DIR>          .
+27/09/2014  12:13 PM    <DIR>          ..
+21/09/2014  12:28 AM               324 .bash_history
+19/09/2014  11:42 PM    <DIR>          .leo
+19/09/2014  11:35 PM    <DIR>          code
+27/09/2014  12:13 PM    <DIR>          pip
+               1 File(s)            324 bytes
+               5 Dir(s)  194,017,112,064 bytes free
+
+C:\Users\matt\home>cd code\gcode\apt
+
+C:\Users\matt\home\code\gcode\apt>pip install --editable .
+Obtaining file:///C:/Users/matt/home/code/gcode/apt
+  Running setup.py (path:C:/Users/matt/home/code/gcode/apt\setup.py) egg_info fo
+r package from file:///C:/Users/matt/home/code/gcode/apt
+
+Requirement already satisfied (use --upgrade to upgrade): Click in c:\o4w\apps\p
+ython27\lib\site-packages (from AptInstaller==0.3)
+Installing collected packages: AptInstaller
+  Running setup.py develop for AptInstaller
+
+    Creating c:\o4w\apps\python27\lib\site-packages\AptInstaller.egg-link (link
+to .)
+    Adding AptInstaller 0.3 to easy-install.pth file
+    Installing dapt-script.py script to C:\o4w\apps\Python27\Scripts
+    Installing dapt.exe script to C:\o4w\apps\Python27\Scripts
+    Installing dapt.exe.manifest script to C:\o4w\apps\Python27\Scripts
+    Installing apt-script.py script to C:\o4w\apps\Python27\Scripts
+    Installing apt.exe script to C:\o4w\apps\Python27\Scripts
+    Installing apt.exe.manifest script to C:\o4w\apps\Python27\Scripts
+
+    Installed c:\users\matt\home\code\gcode\apt
+Successfully installed AptInstaller
+Cleaning up...
+
+C:\Users\matt\home\code\gcode\apt>apt
+Traceback (most recent call last):
+  File "C:\o4w\apps\Python27\Scripts\apt-script.py", line 9, in <module>
+    load_entry_point('AptInstaller==0.3', 'console_scripts', 'apt')()
+  File "C:\o4w\apps\Python27\lib\site-packages\pkg_resources.py", line 356, in l
+oad_entry_point
+    return get_distribution(dist).load_entry_point(group, name)
+  File "C:\o4w\apps\Python27\lib\site-packages\pkg_resources.py", line 2472, in
+load_entry_point
+    return ep.load()
+  File "C:\o4w\apps\Python27\lib\site-packages\pkg_resources.py", line 2186, in
+load
+    ['__name__'])
+RuntimeError: unable to get file status from 'c:\users\matt\home\code\gcode\apt\
+apt.py'
+
+C:\Users\matt\home\code\gcode\apt>dapt
+Traceback (most recent call last):
+  File "C:\o4w\apps\Python27\Scripts\dapt-script.py", line 9, in <module>
+    load_entry_point('AptInstaller==0.3', 'console_scripts', 'dapt')()
+TypeError: 'module' object is not callable
+
+C:\Users\matt\home\code\gcode\apt>python apt.py
+-={ Id: apt.py DEV maphew }=-
+
+apt [OPTION]... COMMAND [PACKAGE]...
+
+Commands:
+    available -  show packages available to be installed
+    ball - print full path name of package archive
+    download - download package
+    find - package containing file (from installed packages)
+    help - help COMMAND
+    install - download and install packages, including dependencies
+    list - installed packages
+    listfiles - installed with package X
+    md5 - check md5 sum
+    missing - print missing dependencies for X
+    new - list available upgrades to currently installed packages
+    remove - uninstall packages
+    requires - report package dependencies
+    search - search available packages list for X
+    setup - skeleton installed packages environment
+    update - setup.ini
+    upgrade - all installed packages
+    url - print package archive path, relative to mirror root
+    version - print installed version of X
+    versions - print versions of all installed packages
+
+Options:
+    -d,--download          download only
+    -i,--ini=FILE          use setup.ini [C:/o4w//etc/setup//setup.ini]
+    -m,--mirror=URL        use mirror [http://download.osgeo.org/osgeo4w]
+    -r,--root=DIR          set osgeo4w root [C:/o4w/]
+    -t,--t=NAME            set dist name (*curr*, test, prev)
+    -x,--no-deps           ignore dependencies
+    -s,--start-menu=NAME   set the start menu name (OSGeo4W)
+
+C:\Users\matt\home\code\gcode\apt>b:
+
+B:\code\gcode\apt>bat-for-py
+'bat-for-py' is not recognized as an internal or external command,
+operable program or batch file.
+
+B:\code\gcode\apt>o-help
+                   -={ OSGeo4W Shell Commands }=-
+
+       bmp2tiff           listgeo            ras2tiff
+       cs2cs              nad2bin            raw2tiff
+       curl               ncdump             rgb2ycbcr
+       dllupdate          ncgen              rpcgen
+       fax2ps             nearblack          rpcinfo
+       fax2tiff           nircmd             testepsg
+       gdaladdo           nircmdc            textreplace
+       gdalbuildvrt       ogdi_import        thumbnail
+       gdaldem            ogdi_info          tiff2bw
+       gdalenhance        ogr2ogr            tiff2pdf
+       gdalinfo           ogrinfo            tiff2ps
+       gdallocationinfo   ogrlineref         tiff2rgba
+       gdalmanage         ogrtindex          tiffcmp
+       gdalserver         opj_compress       tiffcp
+       gdalsrsinfo        opj_decompress     tiffcrop
+       gdaltindex         opj_dump           tiffdither
+       gdaltransform      osgeo4w-setup      tiffdump
+       gdalwarp           pal2rgb            tiffinfo
+       gdal_contour       portmap            tiffmedian
+       gdal_grid          ppm2tiff           tiffset
+       gdal_rasterize     proj               tiffsplit
+       gdal_translate     psql               w9xpopen
+       geod               pylupdate4         xmlcatalog
+       geotifcp           pyrcc4             xmllint
+       gif2tiff           python             xxmklink
+       gltpd              pythonw
+
+
+       make-bat-for-py   pyuic4
+       o-help            setup-test
+       o4w_env           setup
+
+GDAL 1.11.0, released 2014/04/16
+
+B:\code\gcode\apt>make-bat-for-py
+
+    Generating .bat files for all .py files in C:\o4w\\bin
+
+
+B:\code\gcode\apt>make-bat-for-py ?apt.py
+
+    Generating .bat files for all .py files in C:\o4w\\bin
+
+
+B:\code\gcode\apt>dir
+ Volume in drive B is Acer
+ Volume Serial Number is 641B-FCCC
+
+ Directory of B:\code\gcode\apt
+
+27/09/2014  12:14 PM    <DIR>          .
+27/09/2014  12:14 PM    <DIR>          ..
+17/09/2014  02:37 PM                22 a1.bat
+17/09/2014  02:37 PM               835 a1.py
+17/09/2014  02:37 PM                22 a2.bat
+17/09/2014  02:37 PM             2,835 a2.py
+17/09/2014  02:37 PM                27 a3-subs.bat
+17/09/2014  02:37 PM             1,407 a3-subs.py
+27/09/2014  11:44 AM               195 appy.py
+17/09/2014  02:37 PM                21 apt-docopt.bat
+17/09/2014  02:37 PM               719 apt-docopt.py
+17/09/2014  02:37 PM                32 apt-skeleton.bat
+27/09/2014  11:00 AM             1,339 apt-skeleton.py
+27/09/2014  12:18 PM            42,663 apt.py
+27/09/2014  11:41 AM    <DIR>          AptInstaller.egg-info
+17/09/2014  02:37 PM               544 args.py
+19/09/2014  11:30 PM            42,703 dapt.py
+27/09/2014  12:14 PM            30,093 dapt.pyc
+17/09/2014  02:37 PM             7,527 Notes.txt
+17/09/2014  02:37 PM                40 set-root.bat
+27/09/2014  12:13 PM               247 setup.py
+27/09/2014  11:45 AM    <DIR>          t
+              18 File(s)        131,271 bytes
+               4 Dir(s)  194,016,821,248 bytes free
+
+B:\code\gcode\apt>rd /s t
+t, Are you sure (Y/N)? t
+t, Are you sure (Y/N)? y
+
+B:\code\gcode\apt>notepad c:\o4w\bin\make-bat-for-py.bat
+
+B:\code\gcode\apt>echo python apt.py %%* >apt.bat
+
+B:\code\gcode\apt>echo python dapt.py %%* >dapt.bat
+
+B:\code\gcode\apt>apt
+
+B:\code\gcode\apt>python apt.py %*
+"%*" not understood, please run "apt help"
+
+B:\code\gcode\apt>notepad apt.bat
+
+B:\code\gcode\apt>notepad dapt.bat
+
+B:\code\gcode\apt>dapt
+-={ Id: apt.py 1192 2012-07-04 19:32:14Z maphew }=-
+
+apt [OPTION]... COMMAND [PACKAGE]...
+
+Commands:
+    available -  show packages available to be installed
+    ball - print full path name of package archive
+    download - download package
+    find - package containing file (from installed packages)
+    help - help COMMAND
+    install - download and install packages, including dependencies
+    list - installed packages
+    listfiles - installed with package X
+    md5 - check md5 sum
+    missing - print missing dependencies for X
+    new - list available upgrades to currently installed packages
+    remove - uninstall packages
+    requires - report package dependencies
+    search - search available packages list for X
+    setup - skeleton installed packages environment
+    update - setup.ini
+    upgrade - all installed packages
+    url - print package archive path, relative to mirror root
+    version - print installed version of X
+    versions - print versions of all installed packages
+
+Options:
+    -d,--download          download only
+    -i,--ini=FILE          use setup.ini [C:/o4w//etc/setup//setup.ini]
+    -m,--mirror=URL        use mirror [http://download.osgeo.org/osgeo4w]
+    -r,--root=DIR          set osgeo4w root [C:/o4w/]
+    -t,--t=NAME            set dist name (*curr*, test, prev)
+    -x,--no-deps           ignore dependencies
+    -s,--start-menu=NAME   set the start menu name (OSGeo4W)
+
+B:\code\gcode\apt>apt
+-={ Id: apt.py DEV maphew }=-
+
+apt [OPTION]... COMMAND [PACKAGE]...
+
+Commands:
+    available -  show packages available to be installed
+    ball - print full path name of package archive
+    download - download package
+    find - package containing file (from installed packages)
+    help - help COMMAND
+    install - download and install packages, including dependencies
+    list - installed packages
+    listfiles - installed with package X
+    md5 - check md5 sum
+    missing - print missing dependencies for X
+    new - list available upgrades to currently installed packages
+    remove - uninstall packages
+    requires - report package dependencies
+    search - search available packages list for X
+    setup - skeleton installed packages environment
+    update - setup.ini
+    upgrade - all installed packages
+    url - print package archive path, relative to mirror root
+    version - print installed version of X
+    versions - print versions of all installed packages
+
+Options:
+    -d,--download          download only
+    -i,--ini=FILE          use setup.ini [C:/o4w//etc/setup//setup.ini]
+    -m,--mirror=URL        use mirror [http://download.osgeo.org/osgeo4w]
+    -r,--root=DIR          set osgeo4w root [C:/o4w/]
+    -t,--t=NAME            set dist name (*curr*, test, prev)
+    -x,--no-deps           ignore dependencies
+    -s,--start-menu=NAME   set the start menu name (OSGeo4W)
+
+B:\code\gcode\apt>del dapt.py
+
+B:\code\gcode\apt>more dapt.py
+#!/usr/bin/env python
+<<docstring>>
+<<imports>>
+###########################
+#Main
+###########################
+if __name__ == '__main__':
+
+    <<globals>>
+    <<parse command line>>
+    <<post-parse globals>>
+    <<run the commands>>
+    <<wrap up>>
+
+B:\code\gcode\apt>more dapt.py
+#!/usr/bin/env python
+<<docstring>>
+<<imports>>
+###########################
+#Main
+###########################
+if __name__ == '__main__':
+
+    <<globals>>
+    <<parse command line>>
+    <<post-parse globals>>
+    <<run the commands>>
+    <<wrap up>>
+
+B:\code\gcode\apt>dapt
+Traceback (most recent call last):
+  File "dapt.py", line 31, in <module>
+    main(sys.argv[1], sys.argv[2:])
+IndexError: list index out of range
+
+B:\code\gcode\apt>dapt no idea
+Action: no
+Parameters: ['idea']
+
+B:\code\gcode\apt>dapt no
+Action: no
+Parameters: []
+
+B:\code\gcode\apt>dapt n
+Action: n
+Parameters: []
+
+B:\code\gcode\apt>dapt
+Traceback (most recent call last):
+  File "dapt.py", line 31, in <module>
+    main(sys.argv[1], sys.argv[2:])
+IndexError: list index out of range
+
+B:\code\gcode\apt>dapt
+Traceback (most recent call last):
+  File "dapt.py", line 32, in <module>
+    main(sys.argv[1], sys.argv[2:])
+IndexError: list index out of range
+
+B:\code\gcode\apt>dapt n
+Action: n
+Parameters: []
+Traceback (most recent call last):
+  File "dapt.py", line 32, in <module>
+    main(sys.argv[1], sys.argv[2:])
+  File "dapt.py", line 28, in main
+    eval(action)
+  File "<string>", line 1, in <module>
+NameError: name 'n' is not defined
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Traceback (most recent call last):
+  File "dapt.py", line 32, in <module>
+    main(sys.argv[1], sys.argv[2:])
+  File "dapt.py", line 28, in main
+    eval(action)
+  File "<string>", line 1, in <module>
+NameError: name 'setup' is not defined
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Traceback (most recent call last):
+  File "dapt.py", line 37, in <module>
+    main(sys.argv[1], sys.argv[2:])
+  File "dapt.py", line 33, in main
+    eval(action)(args)
+TypeError: setup() takes no arguments (1 given)
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Traceback (most recent call last):
+  File "dapt.py", line 40, in <module>
+    main(sys.argv[1], sys.argv[2:])
+  File "dapt.py", line 34, in main
+    setup(config['root'])
+  File "dapt.py", line 26, in setup
+    os.makedirs(config['etc_setup'])
+NameError: global name 'config' is not defined
+
+B:\code\gcode\apt>dapt setup
+dapt.py:22: SyntaxWarning: name 'config' is assigned to before global declaratio
+n
+  global config
+Action: setup
+Parameters: []
+Traceback (most recent call last):
+  File "dapt.py", line 40, in <module>
+    main(sys.argv[1], sys.argv[2:])
+  File "dapt.py", line 34, in main
+    setup(config['root'])
+  File "dapt.py", line 27, in setup
+    write_installed({0:{}})
+NameError: global name 'write_installed' is not defined
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Traceback (most recent call last):
+  File "dapt.py", line 40, in <module>
+    main(sys.argv[1], sys.argv[2:])
+  File "dapt.py", line 34, in main
+    setup(config['root'])
+  File "dapt.py", line 26, in setup
+    os.makedirs(config['etc_setup'])
+  File "C:\o4w\\apps\Python27\lib\os.py", line 157, in makedirs
+    mkdir(name, mode)
+WindowsError: [Error 183] Cannot create a file when that file already exists: 'C
+:/OSGeo4W/etc/setup'
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Abort: target path exists
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Abort: target path "C:/OSGeo4W" exists
+
+B:\code\gcode\apt>rd c:\OSGeo4W
+The directory is not empty.
+
+B:\code\gcode\apt>rd /y c:\OSGeo4W
+Invalid switch - "y".
+
+B:\code\gcode\apt>rd /q c:\OSGeo4W
+The directory is not empty.
+
+B:\code\gcode\apt>rd /q/s c:\OSGeo4W
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Traceback (most recent call last):
+  File "dapt.py", line 42, in <module>
+    main(sys.argv[1], sys.argv[2:])
+  File "dapt.py", line 36, in main
+    setup(config['root'])
+  File "dapt.py", line 29, in setup
+    write_installed({0:{}})
+NameError: global name 'write_installed' is not defined
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Abort: target path "C:/OSGeo4W" exists
+
+B:\code\gcode\apt>rd /q/s c:\OSGeo4W
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Traceback (most recent call last):
+  File "dapt.py", line 50, in <module>
+    main(sys.argv[1], sys.argv[2:])
+  File "dapt.py", line 44, in main
+    setup(config['root'])
+  File "dapt.py", line 29, in setup
+    write_installed({0:{}})
+  File "dapt.py", line 33, in write_installed
+    file = open (config['installed_db'], 'w')
+KeyError: 'installed_db'
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Abort: target path "C:/OSGeo4W" exists
+
+B:\code\gcode\apt>rd /q/s c:\OSGeo4W
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Traceback (most recent call last):
+  File "dapt.py", line 63, in <module>
+    main(sys.argv[1], sys.argv[2:])
+  File "dapt.py", line 57, in main
+    setup(config['root'])
+  File "dapt.py", line 42, in setup
+    write_installed({0:{}})
+  File "dapt.py", line 49, in write_installed
+    installed[0].keys ()))
+NameError: global name 'installed' is not defined
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Abort: target path "C:/OSGeo4W" exists
+
+B:\code\gcode\apt>rd /q/s c:\OSGeo4W
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Traceback (most recent call last):
+  File "dapt.py", line 84, in <module>
+    main(sys.argv[1], sys.argv[2:])
+  File "dapt.py", line 78, in main
+    setup(config['root'])
+  File "dapt.py", line 42, in setup
+    write_installed({0:{}})
+  File "dapt.py", line 58, in write_installed
+    installed = get_installed()
+  File "dapt.py", line 52, in get_installed
+    for i in open (config['installed_db']).readlines ()[1:]:
+IOError: [Errno 2] No such file or directory: 'C:/OSGeo4W/etc/setup/installed.db
+'
+
+B:\code\gcode\apt>rd /q/s c:\OSGeo4W
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Traceback (most recent call last):
+  File "dapt.py", line 86, in <module>
+    main(sys.argv[1], sys.argv[2:])
+  File "dapt.py", line 80, in main
+    setup(config['root'])
+  File "dapt.py", line 42, in setup
+    write_installed({0:{}})
+  File "dapt.py", line 58, in write_installed
+    installed = get_installed()
+  File "dapt.py", line 52, in get_installed
+    for i in open (config['installed_db']).readlines ()[1:]:
+IOError: [Errno 2] No such file or directory: 'C:/OSGeo4W/etc/setup/installed.db
+'
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Abort: target path "C:/OSGeo4W" exists
+
+B:\code\gcode\apt>rd /q/s c:\OSGeo4W
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Traceback (most recent call last):
+  File "dapt.py", line 89, in <module>
+    main(sys.argv[1], sys.argv[2:])
+  File "dapt.py", line 83, in main
+    setup(config['root'])
+  File "dapt.py", line 43, in setup
+    update()
+NameError: global name 'update' is not defined
+
+B:\code\gcode\apt>rd /q/s c:\OSGeo4W
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+
+B:\code\gcode\apt>dir c:\OSGeo4W
+ Volume in drive C is Acer
+ Volume Serial Number is 641B-FCCC
+
+ Directory of c:\OSGeo4W
+
+27/09/2014  02:07 PM    <DIR>          .
+27/09/2014  02:07 PM    <DIR>          ..
+27/09/2014  02:07 PM    <DIR>          etc
+               0 File(s)              0 bytes
+               3 Dir(s)  194,007,711,744 bytes free
+
+B:\code\gcode\apt>dir c:\OSGeo4W\etc
+ Volume in drive C is Acer
+ Volume Serial Number is 641B-FCCC
+
+ Directory of c:\OSGeo4W\etc
+
+27/09/2014  02:07 PM    <DIR>          .
+27/09/2014  02:07 PM    <DIR>          ..
+27/09/2014  02:07 PM    <DIR>          setup
+               0 File(s)              0 bytes
+               3 Dir(s)  194,007,711,744 bytes free
+
+B:\code\gcode\apt>dir c:\OSGeo4W\etc\setup
+ Volume in drive C is Acer
+ Volume Serial Number is 641B-FCCC
+
+ Directory of c:\OSGeo4W\etc\setup
+
+27/09/2014  02:07 PM    <DIR>          .
+27/09/2014  02:07 PM    <DIR>          ..
+27/09/2014  02:07 PM                16 installed.db
+               1 File(s)             16 bytes
+               2 Dir(s)  194,007,711,744 bytes free
+
+B:\code\gcode\apt>more c:\OSGeo4W\etc\setup\installed.db
+INSTALLED.DB 2
+
+B:\code\gcode\apt>rd /q/s c:\OSGeo4W
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+{0: {}}
+
+B:\code\gcode\apt>copy c:\o4w\etc\setup\installed.db c:\OSGeo4W\etc\setup\
+Overwrite c:\OSGeo4W\etc\setup\installed.db? (Yes/No/All): y
+        1 file(s) copied.
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Abort: target path "C:/OSGeo4W" exists
+
+B:\code\gcode\apt>dapt get_installed
+Action: get_installed
+Parameters: []
+Traceback (most recent call last):
+  File "dapt.py", line 89, in <module>
+    main(sys.argv[1], sys.argv[2:])
+  File "dapt.py", line 85, in main
+    eval(action)(args)
+TypeError: get_installed() takes no arguments (1 given)
+
+B:\code\gcode\apt>dapt get_installed
+Action: get_installed
+Parameters: []
+{0: {'libxml2': 'libxml2-2.9.1-1.tar.bz2', 'gdal110dll': 'gdal110dll-1.10.1-1.ta
+r.bz2', 'libtiff': 'libtiff-4.0.2-2.tar.bz2', 'libjpeg12': 'libjpeg12-6b-3.tar.b
+z2', 'python-core': 'python-core-2.7.4-3.tar.bz2', 'netcdf': 'netcdf-3.6.1-1.tar
+.bz2', 'freexl': 'freexl-1.0.0e-1.tar.bz2', 'curl': 'curl-7.15.1-2.tar.bz2', 'ms
+vcrt': 'msvcrt-1.0.1-12.tar.bz2', 'iconv': 'iconv-1.9.1-1.tar.bz2', 'sip': 'sip-
+4.12.1-4.tar.bz2', 'libpq': 'libpq-8.3.10-3.tar.bz2', 'geos': 'geos-3.4.2-1.tar.
+bz2', 'libintl': 'libintl-0.14.4-2.tar.bz2', 'libgeotiff': 'libgeotiff-1.3.0-3.t
+ar.bz2', 'spatialite': 'spatialite-4.1.1-1.tar.bz2', 'proj': 'proj-4.8.0-0.tar.b
+z2', 'sqlite3': 'sqlite3-3.7.17-1.tar.bz2', 'python-help': 'python-help-2.7.4-1.
+tar.bz2', 'libmysql': 'libmysql-5.0.18-1.tar.bz2', 'shell': 'shell-1.0.0-13.tar.
+bz2', 'python': 'python-2.7.4-2.tar.bz2', 'xerces-c': 'xerces-c-2.7.0-1.tar.bz2'
+, 'qt4-libs': 'qt4-libs-4.7.1-6.tar.bz2', 'pyqt4': 'pyqt4-4.8.3-2.tar.bz2', 'pro
+j-hpgn': 'proj-hpgn-1.0-1.tar.bz2', 'python-tools': 'python-tools-2.7.4-1.tar.bz
+2', 'gdal19dll': 'gdal19dll-1.9.2-1.tar.bz2', 'openjpeg': 'openjpeg-2.0.0-1.tar.
+bz2', 'gdal': 'gdal-1.11.0-2.tar.bz2', 'msys': 'msys-1.0.18-7.tar.bz2', 'xerces-
+c-vc9': 'xerces-c-vc9-3.1.1-2.tar.bz2', 'gdal18dll': 'gdal-1.8.1-0.tar.bz2', 'og
+di': 'ogdi-3.2.0b1-4.tar.bz2', 'python-testsuite': 'python-testsuite-2.7.4-1.tar
+.bz2', 'hdf4': 'hdf4-4.2.0r3-4.tar.bz2', 'hdf5': 'hdf5-1.8.11-1.tar.bz2', 'libjp
+eg': 'libjpeg-6b-5.tar.bz2', 'proj-datumgrid': 'proj-datumgrid-1.5-1.tar.bz2', '
+setup': 'setup-1.0.7-10.tar.bz2', 'zlib': 'zlib-1.2.3-1.tar.bz2', 'gdal15dll': '
+gdal-1.5.4-1.tar.bz2', 'szip': 'szip-2.1-1.tar.bz2', 'python-tcltk': 'python-tcl
+tk-2.7.4-1.tar.bz2', 'openssl': 'openssl-1.0.1g-1.tar.bz2', 'spatialite3dll': 's
+patialite-3.0.1-0.tar.bz2', 'expat': 'expat-2.0.1-1.tar.bz2'}}
+
+B:\code\gcode\apt>dapt get_installed
+Action: get_installed
+Parameters: []
+{0: {'libxml2': 'libxml2-2.9.1-1.tar.bz2', 'gdal110dll': 'gdal110dll-1.10.1-1.ta
+r.bz2', 'libtiff': 'libtiff-4.0.2-2.tar.bz2', 'libjpeg12': 'libjpeg12-6b-3.tar.b
+z2', 'python-core': 'python-core-2.7.4-3.tar.bz2', 'netcdf': 'netcdf-3.6.1-1.tar
+.bz2', 'freexl': 'freexl-1.0.0e-1.tar.bz2', 'curl': 'curl-7.15.1-2.tar.bz2', 'ms
+vcrt': 'msvcrt-1.0.1-12.tar.bz2', 'iconv': 'iconv-1.9.1-1.tar.bz2', 'sip': 'sip-
+4.12.1-4.tar.bz2', 'libpq': 'libpq-8.3.10-3.tar.bz2', 'geos': 'geos-3.4.2-1.tar.
+bz2', 'libintl': 'libintl-0.14.4-2.tar.bz2', 'libgeotiff': 'libgeotiff-1.3.0-3.t
+ar.bz2', 'spatialite': 'spatialite-4.1.1-1.tar.bz2', 'proj': 'proj-4.8.0-0.tar.b
+z2', 'sqlite3': 'sqlite3-3.7.17-1.tar.bz2', 'python-help': 'python-help-2.7.4-1.
+tar.bz2', 'libmysql': 'libmysql-5.0.18-1.tar.bz2', 'shell': 'shell-1.0.0-13.tar.
+bz2', 'python': 'python-2.7.4-2.tar.bz2', 'xerces-c': 'xerces-c-2.7.0-1.tar.bz2'
+, 'qt4-libs': 'qt4-libs-4.7.1-6.tar.bz2', 'pyqt4': 'pyqt4-4.8.3-2.tar.bz2', 'pro
+j-hpgn': 'proj-hpgn-1.0-1.tar.bz2', 'python-tools': 'python-tools-2.7.4-1.tar.bz
+2', 'gdal19dll': 'gdal19dll-1.9.2-1.tar.bz2', 'openjpeg': 'openjpeg-2.0.0-1.tar.
+bz2', 'gdal': 'gdal-1.11.0-2.tar.bz2', 'msys': 'msys-1.0.18-7.tar.bz2', 'xerces-
+c-vc9': 'xerces-c-vc9-3.1.1-2.tar.bz2', 'gdal18dll': 'gdal-1.8.1-0.tar.bz2', 'og
+di': 'ogdi-3.2.0b1-4.tar.bz2', 'python-testsuite': 'python-testsuite-2.7.4-1.tar
+.bz2', 'hdf4': 'hdf4-4.2.0r3-4.tar.bz2', 'hdf5': 'hdf5-1.8.11-1.tar.bz2', 'libjp
+eg': 'libjpeg-6b-5.tar.bz2', 'proj-datumgrid': 'proj-datumgrid-1.5-1.tar.bz2', '
+setup': 'setup-1.0.7-10.tar.bz2', 'zlib': 'zlib-1.2.3-1.tar.bz2', 'gdal15dll': '
+gdal-1.5.4-1.tar.bz2', 'szip': 'szip-2.1-1.tar.bz2', 'python-tcltk': 'python-tcl
+tk-2.7.4-1.tar.bz2', 'openssl': 'openssl-1.0.1g-1.tar.bz2', 'spatialite3dll': 's
+patialite-3.0.1-0.tar.bz2', 'expat': 'expat-2.0.1-1.tar.bz2'}}
+
+B:\code\gcode\apt>dapt get_installed
+Action: get_installed
+Parameters: []
+Traceback (most recent call last):
+  File "dapt.py", line 93, in <module>
+    main(sys.argv[1], sys.argv[2:])
+  File "dapt.py", line 89, in main
+    eval(action)(args)
+  File "dapt.py", line 58, in get_installed
+    installed[int (status)][name] = ball
+KeyError: 0
+
+B:\code\gcode\apt>dapt get_installed
+Action: get_installed
+Parameters: []
+Traceback (most recent call last):
+  File "dapt.py", line 93, in <module>
+    main(sys.argv[1], sys.argv[2:])
+  File "dapt.py", line 89, in main
+    eval(action)(args)
+  File "dapt.py", line 58, in get_installed
+    installed[int (status)][name] = ball
+KeyError: 0
+
+B:\code\gcode\apt>dapt get_installed
+Action: get_installed
+Parameters: []
+{'libxml2': 'libxml2-2.9.1-1.tar.bz2', 'gdal110dll': 'gdal110dll-1.10.1-1.tar.bz
+2', 'libtiff': 'libtiff-4.0.2-2.tar.bz2', 'libjpeg12': 'libjpeg12-6b-3.tar.bz2',
+ 'python-core': 'python-core-2.7.4-3.tar.bz2', 'netcdf': 'netcdf-3.6.1-1.tar.bz2
+', 'freexl': 'freexl-1.0.0e-1.tar.bz2', 'curl': 'curl-7.15.1-2.tar.bz2', 'msvcrt
+': 'msvcrt-1.0.1-12.tar.bz2', 'iconv': 'iconv-1.9.1-1.tar.bz2', 'sip': 'sip-4.12
+.1-4.tar.bz2', 'libpq': 'libpq-8.3.10-3.tar.bz2', 'geos': 'geos-3.4.2-1.tar.bz2'
+, 'libintl': 'libintl-0.14.4-2.tar.bz2', 'libgeotiff': 'libgeotiff-1.3.0-3.tar.b
+z2', 'spatialite': 'spatialite-4.1.1-1.tar.bz2', 'proj': 'proj-4.8.0-0.tar.bz2',
+ 'sqlite3': 'sqlite3-3.7.17-1.tar.bz2', 'python-help': 'python-help-2.7.4-1.tar.
+bz2', 'libmysql': 'libmysql-5.0.18-1.tar.bz2', 'shell': 'shell-1.0.0-13.tar.bz2'
+, 'python': 'python-2.7.4-2.tar.bz2', 'xerces-c': 'xerces-c-2.7.0-1.tar.bz2', 'q
+t4-libs': 'qt4-libs-4.7.1-6.tar.bz2', 'pyqt4': 'pyqt4-4.8.3-2.tar.bz2', 'proj-hp
+gn': 'proj-hpgn-1.0-1.tar.bz2', 'python-tools': 'python-tools-2.7.4-1.tar.bz2',
+'gdal19dll': 'gdal19dll-1.9.2-1.tar.bz2', 'openjpeg': 'openjpeg-2.0.0-1.tar.bz2'
+, 'gdal': 'gdal-1.11.0-2.tar.bz2', 'msys': 'msys-1.0.18-7.tar.bz2', 'xerces-c-vc
+9': 'xerces-c-vc9-3.1.1-2.tar.bz2', 'gdal18dll': 'gdal-1.8.1-0.tar.bz2', 'ogdi':
+ 'ogdi-3.2.0b1-4.tar.bz2', 'python-testsuite': 'python-testsuite-2.7.4-1.tar.bz2
+', 'hdf4': 'hdf4-4.2.0r3-4.tar.bz2', 'hdf5': 'hdf5-1.8.11-1.tar.bz2', 'libjpeg':
+ 'libjpeg-6b-5.tar.bz2', 'proj-datumgrid': 'proj-datumgrid-1.5-1.tar.bz2', 'setu
+p': 'setup-1.0.7-10.tar.bz2', 'zlib': 'zlib-1.2.3-1.tar.bz2', 'gdal15dll': 'gdal
+-1.5.4-1.tar.bz2', 'szip': 'szip-2.1-1.tar.bz2', 'python-tcltk': 'python-tcltk-2
+.7.4-1.tar.bz2', 'openssl': 'openssl-1.0.1g-1.tar.bz2', 'spatialite3dll': 'spati
+alite-3.0.1-0.tar.bz2', 'expat': 'expat-2.0.1-1.tar.bz2'}
+
+B:\code\gcode\apt>dapt get_installed
+Action: get_installed
+Parameters: []
+
+B:\code\gcode\apt>dapt get_installed
+Action: get_installed
+Parameters: []
+
+B:\code\gcode\apt>dapt get_installed j
+Action: get_installed
+Parameters: ['j']
+{'libxml2': 'libxml2-2.9.1-1.tar.bz2', 'gdal110dll': 'gdal110dll-1.10.1-1.tar.bz
+2', 'libtiff': 'libtiff-4.0.2-2.tar.bz2', 'libjpeg12': 'libjpeg12-6b-3.tar.bz2',
+ 'python-core': 'python-core-2.7.4-3.tar.bz2', 'netcdf': 'netcdf-3.6.1-1.tar.bz2
+', 'freexl': 'freexl-1.0.0e-1.tar.bz2', 'curl': 'curl-7.15.1-2.tar.bz2', 'msvcrt
+': 'msvcrt-1.0.1-12.tar.bz2', 'iconv': 'iconv-1.9.1-1.tar.bz2', 'sip': 'sip-4.12
+.1-4.tar.bz2', 'libpq': 'libpq-8.3.10-3.tar.bz2', 'geos': 'geos-3.4.2-1.tar.bz2'
+, 'libintl': 'libintl-0.14.4-2.tar.bz2', 'libgeotiff': 'libgeotiff-1.3.0-3.tar.b
+z2', 'spatialite': 'spatialite-4.1.1-1.tar.bz2', 'proj': 'proj-4.8.0-0.tar.bz2',
+ 'sqlite3': 'sqlite3-3.7.17-1.tar.bz2', 'python-help': 'python-help-2.7.4-1.tar.
+bz2', 'libmysql': 'libmysql-5.0.18-1.tar.bz2', 'shell': 'shell-1.0.0-13.tar.bz2'
+, 'python': 'python-2.7.4-2.tar.bz2', 'xerces-c': 'xerces-c-2.7.0-1.tar.bz2', 'q
+t4-libs': 'qt4-libs-4.7.1-6.tar.bz2', 'pyqt4': 'pyqt4-4.8.3-2.tar.bz2', 'proj-hp
+gn': 'proj-hpgn-1.0-1.tar.bz2', 'python-tools': 'python-tools-2.7.4-1.tar.bz2',
+'gdal19dll': 'gdal19dll-1.9.2-1.tar.bz2', 'openjpeg': 'openjpeg-2.0.0-1.tar.bz2'
+, 'gdal': 'gdal-1.11.0-2.tar.bz2', 'msys': 'msys-1.0.18-7.tar.bz2', 'xerces-c-vc
+9': 'xerces-c-vc9-3.1.1-2.tar.bz2', 'gdal18dll': 'gdal-1.8.1-0.tar.bz2', 'ogdi':
+ 'ogdi-3.2.0b1-4.tar.bz2', 'python-testsuite': 'python-testsuite-2.7.4-1.tar.bz2
+', 'hdf4': 'hdf4-4.2.0r3-4.tar.bz2', 'hdf5': 'hdf5-1.8.11-1.tar.bz2', 'libjpeg':
+ 'libjpeg-6b-5.tar.bz2', 'proj-datumgrid': 'proj-datumgrid-1.5-1.tar.bz2', 'setu
+p': 'setup-1.0.7-10.tar.bz2', 'zlib': 'zlib-1.2.3-1.tar.bz2', 'gdal15dll': 'gdal
+-1.5.4-1.tar.bz2', 'szip': 'szip-2.1-1.tar.bz2', 'python-tcltk': 'python-tcltk-2
+.7.4-1.tar.bz2', 'openssl': 'openssl-1.0.1g-1.tar.bz2', 'spatialite3dll': 'spati
+alite-3.0.1-0.tar.bz2', 'expat': 'expat-2.0.1-1.tar.bz2'}
+
+B:\code\gcode\apt>rd /q/s c:\OSGeo4W
+
+B:\code\gcode\apt>dapt get_installed
+Action: get_installed
+Parameters: []
+
+B:\code\gcode\apt>dapt get_installed g
+Action: get_installed
+Parameters: ['g']
+{}
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Traceback (most recent call last):
+  File "dapt.py", line 96, in <module>
+    main(sys.argv[1], sys.argv[2:])
+  File "dapt.py", line 90, in main
+    setup(config['root'])
+  File "dapt.py", line 42, in setup
+    write_installed({0:{}})
+  File "dapt.py", line 74, in write_installed
+    installed[0].keys ()))
+KeyError: 0
+
+B:\code\gcode\apt>rd /q/s c:\OSGeo4W
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Traceback (most recent call last):
+  File "dapt.py", line 99, in <module>
+    main(sys.argv[1], sys.argv[2:])
+  File "dapt.py", line 93, in main
+    setup(config['root'])
+  File "dapt.py", line 42, in setup
+    write_installed({0:{}})
+  File "dapt.py", line 76, in write_installed
+    installed[0].keys ()))
+KeyError: 0
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+Abort: target path "C:/OSGeo4W" exists
+
+B:\code\gcode\apt>rd /q/s c:\OSGeo4W
+
+B:\code\gcode\apt>dapt setup
+Action: setup
+Parameters: []
+
+B:\code\gcode\apt>dapt get_installed g
+Action: get_installed
+Parameters: ['g']
+{}
+
+B:\code\gcode\apt>copy c:\o4w\etc\setup\installed.db c:\OSGeo4W\etc\setup\
+        1 file(s) copied.
+
+B:\code\gcode\apt>dapt get_installed g
+Action: get_installed
+Parameters: ['g']
+{'libxml2': 'libxml2-2.9.1-1.tar.bz2', 'gdal110dll': 'gdal110dll-1.10.1-1.tar.bz
+2', 'libtiff': 'libtiff-4.0.2-2.tar.bz2', 'libjpeg12': 'libjpeg12-6b-3.tar.bz2',
+ 'python-core': 'python-core-2.7.4-3.tar.bz2', 'netcdf': 'netcdf-3.6.1-1.tar.bz2
+', 'freexl': 'freexl-1.0.0e-1.tar.bz2', 'curl': 'curl-7.15.1-2.tar.bz2', 'msvcrt
+': 'msvcrt-1.0.1-12.tar.bz2', 'iconv': 'iconv-1.9.1-1.tar.bz2', 'sip': 'sip-4.12
+.1-4.tar.bz2', 'libpq': 'libpq-8.3.10-3.tar.bz2', 'geos': 'geos-3.4.2-1.tar.bz2'
+, 'libintl': 'libintl-0.14.4-2.tar.bz2', 'libgeotiff': 'libgeotiff-1.3.0-3.tar.b
+z2', 'spatialite': 'spatialite-4.1.1-1.tar.bz2', 'proj': 'proj-4.8.0-0.tar.bz2',
+ 'sqlite3': 'sqlite3-3.7.17-1.tar.bz2', 'python-help': 'python-help-2.7.4-1.tar.
+bz2', 'libmysql': 'libmysql-5.0.18-1.tar.bz2', 'shell': 'shell-1.0.0-13.tar.bz2'
+, 'python': 'python-2.7.4-2.tar.bz2', 'xerces-c': 'xerces-c-2.7.0-1.tar.bz2', 'q
+t4-libs': 'qt4-libs-4.7.1-6.tar.bz2', 'pyqt4': 'pyqt4-4.8.3-2.tar.bz2', 'proj-hp
+gn': 'proj-hpgn-1.0-1.tar.bz2', 'python-tools': 'python-tools-2.7.4-1.tar.bz2',
+'gdal19dll': 'gdal19dll-1.9.2-1.tar.bz2', 'openjpeg': 'openjpeg-2.0.0-1.tar.bz2'
+, 'gdal': 'gdal-1.11.0-2.tar.bz2', 'msys': 'msys-1.0.18-7.tar.bz2', 'xerces-c-vc
+9': 'xerces-c-vc9-3.1.1-2.tar.bz2', 'gdal18dll': 'gdal-1.8.1-0.tar.bz2', 'ogdi':
+ 'ogdi-3.2.0b1-4.tar.bz2', 'python-testsuite': 'python-testsuite-2.7.4-1.tar.bz2
+', 'hdf4': 'hdf4-4.2.0r3-4.tar.bz2', 'hdf5': 'hdf5-1.8.11-1.tar.bz2', 'libjpeg':
+ 'libjpeg-6b-5.tar.bz2', 'proj-datumgrid': 'proj-datumgrid-1.5-1.tar.bz2', 'setu
+p': 'setup-1.0.7-10.tar.bz2', 'zlib': 'zlib-1.2.3-1.tar.bz2', 'gdal15dll': 'gdal
+-1.5.4-1.tar.bz2', 'szip': 'szip-2.1-1.tar.bz2', 'python-tcltk': 'python-tcltk-2
+.7.4-1.tar.bz2', 'openssl': 'openssl-1.0.1g-1.tar.bz2', 'spatialite3dll': 'spati
+alite-3.0.1-0.tar.bz2', 'expat': 'expat-2.0.1-1.tar.bz2'}
+
+B:\code\gcode\apt>dapt write_installed
+Action: write_installed
+Parameters: []
+('libxml2', 'libxml2-2.9.1-1.tar.bz2')
+('gdal110dll', 'gdal110dll-1.10.1-1.tar.bz2')
+('libtiff', 'libtiff-4.0.2-2.tar.bz2')
+('libjpeg12', 'libjpeg12-6b-3.tar.bz2')
+('python-core', 'python-core-2.7.4-3.tar.bz2')
+('netcdf', 'netcdf-3.6.1-1.tar.bz2')
+('freexl', 'freexl-1.0.0e-1.tar.bz2')
+('curl', 'curl-7.15.1-2.tar.bz2')
+('msvcrt', 'msvcrt-1.0.1-12.tar.bz2')
+('iconv', 'iconv-1.9.1-1.tar.bz2')
+('sip', 'sip-4.12.1-4.tar.bz2')
+('libpq', 'libpq-8.3.10-3.tar.bz2')
+('geos', 'geos-3.4.2-1.tar.bz2')
+('libintl', 'libintl-0.14.4-2.tar.bz2')
+('libgeotiff', 'libgeotiff-1.3.0-3.tar.bz2')
+('spatialite', 'spatialite-4.1.1-1.tar.bz2')
+('proj', 'proj-4.8.0-0.tar.bz2')
+('sqlite3', 'sqlite3-3.7.17-1.tar.bz2')
+('python-help', 'python-help-2.7.4-1.tar.bz2')
+('libmysql', 'libmysql-5.0.18-1.tar.bz2')
+('shell', 'shell-1.0.0-13.tar.bz2')
+('python', 'python-2.7.4-2.tar.bz2')
+('xerces-c', 'xerces-c-2.7.0-1.tar.bz2')
+('qt4-libs', 'qt4-libs-4.7.1-6.tar.bz2')
+('pyqt4', 'pyqt4-4.8.3-2.tar.bz2')
+('proj-hpgn', 'proj-hpgn-1.0-1.tar.bz2')
+('python-tools', 'python-tools-2.7.4-1.tar.bz2')
+('gdal19dll', 'gdal19dll-1.9.2-1.tar.bz2')
+('openjpeg', 'openjpeg-2.0.0-1.tar.bz2')
+('gdal', 'gdal-1.11.0-2.tar.bz2')
+('msys', 'msys-1.0.18-7.tar.bz2')
+('xerces-c-vc9', 'xerces-c-vc9-3.1.1-2.tar.bz2')
+('gdal18dll', 'gdal-1.8.1-0.tar.bz2')
+('ogdi', 'ogdi-3.2.0b1-4.tar.bz2')
+('python-testsuite', 'python-testsuite-2.7.4-1.tar.bz2')
+('hdf4', 'hdf4-4.2.0r3-4.tar.bz2')
+('hdf5', 'hdf5-1.8.11-1.tar.bz2')
+('libjpeg', 'libjpeg-6b-5.tar.bz2')
+('proj-datumgrid', 'proj-datumgrid-1.5-1.tar.bz2')
+('setup', 'setup-1.0.7-10.tar.bz2')
+('zlib', 'zlib-1.2.3-1.tar.bz2')
+('gdal15dll', 'gdal-1.5.4-1.tar.bz2')
+('szip', 'szip-2.1-1.tar.bz2')
+('python-tcltk', 'python-tcltk-2.7.4-1.tar.bz2')
+('openssl', 'openssl-1.0.1g-1.tar.bz2')
+('spatialite3dll', 'spatialite-3.0.1-0.tar.bz2')
+('expat', 'expat-2.0.1-1.tar.bz2')
+
+B:\code\gcode\apt>
