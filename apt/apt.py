@@ -179,14 +179,18 @@ def help ():
     # adding global packagename doesn't help
     # so has been broken since at least the beginning of a2.py
     #(and even if did work that's a kludge, because it's commands we want help for not packages)
-    global packagename
-    
-    # if "help for..." not present then just show general help. This only part that works.
+    ##global packagename
+        
+    # if "help for..." not present then just show general help.
     if len (params) < 2:
         usage ()
         sys.exit (0)
 
-    print  __main__.__dict__[packagename].__doc__
+    # this a bit better, it shows the docstring for ___,
+    # but it misses on the "additional help" part
+    action = params[1]
+
+    print  __main__.__dict__[action].__doc__
 
 #@+node:maphew.20100223163802.3724: *3* install
 def install (packages):
