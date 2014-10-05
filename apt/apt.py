@@ -43,9 +43,9 @@ import shlex
 #Usage
 ###########################
 def usage ():
-    global setup_ini
-    global mirror
-    global root
+    # global setup_ini
+    # global mirror
+    # global root
     print '-={ %s }=-\n'% (str.strip(svn_id, ' $'))
     # FIXME: list only usable command line parameters, not all functions
     # SOLVED: omit '''comment''' after function name, only those are listed
@@ -53,14 +53,27 @@ def usage ():
     sys.stdout.write ('''apt [OPTION]... COMMAND [PACKAGE]...
 
 Commands:
-''')
-    d = __main__.__dict__
-    commands = filter (lambda x:
-               type (d[x]) == type (usage) and d[x].__doc__, d)
-    sys.stdout.writelines (map (lambda x:
-                    "    %s - %s\n" % (x, d[x].__doc__),
-                   sorted (commands)))
-    sys.stdout.write (r'''
+    available -  show packages available to be installed
+    ball - print full path name of package archive
+    download - download package
+    find - package containing file (from installed packages)
+    help - show help for COMMAND
+    install - download and install packages, including dependencies
+    list - installed packages
+    listfiles - installed with package X
+    md5 - check md5 sum
+    missing - print missing dependencies for X
+    new - list available upgrades to currently installed packages
+    remove - uninstall packages
+    requires - report package dependencies
+    search - search available packages list for X
+    setup - skeleton installed packages environment
+    update - setup.ini
+    upgrade - all installed packages
+    url - print package archive path, relative to mirror root
+    version - print installed version of X
+    versions - print versions of all installed packages
+
 Options:
     -d,--download          download only
     -i,--ini=FILE          use setup.ini [%(setup_ini)s]
@@ -173,23 +186,15 @@ def find ():
 
 #@+node:maphew.20100223163802.3723: *3* help
 def help ():
-    '''help COMMAND'''
-    # Intent appears to be "show additional help for ..."
-    # bug: is broken
-    # adding global packagename doesn't help
-    # so has been broken since at least the beginning of a2.py
-    #(and even if did work that's a kludge, because it's commands we want help for not packages)
-    ##global packagename
+    '''show help for COMMAND'''
+    # FIXME: only shows regular help, should show *additional* help
         
     # if "help for..." not present then just show general help.
     if len (params) < 2:
         usage ()
         sys.exit (0)
 
-    # this a bit better, it shows the docstring for ___,
-    # but it misses on the "additional help" part
     action = params[1]
-
     print  __main__.__dict__[action].__doc__
 
 #@+node:maphew.20100223163802.3724: *3* install
