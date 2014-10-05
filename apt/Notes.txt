@@ -54,6 +54,15 @@ By date of commit messages, `maphew-apt` is most current (Spring 2013).
 apt-r### are largely experimental and near duplicates. I seem to recall something about them being an attempt to sort out and fix a broken branching operation. (Fall 2012) DELETED
 
 apt-hg is Osgeo4w, using hg-subversion plugin. So most out of date (but matching current .exe release). RENAMED to `o4w-apt-hg`.
+#@+node:maphew.20141005121657.7064: ** Todo
+#@+node:maphew.20141005121657.7065: *3* Restore docstrings
+Currently the docstrings of all functions which are not Commands are hidden behind remarks (#).
+
+This is because currently docstrings are used to drive the console help screen. It's too much to have _all_ functions listed there.
+
+Ultimately we want to have all functions properly documented, using docstrings, and print only commands to the help screen.
+
+Writing this, I remember now that this was one of the original drivers for attempting to learn argparse, clint, plac, docopt... in the first place!
 #@+node:maphew.20130122175214.1530: ** bugs
 #@+node:maphew.20141002090256.2026: *3* IOError: invalid data stream
     B:\o4w>python b:\code\maphew\apt\apt.py update
