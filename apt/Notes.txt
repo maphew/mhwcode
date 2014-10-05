@@ -67,6 +67,32 @@ This is because currently docstrings are used to drive the console help screen. 
 Ultimately we want to have all functions properly documented, using docstrings, and print only commands to the help screen.
 
 Writing this, I remember now that this was one of the original drivers for attempting to learn argparse, clint, plac, docopt... in the first place!
+
+----
+2014-Oct-05
+
+For now usage message is hard coded. This is to allow full fledged docstrings in all functions, which in turn will help with refactoring.
+
+Many times I'm stymied in my short bursts of reworking Apt because I don't remember or understand what a given function is supposed to do or how it operates. Better docstrings as I go will help with this.
+
+Next step is rewrite usage() so that it:
+
+    a) has shortlist of Commands (instead of all functions)
+    b) only shows first x characters of docstring (and then help() is used for the whole docstring).
+#@+node:maphew.20141005143559.6904: *4* print docstrings for all
+#@@language python
+'''Print the docstrings for all functions with defined docstrings'''
+
+#@+at
+# This was the original method in cyg-apt for
+#  displaying usage help. Clever, but not flexible enough for us here.
+# https://code.google.com/p/maphew/source/browse/other/cyg-apt.py#78
+#@@c
+d = __main__.__dict__
+commands = filter (lambda x:
+   type (d[x]) == type (usage) and d[x].__doc__, d)
+sys.stdout.writelines (map (lambda x:
+    "    %s - %s\n" % (x, d[x].__doc__), sorted (commands)))
 #@+node:maphew.20130122175214.1530: ** bugs
 #@+node:maphew.20141002090256.2026: *3* IOError: invalid data stream
     B:\o4w>python b:\code\maphew\apt\apt.py update
