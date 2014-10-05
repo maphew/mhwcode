@@ -1,6 +1,12 @@
-#!/usr/bin/env python
 '''Yet another dev run at making apt better, and improving my understanding of python.
-2014-Sep-27, mhw'''
+2014-Sep-27, mhw
+
+This attempt doesn't look for a new magic bullet to avoid contending with
+argparse, nor does it use it. Rather it is, so far, a simple refactoring ground
+of choice functions from apt.py. Ideally each refactoring here will go back into
+apt.py.
+
+'''
 import os
 import sys
 
