@@ -1,6 +1,10 @@
 ''' 2nd attempt at using Plac module to drive Apt.
     Adapted from the 'Fake version control system' example:
-    http://plac.googlecode.com/hg/doc/plac.html#a-non-class-based-example '''
+    http://plac.googlecode.com/hg/doc/plac.html#a-non-class-based-example 
+    
+    Basic premise is to import apt as module, then pick and choose the functions
+    to run in a plac way.
+'''
 
 import plac, apt, os, urllib
 
