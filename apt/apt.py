@@ -599,9 +599,26 @@ def get_filelist (packagename):
 #@+node:maphew.20100223163802.3746: *3* get_installed
 def get_installed ():
     # ''' Get list of installed packages '''
+    # ''' Get list of installed packages from ./etc/setup/installed.db.
+    
+    # Returns nested dictionary (empty when installed.db doesn't exist):
+        # {status_int : {pkg_name : archive_name}}
+    
+    # I don't know significance of the nesting or leading zero. It appears to be
+    # extraneous? The db is just a straight name:tarball lookup table.
+    # In write_installed() the "status" is hard coded as 0 for all packages.
+    # '''
+    
     global installed
+    
+    # I think the intent here is for performance,
+    # don't reread from disk for every invocation.
+    # I'm not sure that's wise. What if setup.exe
+    # has modified it in the interim? Or another 
+    # apt instance?
     if installed:
         return installed
+    
     installed = {0:{}}
     for i in open (installed_db).readlines ()[1:]:
         name, ball, status = string.split (i)
