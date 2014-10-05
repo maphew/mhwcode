@@ -174,6 +174,14 @@ def find ():
 #@+node:maphew.20100223163802.3723: *3* help
 def help ():
     '''help COMMAND'''
+    # Intent appears to be "show additional help for ..."
+    # bug: is broken
+    # adding global packagename doesn't help
+    # so has been broken since at least the beginning of a2.py
+    #(and even if did work that's a kludge, because it's commands we want help for not packages)
+    global packagename
+    
+    # if "help for..." not present then just show general help. This only part that works.
     if len (params) < 2:
         usage ()
         sys.exit (0)
@@ -1116,6 +1124,8 @@ if __name__ == '__main__':
                       ('download', 'help', 'mirror=', 'root='
                        'ini=', 't=', 'start-menu=', 'no-deps'))
 
+    # we start with assumption help is the action to take,
+    # and switch to something else only if instructed so
     command = 'help'
 
     # the first parameter is our action

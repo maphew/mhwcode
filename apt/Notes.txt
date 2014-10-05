@@ -35,6 +35,10 @@ This may mean the end of moving apt furniture about. We've tidied things up, the
 #@+node:maphew.20140905201312.1893: ** Research
 new magic bullet discovered: click
 @url http://click.pocoo.org/3/quickstart
+
+Just discovered a 2nd copy of original cyg-apt:
+http://lilypond.org/cygwin/cyg-apt-gub
+investigate what if any diff from one I started with.
 #@+node:maphew.20140905022205.1895: ** Too many apts
     B:\code\apt\r183\gis\o4w_extras\bin\apt.py
     B:\code\apt\r262\apt\apt.py
