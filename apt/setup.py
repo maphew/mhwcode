@@ -7,7 +7,7 @@ setup(
     install_requires=['Click'],
     entry_points='''
         [console_scripts]
-        apt = apt
-        dapt = dapt
+        apt = apt:main
+        dapt = dapt:main
         '''
     )

@@ -128,6 +128,33 @@ the python in active use.
       File "b:\code\maphew\apt\apt.py", line 551, in do_uninstall
         os.remove (file)
     WindowsError: [Error 5] Access is denied: 'B:\\o4w\\apps\\Python27\\DLLs\\bz2.pyd'
+#@+node:maphew.20141006093411.2071: *3* ...\Scripts\apt.exe broken
+After installing apt to python Scripts folder using `pip install --editable .` apt errors out. And then after changing setup.py as per thread[0] it breaks differently, because it's absolutely right, there is no main(). So I think this means in order to work completely we have to create a main wrapper around (at least) `< <run the commands>>`.
+
+This might mean waiting until after I can figure out the argparse etc. conundrum. Or, maybe solving this will make the conundrum easier to solve(?)
+
+ [0] https://mail.python.org/pipermail/distutils-sig/2007-July/007809.html
+
+
+    b:\>apt
+    Traceback (most recent call last):
+      File "B:\o4w\apps\Python27\Scripts\apt-script.py", line 9, in <module>
+        load_entry_point('AptInstaller==0.3', 'console_scripts', 'apt')()
+    TypeError: 'module' object is not callable
+
+
+
+    b:\>apt
+    Traceback (most recent call last):
+      File "B:\o4w\apps\Python27\Scripts\apt-script.py", line 9, in <module>
+        load_entry_point('AptInstaller==0.3', 'console_scripts', 'apt')()
+      File "build\bdist.win32\egg\pkg_resources.py", line 357, in load_entry_point
+        """Does the package's distribution contain the named metadata?"""
+      File "build\bdist.win32\egg\pkg_resources.py", line 2394, in load_entry_point
+    
+      File "build\bdist.win32\egg\pkg_resources.py", line 2113, in load
+        return location
+    ImportError: <module 'apt' from 'b:\code\maphew\apt\apt.py'> has no 'main' attribute
 #@+node:maphew.20130122175214.1532: *3* fixed
 #@+node:maphew.20130122175214.1531: *4* a2 install bad-pkg-name
 todo: Have apt report nicely when the packagename is not recognized
