@@ -16,8 +16,7 @@
   beginning July 2008
 
 '''
-svn_version = '$Rev: 1192 $'
-svn_id = '$Id: apt.py 1192 2012-07-04 19:32:14Z maphew $'
+apt_version = 'Dev - 2014-Oct'
 #@-<<docstring>>
 #@@language python
 #@@tabwidth -4
@@ -46,7 +45,7 @@ def usage ():
     # global setup_ini
     # global mirror
     # global root
-    print '-={ %s }=-\n'% (str.strip(svn_id, ' $'))
+    print('-={ %s }=-\n'% apt_version)
     # FIXME: list only usable command line parameters, not all functions
     # SOLVED: omit '''comment''' after function name, only those are listed
       # better:  use parsopt instead, #53 http://trac.osgeo.org/osgeo4w/ticket/53
