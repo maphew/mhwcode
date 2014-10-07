@@ -390,32 +390,36 @@ def setup ():
 
 #@+node:maphew.20100223163802.3733: *3* update
 def update ():
-    '''setup.ini'''
+    '''Fetch updated package list from mirror'''
     if not os.path.exists (downloads):
         os.makedirs (downloads)
 
     source = mirror + '/setup.ini.bz2'
     archive = downloads + 'setup.ini.bz2'
 
+   # remove cached ini archive
+    if os.path.exists(archive):
+        shutil.copy(archive, archive + '.bak')
+        
+    #FIXME: we should check for valid url
+    # most common cause for corrupted .bz2 is 404 not found
+    print('Fetching %s' % source)
+    f = urllib.urlretrieve(source, archive, down_stat)
+    print('')        
+        
+    try:
+        uncompressedData = bz2.BZ2File(archive).read()
+    except:
+       raise IOError('\n*** Error decompressing: %s' % archive)
+
     # backup existing setup config
     if os.path.exists (setup_ini):
-        if os.path.exists (setup_bak):
-                os.remove (setup_bak)
-        os.rename (setup_ini, setup_bak)
-
-   # remove cached ini
-    if os.path.exists (archive):
-        os.remove (archive)
-
-   # get current ini
-    f = urllib.urlretrieve(source, archive, down_stat)
-    uncompressedData = bz2.BZ2File(archive).read()
+        shutil.copy(setup_ini, setup_bak)
 
     # save uncompressed ini to setup dir
     ini = open(setup_ini, 'w')
     ini.write(uncompressedData)
     ini.close
-
 #@+node:maphew.20100223163802.3734: *3* upgrade
 def upgrade (dummy):
     '''all installed packages'''
