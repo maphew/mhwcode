@@ -643,6 +643,37 @@ def get_filelist (packagename):
         raise TypeError('urg')
     return lst
 
+#@+node:maphew.20141008125017.2075: *3* get_info
+def get_info(packagename):
+    ''' Retrieve details for package X.
+    
+    Returns dict of information for the package from setup.ini (category, version, archive name, etc.)
+    
+    When invoked as command prints the info to console:
+        
+    B:\> apt get_info shell
+    
+    category:       Commandline_Utilities
+    install :       x86/release/shell/shell-1.0.0-13.tar.bz2 3763 c38f03d2b7160f891fc36ec776ca4685
+    ldesc   :       "Menu and Desktop icon launch OSGeo4W command shell"
+    requires:       msvcrt setup
+    sdesc   :       "OSGeo4W Command Shell"
+    version :       1.0.0-13        
+        
+    Would be nice to order the printed info logically, e.g. short description before long, version before install file. However then we hardcode the key names into the function. Not sure it's a good idea.
+    
+    We should also split "install" into "file, size, md5", farther up the processing chain though.
+    '''
+
+    packagename = ' '.join(packagename)
+    d = dists[distname][packagename]
+    
+    if command == 'get_info':
+        print('')
+        for k in d.keys():
+            print('{0:8}:\t{1}'.format(k,d[k]))
+    
+    return d
 #@+node:maphew.20100223163802.3746: *3* get_installed
 def get_installed ():
     ''' Get list of installed packages from ./etc/setup/installed.db.
