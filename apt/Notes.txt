@@ -94,22 +94,6 @@ commands = filter (lambda x:
 sys.stdout.writelines (map (lambda x:
     "    %s - %s\n" % (x, d[x].__doc__), sorted (commands)))
 #@+node:maphew.20130122175214.1530: ** bugs
-#@+node:maphew.20141002090256.2026: *3* IOError: invalid data stream
-    B:\o4w>python b:\code\maphew\apt\apt.py update
-    ...100%  Traceback (most recent call last):
-      File "b:\code\maphew\apt\apt.py", line 1190, in <module>
-        update ()
-      File "b:\code\maphew\apt\apt.py", line 396, in update
-        uncompressedData = bz2.BZ2File(archive).read()
-    IOError: invalid data stream
-
-
-After which etc\setup\setup.ini no longer exists.
-Fix with
-
-    copy etc\setup\setup.bak etc\setup\setup.ini
-    
-hunch: has something to with mirror settings, .../x86/...
 #@+node:maphew.20141002090256.2028: *3* Access denied to .pyd
 We should exit with a graceful error in the case where Apt is trying to upgrade
 the python in active use.
@@ -156,6 +140,22 @@ This might mean waiting until after I can figure out the argparse etc. conundrum
         return location
     ImportError: <module 'apt' from 'b:\code\maphew\apt\apt.py'> has no 'main' attribute
 #@+node:maphew.20130122175214.1532: *3* fixed
+#@+node:maphew.20141002090256.2026: *4* IOError: invalid data stream
+    B:\o4w>python b:\code\maphew\apt\apt.py update
+    ...100%  Traceback (most recent call last):
+      File "b:\code\maphew\apt\apt.py", line 1190, in <module>
+        update ()
+      File "b:\code\maphew\apt\apt.py", line 396, in update
+        uncompressedData = bz2.BZ2File(archive).read()
+    IOError: invalid data stream
+
+
+After which etc\setup\setup.ini no longer exists.
+Fix with
+
+    copy etc\setup\setup.bak etc\setup\setup.ini
+    
+hunch: has something to with mirror settings, .../x86/...
 #@+node:maphew.20130122175214.1531: *4* a2 install bad-pkg-name
 todo: Have apt report nicely when the packagename is not recognized
 
