@@ -344,26 +344,53 @@ def requires ():
     ## display as horizontal list, all on one line
     #print string.join (depends)
 #@+node:maphew.20100223163802.3731: *3* search
-def search ():
-    '''search available packages list for X'''
+def search(pattern):
+    '''search available packages list for X
+    
+    (doesn't search descriptions yet)'''
+    
     global packagename
-    regexp = packagename
+    # regexp = packagename
     packages = []
     keys = []
+    
+    # # reverse engineering the globals...
+    # # 'dists' is actually contents of setup.ini in a dict
+    # # 'distname' is always 'current' (at present)
+    # # 
+    # print type(dists)
+    # print(distname)
+    # print(pattern)
+    
+    #pattern comes in as a list, we need bare string
+    pattern = ' '.join(pattern)
+    
+    if not pattern:
+        print("--- Missing what to search for")
+        #help(search) #stub for when help takes a parameter (print a usage message)
+        sys.exit()
+    
     if distname in dists:
+        # build list of packagenames
         keys = dists[distname].keys ()
+        ##print('---keys:', keys)
     else:
+        print('this "else:" does not get used???')
         for i in dists.keys ():
             for j in dists[i].keys ():
                 if not j in keys:
                     keys.append (j)
+    
+    #search for the regexp pattern
+    #fixme: change to search desciption as well
     for i in keys:
-        if not regexp or re.search (regexp, i):
+        if not pattern or re.search (pattern, i):
             if distname in dists:
                 if dists[distname][i].has_key (INSTALL):
                     packages.append (i)
             else:
                 packages.append (i)
+    
     for packagename in sorted (packages):
         s = packagename
         d = get_field ('sdesc')
@@ -1234,6 +1261,8 @@ if __name__ == '__main__':
     else:
         check_setup(installed_db, setup_ini)
 
+        #fixme: these setup more globals like dists-which-is-really-installed-list
+        #that are hard to track later. Should change to "thing = get_thing()"
         get_setup_ini ()
         get_installed ()
 
