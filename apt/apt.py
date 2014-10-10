@@ -109,15 +109,16 @@ def check_setup(installed_db, setup_ini):
 ###########################
 #@+node:maphew.20100223163802.3719: *3* available
 def available(foo):
-    ''' show packages available to be installed'''
+    '''Show packages available to be installed
 
-    # TODO: this function requires a parameter only because of the command calling
-     # structure of the module. The parameter is not used. When the command
-     # structure is fixed remove the parameter (or perhaps make it useful by
-     # saying (available(at_url_of_package_mirror_x)`
+    TODO: this function requires a parameter only because of the command calling
+     structure of the module. The parameter is not used. When the command
+     structure is fixed remove the parameter (or perhaps make it useful by
+     saying (available(at_url_of_package_mirror_x)`
 
-    # courtesy of Aaron Digulla,
-    # http://stackoverflow.com/questions/1524126/how-to-print-a-list-more-nicely
+    courtesy of Aaron Digulla,
+    http://stackoverflow.com/questions/1524126/how-to-print-a-list-more-nicely
+    '''
 
     # All packages mentioned in setup.ini
     # TODO: pass distribution as parameter instead of hardcoding
