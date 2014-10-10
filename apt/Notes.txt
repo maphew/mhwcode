@@ -93,6 +93,13 @@ commands = filter (lambda x:
    type (d[x]) == type (usage) and d[x].__doc__, d)
 sys.stdout.writelines (map (lambda x:
     "    %s - %s\n" % (x, d[x].__doc__), sorted (commands)))
+#@+node:maphew.20141010024515.2076: *3* Setup.ini has new fields
+New fields in setup.ini which we aren't capturing or doing anything with yet:
+
+    arch: x86
+    setup-timestamp: 1412665633
+
+(There are also [prev] and "source:", for wich there is some legacy code. I'm doubtful that it does anything useful though.) 
 #@+node:maphew.20130122175214.1530: ** bugs
 #@+node:maphew.20141002090256.2028: *3* Access denied to .pyd
 We should exit with a graceful error in the case where Apt is trying to upgrade
