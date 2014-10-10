@@ -650,29 +650,42 @@ def get_info(packagename):
     
     Returns dict of information for the package from setup.ini (category, version, archive name, etc.)
     
+    Note: "local_zip" is best guess based on current mirror. (We don't record which mirror was in use at the time of package install.)
+    
     When invoked as command prints the info to console:
         
     B:\> apt get_info shell
     
-    category:       Commandline_Utilities
-    install :       x86/release/shell/shell-1.0.0-13.tar.bz2 3763 c38f03d2b7160f891fc36ec776ca4685
-    ldesc   :       "Menu and Desktop icon launch OSGeo4W command shell"
-    requires:       msvcrt setup
-    sdesc   :       "OSGeo4W Command Shell"
-    version :       1.0.0-13        
-        
-    Would be nice to order the printed info logically, e.g. short description before long, version before install file. However then we hardcode the key names into the function. Not sure it's a good idea.
-    
-    We should also split "install" into "file, size, md5", farther up the processing chain though.
-    '''
-
+    name     : shell
+    version  : 1.0.0-13
+    sdesc    : "OSGeo4W Command Shell"
+    ldesc    : "Menu and Desktop icon launch OSGeo4W command shell"
+    category : Commandline_Utilities
+    requires : msvcrt setup
+    zip_path : x86/release/shell/shell-1.0.0-13.tar.bz2
+    zip_size : 3763
+    md5      : c38f03d2b7160f891fc36ec776ca4685
+    local_zip: d:/temp/o4w-cache/setup/http%3a%2f%2fdownload.osgeo.org%2...
+        '''
     packagename = ' '.join(packagename)
     d = dists[distname][packagename]
+    d['name'] = packagename
+    
+    # 'install' key has compound values, atomize it.
+    d['zip_path'],d['zip_size'],d['md5'] = d['install'].split()
+    del d['install']
+    
+    d['local_zip'] = '%s/%s' % (downloads, d['zip_path'])
     
     if command == 'get_info':
         print('')
-        for k in d.keys():
-            print('{0:8}:\t{1}'.format(k,d[k]))
+        for k in 'name, version, sdesc, ldesc, category, requires, zip_path, zip_size, md5, local_zip'.split(', '):
+            print('{0:9}: {1}'.format(k,d[k]))
+            
+        # This guaranteed to print entire dict contents,
+        # but not in a logical order.
+        # for k in d.keys():
+            # print('{0:8}:\t{1}'.format(k,d[k]))
     
     return d
 #@+node:maphew.20100223163802.3746: *3* get_installed
