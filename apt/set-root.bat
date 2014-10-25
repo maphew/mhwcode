@@ -1,1 +1,0 @@
-set osgeo4w_root=d:\temp\o4w_2012-nov-11
