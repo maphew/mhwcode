@@ -19,6 +19,7 @@ if len(sys.argv) < 2:
 
 src_raster = sys.argv[1]
 out_raster = sys.argv[2]
+create_options = 'compress=lzw predictor=2 tiled=yes'.split()
 
 def main(src_raster):
     raster = gdal.Open(src_raster)
@@ -75,12 +76,11 @@ def write_raster(template, array, transform, filename):
     '''
     template = gdal.Open(template)
     driver = template.GetDriver()
-    num_bands = 1
+    num_bands = template.RasterCount
     band = template.GetRasterBand(1)
-##    datatype = gdal.GetRasterDataType(band.DataType)
     rows,cols = array.shape
-    #out_raster = driver.Create(filename, cols, rows, gdal.GDT_Byte)
-    out_raster = driver.Create(filename, cols, rows, num_bands, band.DataType)
+    out_raster = driver.Create(filename, cols, rows, num_bands, band.DataType,
+        create_options)
     out_raster.SetGeoTransform(transform)
     out_raster.SetProjection(template.GetProjection())
     band = out_raster.GetRasterBand(1)
