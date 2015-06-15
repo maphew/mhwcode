@@ -40,16 +40,18 @@ def main(src_raster):
     data = np.array(raster.ReadAsArray())
     non_empty_columns = np.where(data.max(axis=0)>0)[0]
     non_empty_rows = np.where(data.max(axis=1)>0)[0]
-    crop_box = (min(non_empty_rows), max(non_empty_rows),
-        min(non_empty_columns), max(non_empty_columns))
+    crop_box = {'xmin': min(non_empty_columns),
+        'xmax': max(non_empty_columns),
+        'ymin': min(non_empty_rows),
+        'ymax': max(non_empty_rows)}
 
     # Calculate cropped geo referencing
-    new_xmin = xmin + (xcell * crop_box[0]) + xcell
-    new_ymax = ymax + (ycell * crop_box[2]) - ycell
+    new_xmin = xmin + (xcell * crop_box['xmin']) + xcell
+    new_ymax = ymax + (ycell * crop_box['ymin']) - ycell
     cropped_transform = new_xmin, xcell, 0.0, new_ymax, 0.0, ycell
 
     # crop
-    new_data = data[crop_box[0]:crop_box[1]+1, crop_box[2]:crop_box[3]+1]
+    new_data = data[crop_box['ymin']:crop_box['ymax']+1, crop_box['xmin']:crop_box['xmax']+1]
 
     new_rows, new_cols = new_data.shape # note: inverted relative to geo units
     #print cropped_transform
