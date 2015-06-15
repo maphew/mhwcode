@@ -80,12 +80,14 @@ def write_raster(template, array, transform, filename):
     driver = template.GetDriver()
     num_bands = template.RasterCount
     band = template.GetRasterBand(1)
+    nodata = band.GetNoDataValue()
     rows,cols = array.shape
     out_raster = driver.Create(filename, cols, rows, num_bands, band.DataType,
         create_options)
     out_raster.SetGeoTransform(transform)
     out_raster.SetProjection(template.GetProjection())
     band = out_raster.GetRasterBand(1)
+    band.SetNoDataValue(nodata)
     band.WriteArray(array)
     band.FlushCache()
     out_raster = None
