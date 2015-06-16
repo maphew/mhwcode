@@ -46,8 +46,10 @@ def main(src_raster):
         'ymax': max(non_empty_rows)}
 
     # Calculate cropped geo referencing
-    new_xmin = xmin + (xcell * crop_box['xmin']) + xcell
-    new_ymax = ymax + (ycell * crop_box['ymin']) - ycell
+##    new_xmin = xmin + (xcell * crop_box['xmin']) + xcell
+##    new_ymax = ymax + (ycell * crop_box['ymin']) - ycell
+    new_xmin = xmin + (xcell * crop_box['xmin'])
+    new_ymax = ymax + (ycell * crop_box['ymin'])
     cropped_transform = new_xmin, xcell, 0.0, new_ymax, 0.0, ycell
 
     # crop
