@@ -78,6 +78,8 @@ def write_raster(template, array, transform, filename):
     '''
     template = gdal.Open(template)
     driver = template.GetDriver()
+    if driver.ShortName == 'VRT':
+        driver = gdal.GetDriverByName('GTiff')
     num_bands = template.RasterCount
     band = template.GetRasterBand(1)
     nodata = band.GetNoDataValue()
