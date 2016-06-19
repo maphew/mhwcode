@@ -152,12 +152,12 @@ def deRegisterPy(pycore_regpath, version):
         # installpath = QueryValueEx(reg, installkey)[0] # win64
         installpath = QueryValue(reg, installkey) # win32
         
-        if not installpath == our_installpath:
+        if not installpath.lower() == our_installpath.lower():
             print "\nInstall path differs, skipping removal.\n"
             print "\tTheirs:\t%s \n\tOurs:\t%s" % (installpath, our_installpath)
             return
             
-        if installpath == our_installpath:
+        if installpath.lower() == our_installpath.lower():
             print 'Confirmed match of version# and install path, removing...\n'
             # print '(%s vs %s)' % (installpath, our_installpath)
             for subkey in ['\\InstallPath', '\\PythonPath']:
