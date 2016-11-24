@@ -85,7 +85,9 @@ class SVGLib:
         self.extent = [ bbox[0],bbox[3]*-1,bbox[2]-bbox[0],bbox[3]-bbox[1] ]
 
         # initialize colorsystem and define colors
-        self.libPath = "%s" % re.sub("\\\[^\\\]+$","",argv[0])
+        ##self.libPath = "%s" % re.sub("\\\[^\\\]+$","",argv[0])
+        self.libPath = os.path.dirname(os.path.realpath(__file__))
+            #fix Windows `[Errno 2] No such file or directory: 'asSVG.py/Tango-Palette.gpl'`
         self.colors = SVGColor(gp,self.libPath)
         
     ########################
