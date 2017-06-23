@@ -1,4 +1,0 @@
-syntax: glob
-*.pyc
-google-code.txt
-*.egg-info

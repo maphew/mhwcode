@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet Layers Control Example</title>
+	<meta charset="utf-8" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+	<!-- <link rel="stylesheet" href="https://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" /> -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
+   integrity="sha512-07I2e+7D8p6he1SIM+1twR5TIrhUQn9+I6yjqD53JQjFiMf8EtC93ty0/5vJTZGF8aAocvHYNEDJajGdNx1IsQ=="
+   crossorigin=""/>  
+	<link rel="stylesheet" href="control.w3w.css" />
+</head>
+<body>
+  <p>Adapted from <a href="https://github.com/davidpiesse/leaflet.w3w">https://github.com/davidpiesse/leaflet.w3w</a></p>
+  
+	<div id="map" style="width: 100%; height: 600px; border: thin dotted;"></div>
+
+	<!-- <script src="https://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script> -->
+   <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"
+   integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
+   crossorigin=""></script>
+  
+	<script src="/control.w3w.js"></script>
+	<script>
+    // your Mapbox API token
+    var mb_token = 'pk.eyJ1IjoibWFwaGV3IiwiYSI6ImNqNGE0bHljNzEwNHQzMnA3cmFkMnZpMXkifQ.nRZ79Ob2sd6nLu-cVHPiLA'
+		
+    var places = new L.LayerGroup();
+
+		L.marker([60.672923, -135.024628]).bindPopup('Schwatka Lake - east boat ramp').addTo(places);
+
+
+		var mbAttr = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+		'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+		'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+		mbUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=' + mb_token,
+    satUrl = 'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v9/tiles/256/{z}/{x}/{y}?access_token=' + mb_token;
+
+  var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+});    
+    
+    
+		var grayscale   = L.tileLayer(mbUrl, {id: 'mapbox.light', attribution: mbAttr}),
+		streets  = L.tileLayer(mbUrl, {id: 'mapbox.streets',   attribution: mbAttr}),
+    satellite  = L.tileLayer(satUrl, {id: 'mapbox.satellite-streets',   attribution: mbAttr});
+
+		var map = L.map('map', {
+			center: [60.672923, -135.024628],
+			zoom: 17,
+			layers: [satellite, places]
+		});
+
+		var w = new L.Control.w3w();
+		w.addTo(map);
+		map.on('click', function(e) {
+			console.log(e);
+			w.setCoordinates(e);
+		});
+
+		var baseLayers = {
+			"Grayscale": grayscale,
+			"Streets": streets,
+      "Satellite": satellite
+		};
+
+		var overlays = {
+			"Places": places
+		};
+
+		L.control.layers(baseLayers, overlays).addTo(map);
+	</script>
+</body>
+</html>

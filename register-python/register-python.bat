@@ -1,1 +1,0 @@
-@python register-python.py %*

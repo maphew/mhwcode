@@ -1,1 +1,0 @@
-&sys sed 's/$/\\fctr/' overlap.path.bare > append.txt ; &sys echo end >> append.txt ; &sys arc append fctr link < append.txt ; clip fctr buf_2k fctr-clip link ; kill fctr all ; rename fctr-clip fctr

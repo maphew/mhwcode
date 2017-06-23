@@ -1,1 +1,0 @@
-@python "classy-reggie.py" %*  
