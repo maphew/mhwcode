@@ -101,15 +101,14 @@
     var div_circle = L.divIcon({ className: 'circle-marker'});  
     var marker = L.marker([60.672923, -135.024628], {icon: div_circle} ).addTo(map);
     
-    // https://geospatialresponse.wordpress.com/2015/07/26/leaflet-geojson-pointtolayer/
+    //https://geospatialresponse.wordpress.com/2015/07/26/leaflet-geojson-pointtolayer/
     var pointLayer = L.geoJSON(null, {
       pointToLayer: function(feature,latlng){
-        //return L.divIcon({className: 'circle-marker'});
-        // https://gis.stackexchange.com/questions/235050/leaflet-geojson-bindtooltip-from-feature-attribute
-        label = String(feature.properties.area) // .bindTooltip can't use straight 'feature.properties.attribute'
-        return new L.CircleMarker(latlng, {
-                                  radius: 1,
-                                  }).bindTooltip(label, {permanent: true, opacity: 0.5}).openTooltip();
+        return L.divIcon({className: 'circle-marker'});
+        // return new L.CircleMarker(latlng, {
+                                  // radius: 1,
+                                  // fillOpacity: 0.85
+                                  // }).bindTooltip("here",{permanent: true, opacity: 0.025}).openTooltip();
       }
     });
     pointLayer.addData(points);
@@ -118,11 +117,7 @@
 		L.control.layers(baseLayers, overlays).addTo(map);
 	</script>
   <p>
-    Next experiments: 
-    <ul>
-      <li><a href="/turf.html">turf.html</a></li>
-      <li><a href="/label-points.html">label-points.html</a></li>
-  </ul>
+    Next experiment: <a href="/turf.html">turf.html</a>
   </p>
 </body>
 </html>
