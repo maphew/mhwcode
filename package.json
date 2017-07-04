@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "express": "^4.15.3",
-    "turf": "^3.0.14"
+    "turf": "^3.0.14",
+    "w3w-node-wrapper": "^2.2.0"
   },
   "engines": {
     "node": "8.1.x"
