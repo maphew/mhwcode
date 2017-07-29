@@ -1,0 +1,16 @@
+<head>
+  <style>body {margin: 0;  padding: 0;} #map {position: absolute;  top: 1.5em;  bottom: 0;  width: 100%;}</style>
+</head>
+<body>
+<link href="https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css" rel="stylesheet" />
+<script src="https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js"></script>
+
+<a href="/">Home</a>
+  <div id="map"></div>
+  
+<script>
+  var home = [60.672878, -135.024619];
+  L.mapbox.accessToken = 'pk.eyJ1IjoibWFwaGV3IiwiYSI6ImNqNGE0bHljNzEwNHQzMnA3cmFkMnZpMXkifQ.nRZ79Ob2sd6nLu-cVHPiLA';  
+  var map = L.mapbox.map('map','mapbox.light').setView(home, 21);
+  </script>
+</body>  

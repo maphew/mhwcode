@@ -1,0 +1,20 @@
+{
+"type": "FeatureCollection",
+"name": "test-points-short-named",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "name": "some thing"}, "geometry": { "type": "Point", "coordinates": [ -135.024939373899997, 60.672798081069011 ] } },
+{ "type": "Feature", "properties": { "name": "some thing"}, "geometry": { "type": "Point", "coordinates": [ -135.024939373899997, 60.672825032341493 ] } },
+{ "type": "Feature", "properties": { "name": "some thing"}, "geometry": { "type": "Point", "coordinates": [ -135.024939373899997, 60.672851983614009 ] } },
+{ "type": "Feature", "properties": { "name": "some thing"}, "geometry": { "type": "Point", "coordinates": [ -135.024939373899997, 60.672878934886 ] } },
+{ "type": "Feature", "properties": { "name": "some thing"}, "geometry": { "type": "Point", "coordinates": [ -135.024939373899997, 60.672663324709006 ] } },
+{ "type": "Feature", "properties": { "name": "some thing"}, "geometry": { "type": "Point", "coordinates": [ -135.024939373899997, 60.672690275980997 ] } },
+{ "type": "Feature", "properties": { "name": "some thing"}, "geometry": { "type": "Point", "coordinates": [ -135.024939373899997, 60.67271722725301 ] } },
+{ "type": "Feature", "properties": { "name": "some thing"}, "geometry": { "type": "Point", "coordinates": [ -135.024884259259977, 60.672771129797013 ] } },
+{ "type": "Feature", "properties": { "name": "some thing"}, "geometry": { "type": "Point", "coordinates": [ -135.024884259259977, 60.672798081068997 ] } },
+{ "type": "Feature", "properties": { "name": "some thing"}, "geometry": { "type": "Point", "coordinates": [ -135.024333112874984, 60.672878934885993 ] } },
+{ "type": "Feature", "properties": { "name": "some thing"}, "geometry": { "type": "Point", "coordinates": [ -135.024333112874984, 60.672905886157999 ] } },
+{ "type": "Feature", "properties": { "name": "some thing"}, "geometry": { "type": "Point", "coordinates": [ -135.024333112874984, 60.67293283742999 ] } },
+{ "type": "Feature", "properties": { "name": "some thing"}, "geometry": { "type": "Point", "coordinates": [ -135.024333112874984, 60.672959788701995 ] } }
+]
+}

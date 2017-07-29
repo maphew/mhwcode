@@ -26,6 +26,12 @@ Now we see a partial map. Console reports missing .png files. Oh yeah, we need t
 
 **YAY! it works! :)**
 
+-----
+2017-07-28  
+Added `serve-index` module so don't have to keep editing the index page. See `server.js`
+
+
+
 
 
 

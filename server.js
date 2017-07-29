@@ -3,6 +3,7 @@
 
 // init project
 var express = require('express');
+var serveIndex = require('serve-index'); //https://github.com/expressjs/serve-index
 var app = express();
 
 // we've started you off with Express, 
@@ -11,6 +12,10 @@ var turf = require('turf');
 
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
+
+// Serve URLs like /ftp/thing as public/ftp/thing
+app.use('/', serveIndex('public', {'icons': true}))
+//app.listen()
 
 // http://expressjs.com/en/starter/basic-routing.html
 app.get("/", function (request, response) {
