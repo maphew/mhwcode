@@ -27,11 +27,30 @@ Now we see a partial map. Console reports missing .png files. Oh yeah, we need t
 **YAY! it works! :)**
 
 -----
-2017-07-28  
+## 2017-07-28  
 Added `serve-index` module so don't have to keep editing the index page. See `server.js`
 
+As of this writing only template-map and turf pages are working.
+
+...
+
+Added serve-index module so don't have to keep editing the index page. See `server.js`
+
+Created basic template-map.html. Does nothing but show a map zoomed in on Schwatka boat launch.
+
+Cleaned cruft from turf.html.  Learned how to add a point and buffer it.
 
 
+### Tech Notes
+
+	var point = turf.point([y,x]);
+	var buffered = turf.buffer(point, 15, 'meters');
+	
+_turf.min.js:14 Uncaught TypeError: Cannot read property 'getEdge' of null_
+	
+Why? because 'point' coordinates are reversed!
+	
+See https://chat.stackexchange.com/rooms/939/gis
 
 
 
