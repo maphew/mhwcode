@@ -21,6 +21,19 @@ app.use('/', serveIndex('public', {'icons': true}))
 //  response.sendFile(__dirname + '/views/index.html');
 //});
 
+// Handlebars gives us pleasant template rendering:
+const exphbs = require('express-handlebars');
+const hbs = exphbs.create({
+  layoutsDir: __dirname + "/views"
+});
+app.engine('handlebars', hbs.engine);
+app.set('views', __dirname + '/views');
+app.set('view engine', 'handlebars');
+
+// index route
+app.get('/map', function(req, res) {
+  res.render('index', {MAPBOX_TOKEN: process.env.MAPBOX_TOKEN});
+});
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
