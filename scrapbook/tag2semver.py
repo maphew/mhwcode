@@ -1,3 +1,6 @@
+'''Something I wrote while trying to figure out how use Leo-Editor's git tags for PEP440 valid release names to upload to PyPi.
+   Implemented in Leo round about here https://github.com/leo-editor/leo-editor/commit/c8835d9aa4a609cba2f7f40b6393e44764684d7f
+'''
 import semantic_version
 print('=== Extracting semantic version from git tags ===')
 
@@ -24,15 +27,12 @@ for k,v in valid.items():
 print('\n--- SKIPPED ---\n')
 [print(x) for x in skipped]
 
-
 def thankyou():
-    print('''Thank you to:
-    
+    print('''Thank you to:    
     @Paolo_Bergantino, longest item in list:
         https://stackoverflow.com/questions/873327/pythons-most-efficient-way-to-choose-longest-string-in-list
     @EbraHim, use variable in format string:
-        https://stackoverflow.com/questions/36962995/format-in-python-by-variable-length
-    
+        https://stackoverflow.com/questions/36962995/format-in-python-by-variable-length  
     ''') 
 # (c) 2018 Matt Wilkie, maphew@gmail.com
 # License: X/MIT Open Source
