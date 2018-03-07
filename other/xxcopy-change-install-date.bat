@@ -8,8 +8,8 @@
 Echo Windows Registry Editor Version 5.00 >TempReg.reg
 
 Echo [HKEY_LOCAL_MACHINE\SOFTWARE\Pixelab\XXCOPY] >>TempReg.reg
-Echo "DateInstalled"="2014-11-23 09:51:18" >>TempReg.reg
-Echo "DateLastUsed"="2014-11-23 09:51:18" >>TempReg.reg
+Echo "DateInstalled"="2016-10-28 03:33:30" >>TempReg.reg
+Echo "DateLastUsed"="2016-10-28 03:33:30" >>TempReg.reg
 Echo "Miscellaneous"=hex:00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\ >>TempReg.reg
 Echo   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\ >>TempReg.reg
 Echo   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\ >>TempReg.reg
