@@ -57,6 +57,9 @@ if world_file is None:
 
 if geotransform is not None:
     x, x_size, x_rot, y, y_rot, y_size = geotransform
+    # correct for centre vs corner of pixel
+    x = x_size/2+x
+    y = y_size/2+y
     
     world_file.write('%s\n' % x_size)
     world_file.write('%s\n' % x_rot)
