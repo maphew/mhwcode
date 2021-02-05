@@ -27,7 +27,7 @@ from qgis.core import (
 )
 from qgis.PyQt.QtCore import QVariant
 import processing
-from h3 import h3
+import h3
 
 debug = False
 
