@@ -24,3 +24,10 @@ utmgrid-hunter.py
 (\ENV.461\) mwilkie@COMP-1234 T:\ENV.461
 $ 
 ~~~
+
+## Install
+
+Copy `setenv.bat` and `scripts` folder to root project directory.
+
+
+

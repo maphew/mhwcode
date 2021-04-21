@@ -14,7 +14,6 @@ if not "!_attributes:~0,1!" == "d" (goto :Usage)
       pushd "%1"
       for %%b in (*.pdf) do (
         if not exist "%%~nb.jpg" call :convert "%%b"
-        call :synctime "%%b"
         )
       popd
       )
@@ -30,6 +29,7 @@ if not "!_attributes:~0,1!" == "d" (goto :Usage)
   ::note we rely on filename coming in already quoted
   echo --- Running: call pdf2jpg %1 # #
   call pdf2jpg %1 # #
+  call :synctime %1
   goto :eof
 
 :synctime
