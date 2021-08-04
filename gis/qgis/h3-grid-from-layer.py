@@ -1,7 +1,9 @@
 """Generate an h3 index grid from the extents of input layer.
 In Qgis:
     Processing Toolbox >> Open existing script >> {select this file}
-        >> Edit the variables below
+        >> Select template extent layer in table of contents
+            >> optionally select specific features to get extent from
+        >> Edit the variables below (particularly min/max)
         >> Run
 
 Adapted from https://github.com/ThomasG77/30DayMapChallenge/blob/master/day4_hexagons/data/h3-processing.py
