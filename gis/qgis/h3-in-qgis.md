@@ -10,8 +10,11 @@ Using Uber's H3 hex grid system in Qgis
 
 From there:
 * _Processing tool box >> Open existing script >> Run_, or
-* _Plugins >> Python console >> Open editor >> load script >> Run_
+* _Plugins >> Python console >> Open editor >> load script: [h3-grid-from-layer.py][0] >> Run_
+  * [https://github.com/maphew/code/blob/master/gis/qgis/h3-grid-from-layer.py][0]
 
 More info: 
  - https://gis.stackexchange.com/questions/119495/does-qgis-work-with-anaconda
  - https://h3geo.org/
+
+  [0]: https://github.com/maphew/code/blob/master/gis/qgis/h3-grid-from-layer.py
