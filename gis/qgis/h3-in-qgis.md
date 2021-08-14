@@ -53,7 +53,7 @@ Related: https://gis.stackexchange.com/questions/395708/missing-optional-depende
 
 ---
 
-The way INPUT is handled seems to have changed across Qgis versions.
+<s>The way INPUT is handled seems to have changed across Qgis versions.</s>  Nope! actual error was that the output folder is hardcoded to `%projectPath%/data` and we weren't insuring that folder existed. Now fixed.
 
 ```
 Traceback (most recent call last):

@@ -52,6 +52,10 @@ projectPath = os.path.dirname(QgsProject.instance().fileName())
 geo_csrs = QgsCoordinateReferenceSystem(geographic_coordsys)
 out_csrs = QgsCoordinateReferenceSystem(output_projection)
 
+dataPath = os.path.join(projectPath, "data/")
+if not os.path.exists(dataPath):
+    os.mkdir(dataPath)
+
 #instead of chooser, just use active layer, and selected features within that layer
 mylayer = iface.activeLayer()
 if mylayer.selectedFeatures():
@@ -108,12 +112,13 @@ def hexes_within_layer_extent(layer, level):
 
 geo_layer = proj_to_geo(mylayer)
 
+
 # For each resolution level fetch geometry of each hex feature and write to shapefile with id
 for res in range(min_resolution, max_resolution + 1):
     log("Resolution: {res}")
     fields = QgsFields()
     fields.append(QgsField("id", QVariant.String))
-    shpfile = os.path.join(projectPath, f"data/{out_name_prefix}_{res}.shp")
+    shpfile = os.path.join(dataPath, f"{out_name_prefix}_{res}.shp")
     writer = QgsVectorFileWriter(
         shpfile, "UTF8", fields, QgsWkbTypes.Polygon, driverName="ESRI Shapefile"
     )
