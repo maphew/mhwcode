@@ -3,7 +3,7 @@
 
 ## Preparation
 
-If using Qgis via standard installer open **OSGeo4W shell** and install H3 with pip:
+If using Qgis via standard installer open **OSGeo4W shell** as administrator and install H3 with pip:
 
 ```
 pip install H3
