@@ -6,7 +6,9 @@ In Qgis:
         >> Edit the variables below (particularly min/max)
         >> Run
 
-Adapted from https://github.com/ThomasG77/30DayMapChallenge/blob/master/day4_hexagons/data/h3-processing.py
+Adapted from:
+ - https://github.com/ThomasG77/30DayMapChallenge/blob/master/day4_hexagons/data/h3-processing.py
+ - https://gis.stackexchange.com/questions/310555/using-uber-h3-from-qgis/
 License: X/MIT
 (c) 2021 matt wilkie <maphew@gmail.com>
 """

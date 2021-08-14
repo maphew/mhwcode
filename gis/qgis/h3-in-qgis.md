@@ -17,6 +17,12 @@ From Qgis:
 4. Edit variables (particularly min/max resolution levels)
 5. Run
 
+![screenshot: select extents layer, open script](h3-in-qgis.assets/h3-select-and-open.png)
+
+![screenshot: edit min/max hexes](h3-in-qgis.assets/h3-edit-min-max.png)
+
+![screenshot: result](h3-in-qgis.assets/h3-results.png)
+
 ## Preparation
 
 If using Qgis via standard installer open **OSGeo4W shell** as administrator and install H3 with pip:
