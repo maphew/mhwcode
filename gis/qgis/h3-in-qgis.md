@@ -1,5 +1,21 @@
 # Qgis & H3
-*Using Uber's H3 hex grid system in Qgis*
+*Using Uber's [H3 hex grid system][1] in Qgis*
+
+https://github.com/maphew/code/tree/master/gis/qgis:
+
+* h3-grid-from-layer.py - the script
+* h3-in-qgis.md - this doc
+
+## Usage
+
+From Qgis:
+
+1. Select a template layer in table of contents to get extent from
+   1. Optionally select specific features
+2. *Processing tool box >> Open existing script: [h3-grid-from-layer.py][0]* 
+3. OR: *Plugins >> Python console >> Open editor >> load script: [h3-grid-from-layer.py][0]* 
+4. Edit variables (particularly min/max resolution levels)
+5. Run
 
 ## Preparation
 
@@ -18,23 +34,9 @@ pip install H3
     
     qgis
 
-## Usage
+### More info: 
 
-From Qgis:
-
-1. Select a template layer in table of contents to get extent from
-   1. Optionally select specific features
-2. *Processing tool box >> Open existing script: [h3-grid-from-layer.py][0]* 
-3. OR: *Plugins >> Python console >> Open editor >> load script: [h3-grid-from-layer.py][0]* 
-4. Edit variables (particularly min/max resolution levels)
-5. Run
-
-More info: 
  - https://gis.stackexchange.com/questions/119495/does-qgis-work-with-anaconda
- - https://h3geo.org/
-
-[0]: https://github.com/maphew/code/blob/master/gis/qgis/h3-grid-from-layer.py
-
 
 
 ## Troubleshooting
@@ -51,20 +53,5 @@ Requirement already satisfied: h3 in c:\users\matt\appdata\roaming\python\python
 
 Related: https://gis.stackexchange.com/questions/395708/missing-optional-dependency-tables-in-qgis
 
----
-
-<s>The way INPUT is handled seems to have changed across Qgis versions.</s>  Nope! actual error was that the output folder is hardcoded to `%projectPath%/data` and we weren't insuring that folder existed. Now fixed.
-
-```
-Traceback (most recent call last):
-  File "C:\PROGRA~1/QGIS32~1.1/apps/qgis/./python/plugins\processing\script\ScriptEditorDialog.py", line 228, in runAlgorithm
-​    exec(self.editor.text(), _locals)
-  File "<string>", line 139, in <module>
-  File "C:\PROGRA~1/QGIS32~1.1/apps/qgis/./python/plugins\processing\tools\general.py", line 108, in run
-​    return Processing.runAlgorithm(algOrName, parameters, onFinish, feedback, context)
-  File "C:\PROGRA~1/QGIS32~1.1/apps/qgis/./python/plugins\processing\core\Processing.py", line 168, in runAlgorithm
-​    raise QgsProcessingException(msg)
-_core.QgsProcessingException: Unable to execute algorithm
-Incorrect parameter value for INPUT
-```
-
+[1]: https://h3geo.org/
+[0]: https://github.com/maphew/code/blob/master/gis/qgis/h3-grid-from-layer.py
