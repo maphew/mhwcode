@@ -1,12 +1,16 @@
 """Generate an h3 index grid from the extents of input layer.
 In Qgis:
     Processing Toolbox >> Open existing script >> {select this file}
-        >> Edit the variables below
+        >> Select template extent layer in table of contents
+            >> optionally select specific features to get extent from
+        >> Edit the variables below (particularly min/max)
         >> Run
-        
-Adapted from https://github.com/ThomasG77/30DayMapChallenge/blob/master/day4_hexagons/data/h3-processing.py
+
+Adapted from:
+ - https://github.com/ThomasG77/30DayMapChallenge/blob/master/day4_hexagons/data/h3-processing.py
+ - https://gis.stackexchange.com/questions/310555/using-uber-h3-from-qgis/
 License: X/MIT
-(c) 2021 matt wilkie <maphew@gmail.com> 
+(c) 2021 matt wilkie <maphew@gmail.com>
 """
 import os
 from qgis.utils import iface
@@ -32,14 +36,12 @@ import h3
 debug = False
 
 ###---------- Edit these variables ----------
-# Name of layer to use for extents
-area_of_interest = "nts-250k"
-
 # Min & max h3 resolution levels, from 0 to 15 (global to sub-meter)
 # High resolutions over broad areas can be slow and consume a lot of storage space
 # https://h3geo.org/docs/core-library/restable
-min_resolution = 3
-max_resolution = 5
+# Resolution 7 is ~2,000m across, 9 is ~320m across, 11 is ~45m (in YT Albers)
+min_resolution = 0
+max_resolution = 9
 
 # Output files are {prefix}_{resolution}: Hex_3, Hex_4, ...
 out_name_prefix = "Hex"
@@ -51,8 +53,18 @@ output_projection = "EPSG:3579"  # placeholder, not currently used
 projectPath = os.path.dirname(QgsProject.instance().fileName())
 geo_csrs = QgsCoordinateReferenceSystem(geographic_coordsys)
 out_csrs = QgsCoordinateReferenceSystem(output_projection)
-# todo: make a dialog chooser
-mylayer = QgsProject.instance().mapLayersByName(area_of_interest)[0]
+
+dataPath = os.path.join(projectPath, "data/")
+if not os.path.exists(dataPath):
+    os.mkdir(dataPath)
+
+#instead of chooser, just use active layer, and selected features within that layer
+mylayer = iface.activeLayer()
+if mylayer.selectedFeatures():
+    params = {'INPUT':mylayer, 'OUTPUT':'memory:sel'}
+    mylayer = processing.run("qgis:saveselectedfeatures", params)["OUTPUT"]
+    if debug:
+        QgsProject.instance().addMapLayer(mylayer)
 
 
 def log(item):
@@ -102,12 +114,13 @@ def hexes_within_layer_extent(layer, level):
 
 geo_layer = proj_to_geo(mylayer)
 
+
 # For each resolution level fetch geometry of each hex feature and write to shapefile with id
 for res in range(min_resolution, max_resolution + 1):
     log("Resolution: {res}")
     fields = QgsFields()
     fields.append(QgsField("id", QVariant.String))
-    shpfile = os.path.join(projectPath, f"data/{out_name_prefix}_{res}.shp")
+    shpfile = os.path.join(dataPath, f"{out_name_prefix}_{res}.shp")
     writer = QgsVectorFileWriter(
         shpfile, "UTF8", fields, QgsWkbTypes.Polygon, driverName="ESRI Shapefile"
     )
