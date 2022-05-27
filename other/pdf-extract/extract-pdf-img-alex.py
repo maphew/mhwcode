@@ -3,6 +3,19 @@
 # Adapted from https://stackoverflow.com/questions/2693820/extract-images-from-pdf-without-resampling-in-python
 # by https://stackoverflow.com/users/3209908/alex-paramonov
 #
+import os
+import sys
+from pathlib import Path
+
+# here = r"C:\Users\Matt\code\mhwcode\other\pdf-extract"
+here = Path(__file__).parent.absolute()
+print(here)
+src = r"C:\Users\Matt\Downloads"
+
+pdf_files = list(Path(src).glob("Scan*.pdf"))
+# print(pdf_files)s
+
+
 try:
     from StringIO import StringIO
 except ImportError:
@@ -79,15 +92,34 @@ def get_pdf_images(pdf_fp):
     return images
 
 
-if __name__ == "__main__":
-
-    pdf_fp = "test.pdf"
-
+def extract_images_from(pdf_fp):
+    count = 0
     for image in get_pdf_images(pdf_fp):
         (mode, size, data) = image
         try:
             img = Image.open(StringIO(data))
+            count += 1
         except Exception as e:
             print ("Failed to read image with PIL: {}".format(e))
             continue
         # Do whatever you want with the image
+        img.save(f'out/{pdf_fp.name}_{count}.{img.format}')
+        print(f'out/{pdf_fp.name}_{count}.{img.format}')
+
+if __name__ == "__main__":
+
+    # if 'SPYDER_ENCODING' or 'PYZO_PREFIX' in os.environ.keys():
+    #     pdf_fp = r'C:\users\Matt\Downloads\Scanned from a Xerox Multifunction Printer(1).pdf'
+    #     here = r'C:\Users\Matt\code\mhwcode\other\pdf-extract'
+    # else:
+    #     pdf_fp = sys.argv[1]
+    #     here = sys.argv[0]
+
+    if not os.path.exists('out'):
+        os.makedirs('out')
+
+    for pdf in pdf_files:
+        print(pdf)
+        extract_images_from(pdf)
+
+
