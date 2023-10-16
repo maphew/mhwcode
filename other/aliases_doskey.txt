@@ -1,12 +1,11 @@
 ;= See https://ss64.com/nt/doskey.html
 ;=
-;= Add to registry -- the ` & (doskey ...)` is the important part:
+;= Get new version of this file:
+;=   wget -O c:\bin\aliases_doskey.txt https://raw.githubusercontent.com/maphew/mhwcode/master/other/aliases_doskey.txt
 ;=
-'= reg add "hkcu\Software\Microsoft\Command Processor" /v AutoRun /d "(C:\apps\micromamba\condabin\mamba_hook.bat) & (doskey /macrofile=c:\bin\aliases_doskey.txt)"
-;= 
-;= Result:
-;= [HKEY_CURRENT_USER\Software\Microsoft\Command Processor]
-;= "AutoRun"="(\"C:\\apps\\micromamba\\condabin\\mamba_hook.bat\") & (doskey /macrofile=c:\\bin\\aliases_doskey.txt)"
+;= Add to registry -- the ` & (doskey ...)` is the important part:
+'=   reg add "hkcu\Software\Microsoft\Command Processor" /v AutoRun /d "(C:\apps\micromamba\condabin\mamba_hook.bat) & (doskey /macrofile=c:\bin\aliases_doskey.txt)"
+;=
 
 ;= general aliases
 ls=dir $* $T
