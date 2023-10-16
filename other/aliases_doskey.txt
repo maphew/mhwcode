@@ -12,7 +12,7 @@ ls=dir $* $T
 np=notepad
 
 ;= app specific
-mm="C:\apps\micromamba\condabin\micromamba.bat" $*
+
 
 ;= always end with empty `;= `
 ;=
