@@ -9,11 +9,11 @@
 
 ;= general aliases
 ls=dir $* $T
-np=notepad
-ed=notepad
+np=notepad $* $T
+ed=notepad $* $T
 
 ;= app specific
-fl=fossil
+fl=fossil $* $T
 
 ;= always end with empty `;= `
 ;=
