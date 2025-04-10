@@ -42,6 +42,9 @@ import h3
 
 debug = False
 
+def log(item):
+    return QgsMessageLog.logMessage(str(item))
+
 ###---------- Edit these variables ----------
 # Min & max h3 resolution levels, from 0 to 15 (global to sub-meter)
 # High resolutions over broad areas can be slow and consume a lot of storage space
@@ -58,16 +61,25 @@ output_projection = "EPSG:3579"  # placeholder, not currently used
 # --------------------------------------------
 
 projectPath = os.path.dirname(QgsProject.instance().fileName())
+if not projectPath:
+    # fallback if project not saved
+    projectPath = os.environ.get("TEMP", "/tmp")
+else:
+    projectPath = os.path.dirname(projectPath)
+    
 geo_csrs = QgsCoordinateReferenceSystem(geographic_coordsys)
 out_csrs = QgsCoordinateReferenceSystem(output_projection)
 
-dataPath = os.path.abspath(os.path.join(projectPath, "data"))  # use abspath and remove trailing slash
+if not projectPath:
+    projectPath = os.environ["TEMP"]
+    log(f"No projectPath defined, using TEMP: {projectPath}")
 
+dataPath = os.path.abspath(os.path.join(projectPath, "data"))  # use abspath and remove trailing slash 
 try:
     if not os.path.exists(dataPath):
         os.makedirs(dataPath, exist_ok=True)  # use makedirs instead of mkdir
 except PermissionError:
-    # If we can't create in project directory, fall back to temp
+    log(f"Can't create '{dataPath}' falling back to TEMP")
     dataPath = os.path.abspath(os.path.join(os.environ["TEMP"], "data"))
     os.makedirs(dataPath, exist_ok=True)
 
@@ -78,10 +90,6 @@ if mylayer.selectedFeatures():
     mylayer = processing.run("qgis:saveselectedfeatures", params)["OUTPUT"]
     if debug:
         QgsProject.instance().addMapLayer(mylayer)
-
-
-def log(item):
-    return QgsMessageLog.logMessage(str(item))
 
 
 def proj_to_geo(in_layer):
