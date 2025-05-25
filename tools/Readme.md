@@ -4,5 +4,5 @@ Ready to run scripts that do something.
 
 Typical usage:
 
-  uv run foobar.py ...
+    uv run foobar.py ...
   
