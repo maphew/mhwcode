@@ -1,0 +1,21 @@
+;= See https://ss64.com/nt/doskey.html
+;=
+;= Get new version of this file:
+;=   wget -O c:\bin\doskey-aliases.txt https://raw.githubusercontent.com/maphew/mhwcode/master/other/doskey-aliases.txt
+;=
+;= Add to registry -- the ` & (doskey ...)` is the important part:
+;=   reg add "hkcu\Software\Microsoft\Command Processor" /v AutoRun /d "doskey /macrofile=c:\bin\doskey-aliases.txt"
+;=
+;= if using Cmder add these to C:\apps\cmder\config\user_aliases.cmd 
+;=
+
+;= general aliases
+ls=dir $* $T
+np=notepad $* $T
+ed=notepad $* $T
+
+;= app specific
+fl=fossil $* $T
+
+;= always end with empty `;= `
+;=

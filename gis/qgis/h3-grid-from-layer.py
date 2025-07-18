@@ -1,3 +1,10 @@
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "h3",
+# ]
+# ///
+
 """Generate an h3 index grid from the extents of input layer.
 In Qgis:
     Processing Toolbox >> Open existing script >> {select this file}
@@ -35,13 +42,16 @@ import h3
 
 debug = False
 
+def log(item):
+    return QgsMessageLog.logMessage(str(item))
+
 ###---------- Edit these variables ----------
 # Min & max h3 resolution levels, from 0 to 15 (global to sub-meter)
 # High resolutions over broad areas can be slow and consume a lot of storage space
 # https://h3geo.org/docs/core-library/restable
 # Resolution 7 is ~2,000m across, 9 is ~320m across, 11 is ~45m (in YT Albers)
 min_resolution = 0
-max_resolution = 9
+max_resolution = 7
 
 # Output files are {prefix}_{resolution}: Hex_3, Hex_4, ...
 out_name_prefix = "Hex"
@@ -51,12 +61,27 @@ output_projection = "EPSG:3579"  # placeholder, not currently used
 # --------------------------------------------
 
 projectPath = os.path.dirname(QgsProject.instance().fileName())
+if not projectPath:
+    # fallback if project not saved
+    projectPath = os.environ.get("TEMP", "/tmp")
+else:
+    projectPath = os.path.dirname(projectPath)
+    
 geo_csrs = QgsCoordinateReferenceSystem(geographic_coordsys)
 out_csrs = QgsCoordinateReferenceSystem(output_projection)
 
-dataPath = os.path.join(projectPath, "data/")
-if not os.path.exists(dataPath):
-    os.mkdir(dataPath)
+if not projectPath:
+    projectPath = os.environ["TEMP"]
+    log(f"No projectPath defined, using TEMP: {projectPath}")
+
+dataPath = os.path.abspath(os.path.join(projectPath, "data"))  # use abspath and remove trailing slash 
+try:
+    if not os.path.exists(dataPath):
+        os.makedirs(dataPath, exist_ok=True)  # use makedirs instead of mkdir
+except PermissionError:
+    log(f"Can't create '{dataPath}' falling back to TEMP")
+    dataPath = os.path.abspath(os.path.join(os.environ["TEMP"], "data"))
+    os.makedirs(dataPath, exist_ok=True)
 
 #instead of chooser, just use active layer, and selected features within that layer
 mylayer = iface.activeLayer()
@@ -65,10 +90,6 @@ if mylayer.selectedFeatures():
     mylayer = processing.run("qgis:saveselectedfeatures", params)["OUTPUT"]
     if debug:
         QgsProject.instance().addMapLayer(mylayer)
-
-
-def log(item):
-    return QgsMessageLog.logMessage(str(item))
 
 
 def proj_to_geo(in_layer):
@@ -107,7 +128,28 @@ def hexes_within_layer_extent(layer, level):
     Out: ['8412023ffffffff', '84029d5ffffffff', '8413a93ffffffff']
     """
     ext_poly = poly_from_extent(layer)
-    hex_ids = set(h3.polyfill_polygon(ext_poly, res=level, lnglat_order=True))
+    # Convert to format expected by h3: [[lat1, lng1], [lat2, lng2], ...]
+    polygon = [[p[1], p[0]] for p in ext_poly]  # swap to lat,lng order
+    hex_ids = set()
+    
+    # Get the bounding box and create a grid of points
+    min_lat = min(p[1] for p in ext_poly)
+    max_lat = max(p[1] for p in ext_poly)
+    min_lng = min(p[0] for p in ext_poly)
+    max_lng = max(p[0] for p in ext_poly)
+    
+    # Calculate step size based on resolution level (rough approximation)
+    step = max(0.1, (max_lat - min_lat) / 100)  # adjust step size based on extent
+    
+    # Sample points within the bounding box
+    lat = min_lat
+    while lat <= max_lat:
+        lng = min_lng
+        while lng <= max_lng:
+            hex_ids.add(h3.latlng_to_cell(lat, lng, level))
+            lng += step
+        lat += step
+    
     log(f"Hex IDs within extent poly: {str(len(hex_ids))}")
     return hex_ids
 
@@ -117,33 +159,72 @@ geo_layer = proj_to_geo(mylayer)
 
 # For each resolution level fetch geometry of each hex feature and write to shapefile with id
 for res in range(min_resolution, max_resolution + 1):
-    log("Resolution: {res}")
+    log(f"Resolution: {res}")
+    
+    # Create fields for the layer
     fields = QgsFields()
-    fields.append(QgsField("id", QVariant.String))
-    shpfile = os.path.join(dataPath, f"{out_name_prefix}_{res}.shp")
-    writer = QgsVectorFileWriter(
-        shpfile, "UTF8", fields, QgsWkbTypes.Polygon, driverName="ESRI Shapefile"
-    )
+    field = QgsField()
+    field.setName("h3_index")
+    field.setType(QVariant.String)
+    fields.append(field)
+    field = QgsField()
+    field.setName("resolution")
+    field.setType(QVariant.Int)
+    fields.append(field)
+    
+    save_options = QgsVectorFileWriter.SaveVectorOptions()
+    save_options.driverName = "ESRI Shapefile"
+    save_options.fileEncoding = "UTF-8"
+    
+    # Create a memory layer first
+    uri = f"Polygon?crs={geo_csrs.authid()}"
+    memory_layer = QgsVectorLayer(uri, "temp", "memory")
+    memory_layer.dataProvider().addAttributes(fields)
+    memory_layer.updateFields()
+    
+    if not memory_layer.isValid():
+        log("Error: Invalid memory layer")
+        continue
+    
     features = []
     for id in set(hexes_within_layer_extent(geo_layer, res)):
-        f = QgsFeature()
-        f.setGeometry(
-            QgsGeometry.fromPolygonXY(
-                [
-                    # note reversing back to X,Y
-                    [QgsPointXY(c[1], c[0]) for c in h3.h3_to_geo_boundary(id)]
-                ]
-            )
-        )
-        f.setAttributes([id])
+        f = QgsFeature(fields)
+        f.setAttribute("h3_index", id)
+        f.setAttribute("resolution", res)
+        
+        # Get the hex boundary and create polygon
+        boundary = h3.cell_to_boundary(id)
+        points = [QgsPointXY(lon, lat) for lat, lon in boundary]
+        points.append(points[0])  # close the polygon
+        
+        f.setGeometry(QgsGeometry.fromPolygonXY([points]))
+        features.append(f)
         if debug:
             log(f"Hex: {id} " + str(h3.h3_to_geo_boundary(id)))
-        features.append(f)
-    writer.addFeatures(features)
-    del writer
+    
+    # Add features to memory layer
+    memory_layer.dataProvider().addFeatures(features)
+    
+    # Write the memory layer to file
+    shpfile = os.path.join(dataPath, f"{out_name_prefix}_{res}.shp")
+    error = QgsVectorFileWriter.writeAsVectorFormatV3(
+        layer=memory_layer,
+        fileName=shpfile,
+        transformContext=QgsProject.instance().transformContext(),
+        options=save_options
+    )
+    
+    if error[0] != QgsVectorFileWriter.NoError:
+        log(f"Error writing vector file: {error[0]}")
+        continue
+    
     log("Features out: " + str(len(features)))
 
-    processing.run("qgis:definecurrentprojection", {"INPUT": shpfile, "CRS": geo_csrs})
-
+    # Add the layer to the map with the correct CRS
     layer = QgsVectorLayer(shpfile, f"{out_name_prefix} {res}", "ogr")
-    QgsProject.instance().addMapLayer(layer)
+    if layer.isValid():
+        layer.setCrs(geo_csrs)
+        QgsProject.instance().addMapLayer(layer)
+        log(f"Added layer {out_name_prefix} {res} to map")
+    else:
+        log(f"Error: Could not load layer {out_name_prefix} {res}")
