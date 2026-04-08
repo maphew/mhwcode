@@ -16,9 +16,26 @@ Script is self-contained and can used instead of `uv add GDAL` in any uv project
         + gdal==3.12.1
         Successfully imported gdal module version: 3.12.1
 
+Also add this to pyproject.toml:
+```
+    requires-python = ">=3.12"
+    dependencies = [
+        "gdal==3.12.1",
+    ]
+
+    [[tool.uv.index]]
+    name = "mentaljam-gdal"
+    url = "https://gitlab.com/api/v4/projects/61637378/packages/pypi/simple"
+    explicit = true
+
+    [tool.uv.sources]
+    gdal = { index = "mentaljam-gdal" }
+```
+
 Specify python version and don't embed in current project:
 
     uv run --python 3.13 --no-project install-py-gdal.py
+
 
 (c) 2026 Matt Wilkie <matt.wilkie@yukon.ca>, Yukon Government. X/MIT License.
 """
