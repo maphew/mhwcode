@@ -19,6 +19,8 @@ Script is self-contained and can used instead of `uv add GDAL` in any uv project
 Specify python version and don't embed in current project:
 
     uv run --python 3.13 --no-project install-py-gdal.py
+
+(c) 2026 Matt Wilkie <matt.wilkie@yukon.ca>, Yukon Government. X/MIT License.
 """
 
 from __future__ import annotations
