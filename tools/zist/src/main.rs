@@ -5,8 +5,8 @@ use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
-use zest::format::Format;
-use zest::io::{
+use zist::format::Format;
+use zist::io::{
     compress_in_place, compress_to_writer, decompress_in_place, decompress_to_writer, test_file,
     Options,
 };
@@ -15,7 +15,7 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 fn main() -> ExitCode {
     let mut args = env::args_os();
-    let argv0 = args.next().unwrap_or_else(|| OsString::from("zest"));
+    let argv0 = args.next().unwrap_or_else(|| OsString::from("zist"));
     let rest: Vec<OsString> = args.collect();
     match run(&argv0, &rest) {
         Ok(()) => ExitCode::SUCCESS,
@@ -47,8 +47,8 @@ struct Cli {
 }
 
 fn default_mode_from_argv0(argv0: &Path) -> Mode {
-    let stem = argv0.file_stem().and_then(|s| s.to_str()).unwrap_or("zest");
-    if stem.eq_ignore_ascii_case("unzest") { Mode::Decompress } else { Mode::Compress }
+    let stem = argv0.file_stem().and_then(|s| s.to_str()).unwrap_or("zist");
+    if stem.eq_ignore_ascii_case("unzist") { Mode::Decompress } else { Mode::Compress }
 }
 
 fn run(argv0: &OsString, args: &[OsString]) -> Result<(), u8> {
@@ -60,7 +60,7 @@ fn run(argv0: &OsString, args: &[OsString]) -> Result<(), u8> {
         return Ok(());
     }
     if cli.version {
-        println!("zest {VERSION}");
+        println!("zist {VERSION}");
         return Ok(());
     }
 
@@ -284,8 +284,8 @@ fn err(msg: &str) -> u8 {
 fn print_help(mode: Mode) {
     match mode {
         Mode::Compress => println!(
-            "zest {VERSION} - compress files in place (format-agnostic)\n\n\
-             usage: zest [OPTIONS] FILE...\n\n\
+            "zist {VERSION} - compress files in place (format-agnostic)\n\n\
+             usage: zist [OPTIONS] FILE...\n\n\
              options:\n\
              \x20     --format {{zstd|gz|xz|bz2}}  compression format (default: zstd)\n\
              \x20     --level N                   compression level\n\
@@ -296,13 +296,13 @@ fn print_help(mode: Mode) {
              \x20 -v, --verbose                    emit per-file summary on stderr\n\
              \x20 -q, --quiet                      suppress per-file summary\n\
              \x20 -r, --recursive                  descend directories\n\
-             \x20 -d, --decompress                 decompress (same as unzest)\n\
+             \x20 -d, --decompress                 decompress (same as unzist)\n\
              \x20 -h, --help                       show this help\n\
              \x20 -V, --version                    print version\n"
         ),
         Mode::Decompress => println!(
-            "unzest {VERSION} - decompress files in place (format auto-detected)\n\n\
-             usage: unzest [OPTIONS] FILE...\n\n\
+            "unzist {VERSION} - decompress files in place (format auto-detected)\n\n\
+             usage: unzist [OPTIONS] FILE...\n\n\
              options:\n\
              \x20 -k, --keep                       keep source file\n\
              \x20 -c, --stdout                     write to stdout, keep source\n\
@@ -311,7 +311,7 @@ fn print_help(mode: Mode) {
              \x20 -v, --verbose                    emit per-file summary on stderr\n\
              \x20 -q, --quiet                      suppress per-file summary\n\
              \x20 -r, --recursive                  descend directories\n\
-             \x20 -z, --compress                   compress (same as zest)\n\
+             \x20 -z, --compress                   compress (same as zist)\n\
              \x20 -h, --help                       show this help\n\
              \x20 -V, --version                    print version\n"
         ),

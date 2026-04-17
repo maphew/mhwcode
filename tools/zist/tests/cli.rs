@@ -6,15 +6,15 @@ use tempfile::tempdir;
 
 const PAYLOAD: &[u8] = b"hello cli world\nhello cli world\nhello cli world\n";
 
-fn zest_bin() -> PathBuf {
-    assert_cmd::cargo::cargo_bin("zest")
+fn zist_bin() -> PathBuf {
+    assert_cmd::cargo::cargo_bin("zist")
 }
 
-/// Copy the binary to a peer path named `unzest` so we exercise the real
+/// Copy the binary to a peer path named `unzist` so we exercise the real
 /// argv[0] dispatch on every OS (including Windows, where symlinks need perms).
-fn make_unzest_peer(dir: &std::path::Path) -> PathBuf {
-    let src = zest_bin();
-    let name = if cfg!(windows) { "unzest.exe" } else { "unzest" };
+fn make_unzist_peer(dir: &std::path::Path) -> PathBuf {
+    let src = zist_bin();
+    let name = if cfg!(windows) { "unzist.exe" } else { "unzist" };
     let dst = dir.join(name);
     fs::copy(&src, &dst).unwrap();
     dst
@@ -28,14 +28,14 @@ fn compress_and_decompress_via_argv0() {
     let src = dir.path().join("payload.txt");
     fs::write(&src, PAYLOAD).unwrap();
 
-    Command::cargo_bin("zest").unwrap().arg(&src).assert().success();
+    Command::cargo_bin("zist").unwrap().arg(&src).assert().success();
 
     let compressed = dir.path().join("payload.txt.zst");
     assert!(compressed.exists());
     assert!(!src.exists());
 
-    let unzest = make_unzest_peer(dir.path());
-    Command::new(&unzest).arg(&compressed).assert().success();
+    let unzist = make_unzist_peer(dir.path());
+    Command::new(&unzist).arg(&compressed).assert().success();
 
     assert!(!compressed.exists());
     assert_eq!(fs::read(&src).unwrap(), PAYLOAD);
@@ -47,7 +47,7 @@ fn format_long_flag_selects_gzip() {
     let src = dir.path().join("a.txt");
     fs::write(&src, PAYLOAD).unwrap();
 
-    Command::cargo_bin("zest")
+    Command::cargo_bin("zist")
         .unwrap()
         .args(["--format", "gz"])
         .arg(&src)
@@ -65,7 +65,7 @@ fn unknown_format_errors() {
     let src = dir.path().join("a.txt");
     fs::write(&src, PAYLOAD).unwrap();
 
-    Command::cargo_bin("zest")
+    Command::cargo_bin("zist")
         .unwrap()
         .args(["--format", "zip"])
         .arg(&src)
@@ -76,12 +76,12 @@ fn unknown_format_errors() {
 
 #[test]
 fn no_inputs_errors() {
-    Command::cargo_bin("zest").unwrap().assert().failure();
+    Command::cargo_bin("zist").unwrap().assert().failure();
 }
 
 #[test]
 fn help_flag_succeeds() {
-    Command::cargo_bin("zest").unwrap().arg("--help").assert().success();
+    Command::cargo_bin("zist").unwrap().arg("--help").assert().success();
 }
 
 #[test]
@@ -91,7 +91,7 @@ fn per_file_error_does_not_abort_batch() {
     let bad = dir.path().join("does-not-exist.txt");
     fs::write(&good, PAYLOAD).unwrap();
 
-    Command::cargo_bin("zest").unwrap().arg(&bad).arg(&good).assert().failure();
+    Command::cargo_bin("zist").unwrap().arg(&bad).arg(&good).assert().failure();
     assert!(dir.path().join("good.txt.zst").exists());
 }
 
@@ -103,7 +103,7 @@ fn keep_flag_preserves_source() {
     let src = dir.path().join("a.txt");
     fs::write(&src, PAYLOAD).unwrap();
 
-    Command::cargo_bin("zest").unwrap().arg("-k").arg(&src).assert().success();
+    Command::cargo_bin("zist").unwrap().arg("-k").arg(&src).assert().success();
     assert!(src.exists(), "-k should keep the source");
     assert!(dir.path().join("a.txt.zst").exists());
 }
@@ -114,7 +114,7 @@ fn keep_long_flag_preserves_source() {
     let src = dir.path().join("a.txt");
     fs::write(&src, PAYLOAD).unwrap();
 
-    Command::cargo_bin("zest").unwrap().arg("--keep").arg(&src).assert().success();
+    Command::cargo_bin("zist").unwrap().arg("--keep").arg(&src).assert().success();
     assert!(src.exists());
 }
 
@@ -124,7 +124,7 @@ fn stdout_flag_writes_to_stdout_and_keeps_source() {
     let src = dir.path().join("a.txt");
     fs::write(&src, PAYLOAD).unwrap();
 
-    let out = Command::cargo_bin("zest")
+    let out = Command::cargo_bin("zist")
         .unwrap()
         .arg("-c")
         .arg(&src)
@@ -145,7 +145,7 @@ fn force_flag_overwrites_existing_output() {
     fs::write(&src, PAYLOAD).unwrap();
     fs::write(dir.path().join("a.txt.zst"), b"stale").unwrap();
 
-    Command::cargo_bin("zest").unwrap().arg("-f").arg(&src).assert().success();
+    Command::cargo_bin("zist").unwrap().arg("-f").arg(&src).assert().success();
     let new_bytes = fs::read(dir.path().join("a.txt.zst")).unwrap();
     assert_ne!(new_bytes, b"stale");
     assert_eq!(&new_bytes[..4], &[0x28, 0xB5, 0x2F, 0xFD]);
@@ -158,7 +158,7 @@ fn without_force_refuses_to_clobber() {
     fs::write(&src, PAYLOAD).unwrap();
     fs::write(dir.path().join("a.txt.zst"), b"stale").unwrap();
 
-    Command::cargo_bin("zest").unwrap().arg(&src).assert().failure();
+    Command::cargo_bin("zist").unwrap().arg(&src).assert().failure();
     assert_eq!(fs::read(dir.path().join("a.txt.zst")).unwrap(), b"stale");
     assert!(src.exists());
 }
@@ -168,11 +168,11 @@ fn test_flag_passes_valid_archive() {
     let dir = tempdir().unwrap();
     let src = dir.path().join("a.txt");
     fs::write(&src, PAYLOAD).unwrap();
-    Command::cargo_bin("zest").unwrap().arg(&src).assert().success();
+    Command::cargo_bin("zist").unwrap().arg(&src).assert().success();
     let compressed = dir.path().join("a.txt.zst");
 
-    let unzest = make_unzest_peer(dir.path());
-    Command::new(&unzest).arg("-t").arg(&compressed).assert().success();
+    let unzist = make_unzist_peer(dir.path());
+    Command::new(&unzist).arg("-t").arg(&compressed).assert().success();
     assert!(compressed.exists(), "-t must not remove the file");
 }
 
@@ -181,7 +181,7 @@ fn test_flag_fails_on_corrupted_archive() {
     let dir = tempdir().unwrap();
     let src = dir.path().join("a.txt");
     fs::write(&src, PAYLOAD).unwrap();
-    Command::cargo_bin("zest")
+    Command::cargo_bin("zist")
         .unwrap()
         .args(["--format", "gz"])
         .arg(&src)
@@ -194,8 +194,8 @@ fn test_flag_fails_on_corrupted_archive() {
     bytes[i] ^= 0xFF;
     fs::write(&compressed, &bytes).unwrap();
 
-    let unzest = make_unzest_peer(dir.path());
-    Command::new(&unzest).arg("-t").arg(&compressed).assert().failure();
+    let unzist = make_unzist_peer(dir.path());
+    Command::new(&unzist).arg("-t").arg(&compressed).assert().failure();
 }
 
 #[test]
@@ -204,7 +204,7 @@ fn quiet_flag_suppresses_stdout() {
     let src = dir.path().join("a.txt");
     fs::write(&src, PAYLOAD).unwrap();
 
-    let out = Command::cargo_bin("zest")
+    let out = Command::cargo_bin("zist")
         .unwrap()
         .arg("-q")
         .arg(&src)
@@ -222,7 +222,7 @@ fn verbose_flag_emits_summary() {
     let src = dir.path().join("a.txt");
     fs::write(&src, PAYLOAD).unwrap();
 
-    let assert = Command::cargo_bin("zest")
+    let assert = Command::cargo_bin("zist")
         .unwrap()
         .arg("-v")
         .arg(&src)
@@ -245,8 +245,8 @@ fn level_shortcut_digit() {
     fs::write(&a, &payload).unwrap();
     fs::write(&b, &payload).unwrap();
 
-    Command::cargo_bin("zest").unwrap().arg("-1").arg(&a).assert().success();
-    Command::cargo_bin("zest").unwrap().arg("-9").arg(&b).assert().success();
+    Command::cargo_bin("zist").unwrap().arg("-1").arg(&a).assert().success();
+    Command::cargo_bin("zist").unwrap().arg("-9").arg(&b).assert().success();
 
     // Both should produce valid zstd, and -9 should not be larger than -1 on
     // repetitive data. (We don't assert strictly smaller because zstd minimums
@@ -257,11 +257,11 @@ fn level_shortcut_digit() {
 }
 
 #[test]
-fn decompress_override_on_zest() {
+fn decompress_override_on_zist() {
     let dir = tempdir().unwrap();
     let src = dir.path().join("a.txt");
     fs::write(&src, PAYLOAD).unwrap();
-    Command::cargo_bin("zest")
+    Command::cargo_bin("zist")
         .unwrap()
         .args(["--format", "gz"])
         .arg(&src)
@@ -269,21 +269,21 @@ fn decompress_override_on_zest() {
         .success();
     let compressed = dir.path().join("a.txt.gz");
 
-    // `zest -d` should behave like unzest.
-    Command::cargo_bin("zest").unwrap().arg("-d").arg(&compressed).assert().success();
+    // `zist -d` should behave like unzist.
+    Command::cargo_bin("zist").unwrap().arg("-d").arg(&compressed).assert().success();
     assert!(!compressed.exists());
     assert_eq!(fs::read(&src).unwrap(), PAYLOAD);
 }
 
 #[test]
-fn compress_override_on_unzest() {
+fn compress_override_on_unzist() {
     let dir = tempdir().unwrap();
     let src = dir.path().join("a.txt");
     fs::write(&src, PAYLOAD).unwrap();
 
-    let unzest = make_unzest_peer(dir.path());
-    // `unzest -z` should behave like zest.
-    Command::new(&unzest).arg("-z").arg(&src).assert().success();
+    let unzist = make_unzist_peer(dir.path());
+    // `unzist -z` should behave like zist.
+    Command::new(&unzist).arg("-z").arg(&src).assert().success();
     assert!(dir.path().join("a.txt.zst").exists());
 }
 
@@ -294,7 +294,7 @@ fn bundled_short_flags() {
     fs::write(&src, PAYLOAD).unwrap();
 
     // -kv = --keep --verbose
-    let assert = Command::cargo_bin("zest")
+    let assert = Command::cargo_bin("zist")
         .unwrap()
         .arg("-kv")
         .arg(&src)
@@ -315,7 +315,7 @@ fn recursive_flag_compresses_tree() {
     fs::create_dir(sub.join("inner")).unwrap();
     fs::write(sub.join("inner").join("z.txt"), PAYLOAD).unwrap();
 
-    Command::cargo_bin("zest").unwrap().arg("-r").arg(&sub).assert().success();
+    Command::cargo_bin("zist").unwrap().arg("-r").arg(&sub).assert().success();
     assert!(sub.join("x.txt.zst").exists());
     assert!(sub.join("y.txt.zst").exists());
     assert!(sub.join("inner").join("z.txt.zst").exists());

@@ -1,16 +1,16 @@
 [package]
-name = "zest"
+name = "zist"
 version = "0.1.0"
 edition = "2021"
-description = "Format-agnostic in-place (de)compression wrappers. argv[0] dispatches zest/unzest."
+description = "Format-agnostic in-place (de)compression wrappers. argv[0] dispatches zist/unzist."
 license = "MIT"
 
 [[bin]]
-name = "zest"
+name = "zist"
 path = "src/main.rs"
 
 [lib]
-name = "zest"
+name = "zist"
 path = "src/lib.rs"
 
 [dependencies]
