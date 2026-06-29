@@ -1,1 +1,7 @@
 /other/micromamba/micromamba.tar.bz2
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/
