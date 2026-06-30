@@ -1,5 +1,14 @@
+# /// script
+# requires-python = ">=3.8"
+# dependencies = [
+#   "semantic-version",
+# ]
+# ///
 '''Something I wrote while trying to figure out how use Leo-Editor's git tags for PEP440 valid release names to upload to PyPi.
    Implemented in Leo round about here https://github.com/leo-editor/leo-editor/commit/c8835d9aa4a609cba2f7f40b6393e44764684d7f
+
+Usage:
+    uv run tag2semver.py
 '''
 import semantic_version
 print('=== Extracting semantic version from git tags ===')

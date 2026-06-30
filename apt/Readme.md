@@ -1,5 +1,5 @@
-*2014-Oct-24*
+# apt
 
-Apt has moved to
-[https://github.com/maphew/apt](https://github.com/maphew/apt)
+> **Moved.** This tool now lives at **https://github.com/maphew/apt**
 
+This directory is kept as a breadcrumb so old links and history remain intact.

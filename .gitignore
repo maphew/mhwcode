@@ -1,3 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+*.egg
+.eggs/
+dist/
+build/
+.venv/
+venv/
+.env
+
+# Logs and temp
+*.log
+*.tmp
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*~
+
 # Beads / Dolt files (added by bd init)
 .dolt/
 *.db
