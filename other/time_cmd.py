@@ -1,8 +1,14 @@
 ''' Quick and dirty script to measure execution time of a command.
 
-    Sources:
-        http://stackoverflow.com/questions/1465146/how-do-you-determine-a-processing-time-in-python
-        http://www.cyberciti.biz/faq/python-run-external-command-and-get-output
+Usage:
+    python time_cmd.py <command> [args...]
+
+Example:
+    python time_cmd.py ping -n 4 google.com
+
+Sources:
+    http://stackoverflow.com/questions/1465146/how-do-you-determine-a-processing-time-in-python
+    http://www.cyberciti.biz/faq/python-run-external-command-and-get-output
 '''
 import sys
 import timeit

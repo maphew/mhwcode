@@ -3,7 +3,15 @@
 Make OneNote HTML exports trilium compatible.
 - Identifies and converts the page title (first h1 or p with larger font size) to a proper h1 tag
 - Italicizes the date after fixing the title
-- remove filelist.xml files (not needed) 
+- remove filelist.xml files (not needed)
+
+Requirements:
+    pip install beautifulsoup4 python-dotenv
+    Copy .env.example to .env and set TRILIUM_HOST and TRILIUM_TOKEN
+    See https://github.com/zadam/trilium/wiki/ETAPI
+
+Verify:
+    python import_onenote_zip.py --help
 """
 
 import os

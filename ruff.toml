@@ -1,0 +1,31 @@
+# Ruff configuration for this utility-script collection.
+# Run: uv tool run ruff check path/to/script.py
+#      uv tool run ruff format path/to/script.py
+
+target-version = "py310"
+
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes (undefined names, unused imports)
+    "B",   # flake8-bugbear (likely bugs)
+    "UP",  # pyupgrade (modernise syntax)
+]
+ignore = [
+    "E501",  # line too long — not enforced in a script collection
+]
+
+# Exclude legacy ArcGIS / Python 2 scripts that predate ruff
+exclude = [
+    "arcplus/arcgisscripting.py",
+    "arcplus/arcplus.py",
+    "arcplus/xx-calc-trans.py",
+    "gis/AliasFeatureclassConversion.py",
+    "gis/list-fc-aliases.py",
+    "gis/xx-set-alias.py",
+    "register-python/list-python-installs.py",
+    "register-python/switch-python.py",
+    "register-python/walk-registry.py",
+    "scrapbook/",
+]

@@ -1,5 +1,3 @@
-/other/micromamba/micromamba.tar.bz2
-
 # Beads / Dolt files (added by bd init)
 .dolt/
 *.db

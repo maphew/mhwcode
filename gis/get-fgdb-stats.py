@@ -13,7 +13,11 @@
 """Scan an FGDB and output a CSV of table metadata of size, geometry type, etc.
 
 Typical usage:
-    uv run get-fgdb-stats <gdb_path> [--csv <csv_path>] [--xlsx <xlsx_path>] [--sort-by <column>]
+    uv run get-fgdb-stats.py <gdb_path>
+    uv run get-fgdb-stats.py <gdb_path> --csv out.csv --xlsx out.xlsx --sort-by name
+
+Verify:
+    uv run get-fgdb-stats.py --help
 """
 import csv
 import datetime
@@ -245,7 +249,7 @@ def main(
                     try:
                         if len(str(cell.value)) > max_length:
                             max_length = len(str(cell.value))
-                    except:
+                    except (TypeError, ValueError):
                         pass
                 adjusted_width = (max_length + 2)
                 ws.column_dimensions[column].width = adjusted_width

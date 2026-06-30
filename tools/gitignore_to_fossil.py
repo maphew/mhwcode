@@ -1,10 +1,20 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "rich>=13",
+# ]
+# ///
 """
 Convert .gitignore patterns to Fossil's ignore format with a side-by-side comparison.
 
 Usage:
+    uv run gitignore_to_fossil.py [.gitignore_file]
     python gitignore_to_fossil.py [.gitignore_file]
-    
+
+Verify:
+    uv run gitignore_to_fossil.py --help
+
 If no file is provided, looks for .gitignore in the current directory.
 """
 
@@ -18,7 +28,7 @@ If no file is provided, looks for .gitignore in the current directory.
 import os
 import sys
 from pathlib import Path
-from typing import List, Optional, Set, Tuple
+from typing import List, Optional
 from dataclasses import dataclass
 
 try:
