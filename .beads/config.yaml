@@ -66,3 +66,7 @@
 # - github.token    → use GITHUB_TOKEN env var instead
 
 sync.remote: "git+https://github.com/maphew/mhwcode.git"
+agent:
+    profile: team-maintainer
+
+no-git-ops: false
