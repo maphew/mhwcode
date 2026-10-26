@@ -1,5 +1,5 @@
 type: mhwcode/script-health
-typeVersion: 2026.10.26.1
+typeVersion: 2026.10.26.2
 id: 7b061622-69f0-4f86-8004-66b977ca3a24
 name: script-health
 version: 1
@@ -14,6 +14,7 @@ globalArguments:
     - arcplus
     - register-python
     - Lib
+    - scrapbook
   extensions:
     - .py
     - .ps1

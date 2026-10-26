@@ -18,6 +18,7 @@ const DEFAULT_DIRS = [
   "arcplus",
   "register-python",
   "Lib",
+  "scrapbook",
 ];
 
 const DEFAULT_EXCLUDES = [
@@ -222,6 +223,13 @@ function probeCommand(
     return ["powershell", "-NoProfile", "-NonInteractive", "-Command", script];
   }
 
+  if (extension === ".sh") {
+    if (probe === "help") {
+      return { skip: "no safe help probe for shell scripts" };
+    }
+    return ["bash", "-n", absPath];
+  }
+
   return {
     skip: `no ${probe} probe for ${extension} scripts`,
   };
@@ -344,7 +352,7 @@ async function pool<T>(
 /** Script health behavior — one fan-out sweep per run. */
 export const behavior = {
   type: "mhwcode/script-health",
-  version: "2026.10.26.1",
+  version: "2026.10.26.2",
 
   globalArguments: GlobalArgsSchema,
 

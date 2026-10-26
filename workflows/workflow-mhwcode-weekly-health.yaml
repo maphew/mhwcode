@@ -8,6 +8,8 @@ tags:
 reports:
   require:
     - mhwcode/repo-digest
+trigger:
+  schedule: "0 6 * * 1"
 jobs:
   - name: main
     description: Read-only drift and script health sweep
