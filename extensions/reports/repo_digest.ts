@@ -74,7 +74,7 @@ interface LogPayload {
 interface ScriptResult {
   path: string;
   extension: string;
-  status: "ok" | "failed" | "timeout" | "skipped";
+  status: "ok" | "failed" | "timeout" | "skipped" | "legacy";
   message: string;
   likelyLegacyPython2: boolean;
 }
@@ -88,6 +88,7 @@ interface SweepPayload {
     failed: number;
     timeout: number;
     skipped: number;
+    legacy: number;
     legacyPython2: number;
   };
 }
@@ -99,6 +100,7 @@ interface DirRollup {
   failed: number;
   timeout: number;
   skipped: number;
+  legacy: number;
 }
 
 /** Normalize whatever the repository returns for content into text. */
@@ -166,7 +168,7 @@ function rollupByDir(sweep: SweepPayload): DirRollup[] {
   for (const script of sweep.scripts) {
     const dir = topDir(script.path);
     const row = byDir.get(dir) ??
-      { dir, total: 0, ok: 0, failed: 0, timeout: 0, skipped: 0 };
+      { dir, total: 0, ok: 0, failed: 0, timeout: 0, skipped: 0, legacy: 0 };
     row.total += 1;
     row[script.status] += 1;
     byDir.set(dir, row);
@@ -185,7 +187,9 @@ function table(headers: string[], rows: string[][]): string {
   return [
     `| ${headers.join(" | ")} |`,
     `| ${headers.map(() => "---").join(" | ")} |`,
-    ...rows.map((row) => `| ${row.map((cell) => escape(String(cell))).join(" | ")} |`),
+    ...rows.map((row) =>
+      `| ${row.map((cell) => escape(String(cell))).join(" | ")} |`
+    ),
   ].join("\n");
 }
 
@@ -256,13 +260,14 @@ export const report = {
         "## Script sweep",
         "",
         `${s.total} scripts probed in ${sweep.durationMs} ms: ` +
-          `${s.ok} ok, ${s.failed} failed, ${s.timeout} timeout, ${s.skipped} skipped. ` +
-          `${s.legacyPython2} of the failures are unconverted Python 2.`,
+          `${s.ok} ok, ${s.failed} failed, ${s.timeout} timeout, ${s.skipped} skipped, ` +
+          `${s.legacy} known legacy Python 2. ` +
+          `${s.legacyPython2} files parse as Python 2 overall.`,
         "",
       );
       if (byDir.length > 0) {
         lines.push(table(
-          ["dir", "total", "ok", "failed", "timeout", "skipped"],
+          ["dir", "total", "ok", "failed", "timeout", "skipped", "legacy"],
           byDir.map((d) => [
             d.dir,
             String(d.total),
@@ -270,13 +275,12 @@ export const report = {
             String(d.failed),
             String(d.timeout),
             String(d.skipped),
+            String(d.legacy),
           ]),
         ));
         lines.push("");
       }
-      const realFailures = sweep.scripts.filter(
-        (x) => x.status === "failed" && !x.likelyLegacyPython2,
-      );
+      const realFailures = sweep.scripts.filter((x) => x.status === "failed");
       if (realFailures.length > 0) {
         lines.push("### Failures needing a look", "");
         for (const failure of realFailures.slice(0, 25)) {
@@ -284,8 +288,19 @@ export const report = {
         }
         lines.push("");
       }
+      const newLegacy = legacy.filter((s) => s.status === "failed");
+      if (newLegacy.length > 0) {
+        lines.push(
+          `### New Python 2 drift (${newLegacy.length}) — not in the baseline`,
+          "",
+        );
+        for (const script of newLegacy) {
+          lines.push(`- \`${script.path}\` — ${script.message}`);
+        }
+        lines.push("");
+      }
       if (legacy.length > 0) {
-        lines.push(`### Legacy Python 2 (${legacy.length})`, "");
+        lines.push(`### Known legacy Python 2 (${legacy.length})`, "");
         for (const script of legacy.slice(0, 25)) {
           lines.push(`- \`${script.path}\` — ${script.message}`);
         }
@@ -304,7 +319,11 @@ export const report = {
         workflowRunId: ctx.workflowRunId,
         workflowStatus: ctx.workflowStatus,
         workingTree: status
-          ? { clean: status.clean, count: status.count, entries: status.entries }
+          ? {
+            clean: status.clean,
+            count: status.count,
+            entries: status.entries,
+          }
           : null,
         recentCommits: log
           ? log.commits.map((c) => ({
@@ -317,9 +336,15 @@ export const report = {
           ? {
             summary: sweep.summary,
             byDir,
-            legacyPython2: legacy.map((s) => ({ path: s.path, message: s.message })),
+            legacyPython2: legacy.map((s) => ({
+              path: s.path,
+              message: s.message,
+            })),
             failures: sweep.scripts
-              .filter((s) => s.status === "failed" && !s.likelyLegacyPython2)
+              .filter((s) => s.status === "failed")
+              .map((s) => ({ path: s.path, message: s.message })),
+            newLegacyDrift: sweep.scripts
+              .filter((s) => s.status === "failed" && s.likelyLegacyPython2)
               .map((s) => ({ path: s.path, message: s.message })),
           }
           : null,

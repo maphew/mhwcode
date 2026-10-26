@@ -1,5 +1,5 @@
 type: mhwcode/script-health
-typeVersion: 2026.10.26.2
+typeVersion: 2026.10.26.3
 id: 7b061622-69f0-4f86-8004-66b977ca3a24
 name: script-health
 version: 1
@@ -32,4 +32,35 @@ globalArguments:
     - node_modules
     - samples
     - assets
+  legacyPaths:
+    - arcplus/arcgisscripting.py
+    - arcplus/arcplus.py
+    - arcplus/xx-calc-trans.py
+    - gis/AliasFeatureclassConversion.py
+    - gis/asSVG.py
+    - gis/gdal_extras/bin/fusion.py
+    - gis/gdal_extras/bin/gdal_vrtmerge.py
+    - gis/gdal_extras/bin/gdalsetnull.py
+    - gis/list-fc-aliases.py
+    - gis/misc/nts_map_as_html_table.py
+    - gis/o4w_extras/bin/apt.py
+    - gis/o4w_extras/bin/cyg-apt.py
+    - gis/o4w_extras/bin/gdal-makeworld.py
+    - gis/o4w_extras/bin/gdalcopyproj.py
+    - gis/o4w_extras/bin/gdalsetnull.py
+    - gis/o4w_extras/bin/proj2wkt.py
+    - gis/o4w_extras/bin/wkt2proj.py
+    - gis/xx-set-alias.py
+    - Lib/pyuac.py
+    - other/cmdline.py
+    - other/cyg-apt.py
+    - other/foobar.py
+    - other/pdf-extract/extract-pdf-img.py
+    - other/show_ad_group_members.py
+    - register-python/classy-reggie.py
+    - register-python/list-python-installs.py
+    - register-python/list-registry.py
+    - register-python/locate-leo-py.py
+    - register-python/register-python.py
+    - register-python/walk-registry.py
 methods: {}

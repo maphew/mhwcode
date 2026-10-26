@@ -35,7 +35,7 @@ const DEFAULT_EXCLUDES = [
 const ProbeSchema = z.enum(["syntax", "help", "none"]);
 type Probe = z.infer<typeof ProbeSchema>;
 
-const StatusSchema = z.enum(["ok", "failed", "timeout", "skipped"]);
+const StatusSchema = z.enum(["ok", "failed", "timeout", "skipped", "legacy"]);
 type Status = z.infer<typeof StatusSchema>;
 
 const GlobalArgsSchema = z.object({
@@ -64,6 +64,9 @@ const GlobalArgsSchema = z.object({
   ),
   excludes: z.array(z.string()).default(DEFAULT_EXCLUDES).describe(
     "Directory names skipped while walking",
+  ),
+  legacyPaths: z.array(z.string()).default([]).describe(
+    "Known Python 2 scripts (repo-relative). They report as legacy instead of failed, so the digest only flags new drift",
   ),
 });
 
@@ -116,6 +119,9 @@ const SweepResultSchema = z.object({
     failed: z.number().int(),
     timeout: z.number().int(),
     skipped: z.number().int(),
+    legacy: z.number().int().describe(
+      "Known Python 2 scripts matched by legacyPaths",
+    ),
     legacyPython2: z.number().int().describe(
       "Failed scripts that look like unconverted Python 2",
     ),
@@ -352,7 +358,7 @@ async function pool<T>(
 /** Script health behavior — one fan-out sweep per run. */
 export const behavior = {
   type: "mhwcode/script-health",
-  version: "2026.10.26.2",
+  version: "2026.10.26.3",
 
   globalArguments: GlobalArgsSchema,
 
@@ -456,12 +462,13 @@ export const behavior = {
           const legacy = extension === ".py" && outcome.status === "failed" &&
             /syntax/i.test(outcome.message) &&
             await looksLikePython2(absPath);
+          const known = legacy && globalArgs.legacyPaths.includes(relPath);
 
           results.push({
             path: relPath,
             extension,
             probe,
-            status: outcome.status,
+            status: known ? "legacy" : outcome.status,
             exitCode: outcome.exitCode,
             durationMs: Math.round(performance.now() - scriptStart),
             message: outcome.message,
@@ -489,6 +496,7 @@ export const behavior = {
             failed: count("failed"),
             timeout: count("timeout"),
             skipped: count("skipped"),
+            legacy: count("legacy"),
             legacyPython2: results.filter((r) => r.likelyLegacyPython2).length,
           },
         }, {
@@ -496,6 +504,7 @@ export const behavior = {
             method: "check",
             probe,
             failed: String(count("failed") + count("timeout")),
+            legacy: String(count("legacy")),
           },
         });
 
