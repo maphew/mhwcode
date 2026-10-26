@@ -1,0 +1,34 @@
+type: mhwcode/script-health
+typeVersion: 2026.10.26.1
+id: 7b061622-69f0-4f86-8004-66b977ca3a24
+name: script-health
+version: 1
+tags: {}
+globalArguments:
+  rootPath: 'A:/dev/mhwcode'
+  dirs:
+    - tools
+    - gis
+    - other
+    - video
+    - arcplus
+    - register-python
+    - Lib
+  extensions:
+    - .py
+    - .ps1
+    - .bat
+    - .cmd
+    - .sh
+  probe: syntax
+  timeoutMs: 20000
+  concurrency: 4
+  excludes:
+    - .git
+    - .venv
+    - venv
+    - __pycache__
+    - node_modules
+    - samples
+    - assets
+methods: {}
