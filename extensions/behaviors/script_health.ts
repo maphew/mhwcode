@@ -353,7 +353,7 @@ export const behavior = {
       description:
         "Per-script probe verdicts for one sweep: status, exit code, duration, failure line, and totals",
       schema: SweepResultSchema,
-      lifetime: "ephemeral" as const,
+      lifetime: "infinite" as const,
       garbageCollection: 10,
     },
   },

@@ -1,0 +1,54 @@
+id: ab0a7719-d9b6-4946-9267-5e192585a32d
+name: mhwcode-weekly-health
+description: >-
+  Drift and health check for the script collection: working-tree state, recent
+  commits touching script directories, and a syntax sweep of every script.
+tags:
+  repo: mhwcode
+reports:
+  require:
+    - mhwcode/repo-digest
+jobs:
+  - name: main
+    description: Read-only drift and script health sweep
+    steps:
+      - name: working-tree
+        description: Structured git status for the checkout
+        task:
+          type: model_method
+          modelIdOrName: mhwcode-status
+          methodName: status
+        dependsOn: []
+        weight: 0
+        allowFailure: false
+      - name: recent-script-commits
+        description: Last 10 commits that touched a script directory
+        task:
+          type: model_method
+          modelIdOrName: mhwcode-status
+          methodName: log
+          inputs:
+            paths:
+              - tools
+              - gis
+              - other
+              - video
+              - arcplus
+              - register-python
+              - Lib
+            maxCount: 10
+        dependsOn: []
+        weight: 0
+        allowFailure: false
+      - name: script-sweep
+        description: Syntax-probe every script and count ok/failed/skipped
+        task:
+          type: model_method
+          modelIdOrName: script-health
+          methodName: check
+        dependsOn: []
+        weight: 0
+        allowFailure: false
+    dependsOn: []
+    weight: 0
+version: 1
