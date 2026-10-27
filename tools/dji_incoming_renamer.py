@@ -5,26 +5,47 @@
 #   "wordninja==2.0.0",
 # ]
 # ///
-"""Re-home DJI captures into the TIM naming pattern, with a journal-based undo.
+"""Give DJI capture folders the TIM dated name, in place, with a journaled undo.
 
-Incoming pattern (as dropped off by the pilot)::
+The default action renames each capture folder where it already sits -- one
+``rename()`` per folder, nothing moves, nothing inside the folder is touched::
 
-    W:\\Incoming\\Drones\\ELC\\2026-Aug\\DCIM\\DJI_202608051635_001_01ClearCreek1\\DJI_*.JPG
-    W:\\Incoming\\Drones\\ELC\\2026-Aug\\MISC\\...
+    .../ELC/2026-Aug/DCIM/DJI_202608051635_001_01ClearCreek1/
+      -> .../ELC/2026-Aug/DCIM/2026-08-05-01-Clear-Creek-1/
 
-Outgoing pattern (the processing queue)::
+So a card of 9,000 files is planned and renamed in milliseconds: the plan reads
+directory entries only (one ``scandir`` per folder level), never the file tree.
 
-    W:\\Incoming\\Drones\\TIM\\2026-08-10-2b-Dominion-Remap\\DCIM\\DJI_202608101454_011_2bdominionremap\\DJI_*.JPG
+Repeated flights of one mission
+-------------------------------
+DJI opens a new folder every time a flight is interrupted and resumed -- a
+battery swap, a land/reposition/take-off -- while keeping the mission's start
+time in the name.  One mission can therefore arrive as several folders, with
+file numbering restarting at 0001 in each::
 
-Every file gets a destination of ``<dest>/<YYYY-MM-DD>-<Project-Name>/<relative
-path from source root>``.  The date comes from the flight folder name, the file
-name, the nearest dated ancestor folder, or (last resort) the file mtime.  The
-project label is the pilot's own flight name with DJI's
+    DJI_202608091625_008_Create-Area-Route7    79 shots  16:32:48-16:33:43
+    DJI_202608091625_009_Create-Area-Route7    58 shots  16:37:15-16:37:55
+    DJI_202608091625_010_Create-Area-Route7   952 shots  16:41:16-16:52:27
+
+That is one continuous mission, not duplicate data, and the folders cannot be
+merged without colliding file names.  Each is renamed separately, in DJI's own
+flight order, with a zero-padded suffix::
+
+    2026-08-09-Create-Area-Route-7
+    2026-08-09-Create-Area-Route-7-02
+    2026-08-09-Create-Area-Route-7-03
+
+Two digits because one mission can split more than nine ways: unpadded, ``-10``
+sorts before ``-02`` and the flights come back out of order.
+
+A taken name never costs you a folder: it grows a suffix instead, and no folder
+is ever overwritten.  ``--on-conflict skip`` leaves the later flights alone
+instead of suffixing them.
+
+The label is the pilot's own flight name with DJI's
 ``<brand>_<YYYYMMDDHHMM>_<flight index>_`` prefix removed, then un-squished into
-words (``--style split``, the default):
-
-    DJI_202608101454_011_2bdominionremap  ->  .../TIM/2026-08-10-2b-Dominion-Remap/DCIM/...
-    DJI_202608051635_001_01ClearCreek1    ->  .../TIM/2026-08-05-01-Clear-Creek-1/DCIM/...
+words (``--style split``, the default).  The date comes from the flight folder
+name, a dated ancestor folder, or (last resort) the folder's own mtime.
 
 Word splitting learns from the archive itself: existing ``TIM/<date>-<label>``
 folders contribute the place names and mission words in use, so ``Pondy-Pit``
@@ -37,15 +58,25 @@ the pilot's text untouched (apart from path-illegal characters), and
 ``--project`` overrides every label.
 Everything a run does is written to a JSON journal so ``undo`` can put it back.
 
-This tool moves whole capture folders and names the dated folder; it does not
-rewrite individual file names.
+Relocating instead (opt-in, the old behaviour)
+---------------------------------------------
+``adapt ... --dest W:\\Incoming\\Drones\\TIM`` moves files rather than renaming
+folders, into ``<dest>/<YYYY-MM-DD>-<Project-Name>/<relative path from source
+root>``::
+
+    .../ELC/2026-Aug/DCIM/DJI_202608101454_011_2bdominionremap/DJI_*.JPG
+      -> .../TIM/2026-08-10-2b-Dominion-Remap/DCIM/DJI_202608101454_011_2bdominionremap/DJI_*.JPG
+
+That path needs the file tree, so it is slower and it is no longer the default.
 
 Usage
 -----
     uv run tools/dji_incoming_renamer.py adapt "W:\\Incoming\\Drones\\ELC\\2026-Aug"
     uv run tools/dji_incoming_renamer.py adapt "...\\2026-Aug" --apply
+    uv run tools/dji_incoming_renamer.py adapt "...\\2026-Aug\\DCIM" --apply
     uv run tools/dji_incoming_renamer.py adapt ... --project "Cowley Creek" --apply
     uv run tools/dji_incoming_renamer.py adapt ... --only-date 2026-08-09 --apply
+    uv run tools/dji_incoming_renamer.py adapt "...\\2026-Aug" --dest "W:\\Incoming\\Drones\\TIM" --apply
     uv run tools/dji_incoming_renamer.py runs
     uv run tools/dji_incoming_renamer.py undo --last            # preview
     uv run tools/dji_incoming_renamer.py undo --last --apply    # restore
@@ -62,6 +93,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import errno
 import fnmatch
 import json
 import os
@@ -72,13 +104,25 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
 from pathlib import Path
+from typing import Any
 
-try:  # pinned in the PEP 723 block; degrade if absent
-    import wordninja as _wordninja
-    from wordninja import DEFAULT_LANGUAGE_MODEL as _WORD_MODEL
-except Exception:  # pragma: no cover - dependency missing or renamed
-    _wordninja = None  # type: ignore[assignment]
-    _WORD_MODEL = None  # type: ignore[assignment]
+#: Filled on first use: (wordninja module or None, {word: frequency cost}).
+_WORD_TOOLS: tuple[Any, dict[str, float]] | None = None
+
+
+def word_tools() -> tuple[Any, dict[str, float]]:
+    """Import wordninja lazily; ``runs`` and ``undo`` never pay for it."""
+    global _WORD_TOOLS
+    if _WORD_TOOLS is None:
+        try:  # pinned in the PEP 723 block; degrade if absent
+            import wordninja
+
+            costs = dict(wordninja.DEFAULT_LANGUAGE_MODEL._wordcost)  # noqa: SLF001
+            _WORD_TOOLS = (wordninja, costs)
+        except Exception:  # pragma: no cover - dependency missing or renamed
+            _WORD_TOOLS = (None, {})
+    return _WORD_TOOLS
+
 
 DEFAULT_DEST = Path(r"W:\Incoming\Drones\TIM")
 DEST_ENV = "DJI_TIM_ROOT"
@@ -112,6 +156,13 @@ SKIP_DIR_NAMES = {
 }
 
 _DATE_RE = re.compile(r"((?:19|20)\d{2})[-_.]?(\d{2})[-_.]?(\d{2})")
+#: A folder this tool already renamed: <YYYY-MM-DD>-<label>.
+_DATED_NAME_RE = re.compile(r"^(?:19|20)\d{2}-\d{2}-\d{2}-")
+_SD_DIR_RE = re.compile(r"^SD-\d+$")
+#: A camera timestamp straight after the brand prefix: DJI_202608051635_001.
+_CAPTURE_STAMP_RE = re.compile(
+    r"^(?:DJI|PXL|GOPR|GP|IMG|VID|MVI|DSC|DJIFLY)[-_\s]?\d{8,14}", re.IGNORECASE
+)
 _CAMERA_PREFIX_RE = re.compile(
     r"^(?:DJI|PXL|GOPR|GP|IMG|VID|MVI|DSC|DJIFLY)[-_\s]*", re.IGNORECASE
 )
@@ -176,6 +227,46 @@ def sanitize_label(text: str) -> str:
     return text.strip(" .-")
 
 
+def scandir_dirs(path: Path) -> list[Path]:
+    """Subdirectories of *path*, sorted, from one directory read.
+
+    ``os.scandir`` + ``entry.is_dir()`` uses the attributes the directory listing
+    already carries, so it costs no per-child round trip -- which matters on the
+    SMB share where the drop-off folders live.
+
+    Directory links are skipped: Windows junctions report ``is_dir() == True``
+    and ``is_symlink() == False``, so following them silently renames the same
+    capture twice and lets a link point us at a tree we were not asked about.
+    """
+    found: list[Path] = []
+    try:
+        with os.scandir(path) as entries:
+            for entry in entries:
+                try:
+                    if not entry.is_dir(follow_symlinks=False):
+                        continue
+                    if entry.is_symlink() or _is_junction(entry):
+                        continue
+                    found.append(Path(entry.path))
+                except OSError:  # pragma: no cover - vanished mid-listing
+                    continue
+    except OSError:
+        return []
+    found.sort(key=lambda item: item.name)
+    return found
+
+
+def _is_junction(entry: os.DirEntry) -> bool:
+    """Junctions look exactly like real directories to ``is_dir``."""
+    check = getattr(entry, "is_junction", None)  # Python 3.12+
+    if check is None:  # pragma: no cover - older interpreter
+        return False
+    try:
+        return bool(check())
+    except OSError:  # pragma: no cover
+        return False
+
+
 def normalize_label(text: str) -> str:
     """Letters and digits only, lowercased: how two labels are compared."""
     return re.sub(r"[^a-z0-9]", "", text.lower())
@@ -211,27 +302,34 @@ class Lexicon:
     cache: dict[str, list[str]] = field(default_factory=dict)
 
     @classmethod
-    def from_archive(cls, dest_root: Path) -> Lexicon:
-        english = dict(_WORD_MODEL._wordcost) if _WORD_MODEL else {}  # noqa: SLF001
-        lexicon = cls(english=english)
-        try:
-            children = sorted(dest_root.iterdir())
-        except OSError:
-            return lexicon
-        for child in children:
+    def from_archive(cls, *roots: Path | None) -> Lexicon:
+        """Learn from the dated folders already present under each root."""
+        lexicon = cls(english=dict(word_tools()[1]))
+        for root in roots:
+            lexicon.learn(root)
+        return lexicon
+
+    def learn(self, root: Path | None) -> None:
+        """Absorb existing ``<date>-<label>`` folders below *root*.
+
+        One directory read, no per-child stat: this is the only I/O the plan
+        does outside the folders being renamed.
+        """
+        if root is None:
+            return
+        for child in scandir_dirs(root):
             match = re.match(r"^\d{4}-\d{2}-\d{2}-(.+)$", child.name)
-            if not match or not child.is_dir():
+            if not match:
                 continue
             label = match.group(1)
             normalized = normalize_label(label)
-            lexicon.spellings.setdefault(normalized, label)
+            self.spellings.setdefault(normalized, label)
             if _WORD_SPLIT_RE.search(label) is None:
-                lexicon.names.add(normalized)
+                self.names.add(normalized)
             for part in re.split(r"[^A-Za-z0-9]+", label):
                 for word in _CAMEL_RE.split(part):  # CopperHaul -> copper, haul
                     if len(word) >= 2 and not word.isdigit():
-                        lexicon.domain.add(word.lower())
-        return lexicon
+                        self.domain.add(word.lower())
 
     def segment(self, token: str) -> list[str]:
         """``dominionremap`` -> ``["dominion", "remap"]``; leave unknowns alone."""
@@ -289,9 +387,10 @@ class Lexicon:
         Catches words the frequency list lacks, e.g. ``dominionremap`` ->
         ``dominion | re | map`` -> ``Dominion-Remap``.
         """
-        if _wordninja is None:
+        ninja, _costs = word_tools()
+        if ninja is None:
             return None
-        pieces = _wordninja.split(token)
+        pieces = ninja.split(token)
         if len(pieces) < 2:
             return None
         glued: list[str] = []
@@ -659,6 +758,255 @@ def build_plan(
 
 
 # --------------------------------------------------------------------------
+# in-place rename (the default)
+# --------------------------------------------------------------------------
+
+
+@dataclass
+class RenameItem:
+    """One capture folder that wants the dated name but no new home."""
+
+    src: Path
+    dst: Path
+    label: str
+    when: date
+    flight: int = 1  # 1 = first folder of this mission on this day
+    mtime_dated: bool = False
+
+
+@dataclass
+class RenamePlan:
+    root: Path
+    items: list[RenameItem] = field(default_factory=list)
+    skipped: list[tuple[Path, str]] = field(default_factory=list)
+    notes: list[str] = field(default_factory=list)
+
+    @property
+    def mtime_dated(self) -> int:
+        return sum(1 for item in self.items if item.mtime_dated)
+
+    @property
+    def repeated(self) -> int:
+        return sum(1 for item in self.items if item.flight > 1)
+
+
+def is_dated_name(name: str) -> bool:
+    """True for a folder this tool has already renamed."""
+    return _DATED_NAME_RE.match(name) is not None
+
+
+def looks_like_capture(name: str) -> bool:
+    """True when DJI (or a sibling brand) opened the folder.
+
+    Needs a camera prefix *and* a timestamp: ``_FLIGHT_PREFIX_RE`` alone matches
+    ``GPX``, ``VIDEOGRAPHY`` and ``DJI_Backups``, and renaming an unrelated
+    survey folder is exactly the kind of surprise this tool must not produce.
+    """
+    if not _FLIGHT_PREFIX_RE.match(name):
+        return False
+    return _CAPTURE_STAMP_RE.match(name) is not None or extract_date(name) is not None
+
+
+def scan_container(name: str) -> bool:
+    """Folders whose children are capture folders (DCIM, SD-01, ...)."""
+    upper = name.upper()
+    return upper == "DCIM" or _SD_DIR_RE.match(upper) is not None
+
+
+def _listable(name: str) -> bool:
+    return not name.startswith("$") and name.upper() not in SKIP_DIR_NAMES
+
+
+def iter_capture_dirs(
+    root: Path, notes: list[str] | None = None, _depth: int = 0
+) -> list[Path]:
+    """Capture folders at or below *root*, walking only through containers.
+
+    Pointing at a month folder, at its ``DCIM``, at ``SD-01`` or at an
+    ``SD-05`` all work the same way: descend through container folders
+    (``DCIM``, ``SD-<n>``) and stop at everything else.  Nothing below a
+    capture folder is ever listed, and duplicates are impossible because each
+    folder is returned at most once (links are not followed at all).
+    """
+    if _depth == 0 and root.name.upper() == "MISC":
+        # Thumbnails, the flight DB and the rest of MISC belong to the card.
+        # Protected whether MISC is a child or the folder we were pointed at.
+        if notes is not None:
+            notes.append(f"{root} is a MISC folder; leaving its contents alone")
+        return []
+    if _depth >= _MAX_SCAN_DEPTH:
+        if notes is not None:
+            notes.append(f"stopped descending at {root} (too many folder levels)")
+        return []
+    found: list[Path] = []
+    for child in scandir_dirs(root):
+        if not _listable(child.name):
+            continue
+        if child.name.upper() == "MISC":
+            # Thumbnails and the flight DB belong to the card, not to a date.
+            # Left alone even when MISC is the folder you pointed at.
+            found.append(child)
+        elif scan_container(child.name):
+            found.extend(iter_capture_dirs(child, notes, _depth + 1))
+        else:
+            found.append(child)
+    return found
+
+
+def folder_date(folder: Path) -> tuple[date, bool]:
+    """Date for *folder*: its name, a dated ancestor, or (last) its mtime."""
+    found = extract_date(folder.name)
+    if found:
+        return found, False
+    for parent in folder.parents:
+        found = extract_date(parent.name)
+        if found:
+            return found, False
+    try:
+        return datetime.fromtimestamp(folder.stat().st_mtime).date(), True
+    except OSError:  # pragma: no cover - unreadable folder
+        return datetime.now().date(), True
+
+
+#: How many folder levels below the pointed-at folder to look for captures
+#: (month -> DCIM -> capture is two; SD-01 -> DCIM -> capture is two).
+_MAX_SCAN_DEPTH = 4
+
+#: Width of the "which folder of this mission" suffix.  Two digits sorts
+#: correctly up to 99 continuations; one digit would put ``-10`` before ``-02``.
+_FLIGHT_SUFFIX_WIDTH = 2
+
+
+def flight_name(group: str, ordinal: int) -> str:
+    """``<date>-<label>`` for the first folder, ``-02``, ``-03`` after that."""
+    if ordinal <= 1:
+        return group
+    return f"{group}-{ordinal:0{_FLIGHT_SUFFIX_WIDTH}d}"
+
+
+def build_rename_plan(
+    root: Path,
+    *,
+    project_override: str | None = None,
+    style: str = "split",
+    lexicon: Lexicon | None = None,
+    date_override: date | None = None,
+    only_dates: set[date] | None = None,
+    excludes: list[str] | None = None,
+    on_conflict: str = "rename",
+) -> RenamePlan:
+    plan = RenamePlan(root=root)
+    lexicon = lexicon or Lexicon()
+    excludes = excludes or []
+    wanted: list[tuple[Path, date, str, bool]] = []
+    for folder in iter_capture_dirs(root, plan.notes):
+        if _is_excluded(Path(folder.name), excludes):
+            plan.skipped.append((folder, "excluded by --exclude"))
+            continue
+        if is_dated_name(folder.name):
+            plan.skipped.append((folder, "already has the dated name"))
+            continue
+        if not looks_like_capture(folder.name):
+            if folder.name.upper() in CONTAINER_NAMES:
+                plan.skipped.append((folder, "container folder (left alone)"))
+            elif _FLIGHT_PREFIX_RE.match(folder.name):
+                plan.skipped.append((folder, "no camera timestamp in the name"))
+            else:
+                plan.skipped.append((folder, "not a camera capture folder"))
+            continue
+        when, guessed = folder_date(folder)
+        if date_override is not None:
+            when, guessed = date_override, False
+        if only_dates and when not in only_dates:
+            plan.skipped.append((folder, f"date {when.isoformat()} not selected"))
+            continue
+        label = project_override or project_from_name(
+            folder.name, style=style, lexicon=lexicon
+        )
+        if not label:
+            label = "Unknown"
+        wanted.append((folder, when, label, guessed))
+
+    # Same date + same label means DJI split one mission across folders (a
+    # battery swap mid-flight).  They are separate data, so they are renamed
+    # separately: the DJI names are fixed-width, so name order is flight order.
+    by_parent: dict[Path, dict[str, list[tuple[Path, date, str, bool]]]] = {}
+    for folder, when, label, guessed in wanted:
+        group = f"{when.isoformat()}-{label}"
+        by_parent.setdefault(folder.parent, {}).setdefault(group, []).append(
+            (folder, when, label, guessed)
+        )
+
+    claimed: set[Path] = set()
+    for parent, groups in sorted(by_parent.items(), key=lambda kv: kv[0].name):
+        for group, members in sorted(groups.items()):
+            members.sort(key=lambda member: member[0].name)
+            for flight, (folder, when, label, guessed) in enumerate(members, start=1):
+                # Keep counting up the same series when a name is already taken,
+                # so a stray folder never turns flight 2 into "...-2-2".
+                ordinal = flight
+                dst = parent / flight_name(group, ordinal)
+                while (dst in claimed or dst.exists()) and dst != folder:
+                    if on_conflict == "skip":
+                        break
+                    ordinal += 1
+                    dst = parent / flight_name(group, ordinal)
+                if (dst in claimed or dst.exists()) and dst != folder:
+                    plan.skipped.append(
+                        (folder, f"{dst.name} already exists (flight {flight})")
+                    )
+                    continue
+                if dst == folder:
+                    plan.skipped.append((folder, "already in place"))
+                    continue
+                claimed.add(dst)
+                plan.items.append(
+                    RenameItem(
+                        src=folder,
+                        dst=dst,
+                        label=label,
+                        when=when,
+                        flight=flight,
+                        mtime_dated=guessed,
+                    )
+                )
+    return plan
+
+
+def render_rename_plan(plan: RenamePlan) -> None:
+    print(f"Folder : {plan.root}")
+    print(f"Rename : {len(plan.items)} capture folder(s), in place")
+    if plan.mtime_dated:
+        print(
+            f"WARNING: {plan.mtime_dated} folder(s) had no date in any name; "
+            "dated from the folder's own mtime"
+        )
+    if plan.repeated:
+        print(
+            f"NOTE: {plan.repeated} folder(s) continue a mission DJI split across "
+            "several folders; they get a zero-padded -02, -03 suffix in flight order"
+        )
+    for note in plan.notes:
+        print(f"NOTE: {note}")
+    print()
+    if plan.items:
+        width = min(52, max(len(item.src.name) for item in plan.items))
+        for item in plan.items:
+            print(f"  {item.src.name:<{width}}  ->  {item.dst.name}")
+    if plan.skipped:
+        print()
+        print(f"Left alone: {len(plan.skipped):,} folder(s)")
+        reasons: dict[str, int] = {}
+        for _folder, reason in plan.skipped:
+            key = reason.split(" (")[0]
+            reasons[key] = reasons.get(key, 0) + 1
+        for reason, count in sorted(reasons.items(), key=lambda kv: -kv[1])[:6]:
+            print(f"  {count:>5}  {reason}")
+        for folder, reason in plan.skipped[:5]:
+            print(f"    - {folder.name}: {reason}")
+
+
+# --------------------------------------------------------------------------
 # journal
 # --------------------------------------------------------------------------
 
@@ -708,8 +1056,36 @@ class Journal:
                     "size": i.entry.size,
                     "mtime": i.entry.mtime,
                     "replaces": i.replaces,
+                    "state": "pending",
                 }
                 for i in plan.items
+            ],
+        )
+
+    @classmethod
+    def new_rename(cls, plan: RenamePlan, options: dict) -> Journal:
+        stamp = datetime.now(timezone.utc)
+        return cls(
+            id=stamp.strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:6],
+            created=stamp.isoformat(timespec="seconds"),
+            status="pending",
+            op="rename",
+            src_root=str(plan.root),
+            dest_root=str(plan.root),
+            options=options,
+            ops=[
+                {
+                    "src": str(item.src),
+                    "dst": str(item.dst),
+                    "from_name": item.src.name,
+                    "to_name": item.dst.name,
+                    "label": item.label,
+                    "date": item.when.isoformat(),
+                    "flight": item.flight,
+                    "mtime_dated": item.mtime_dated,
+                    "state": "pending",
+                }
+                for item in plan.items
             ],
         )
 
@@ -745,14 +1121,20 @@ class Journal:
             version=data.get("version", JOURNAL_VERSION),
         )
 
-    def write(self, journal_dir: Path) -> Path:
+    def write(self, journal_dir: Path, *, durable: bool = True) -> Path:
         journal_dir.mkdir(parents=True, exist_ok=True)
         target = self.path or (journal_dir / f"{self.id}.json")
         tmp = target.with_suffix(".json.tmp")
-        tmp.write_text(
-            json.dumps(self.to_dict(), indent=2, ensure_ascii=False) + "\n",
-            encoding="utf-8",
-        )
+        payload = json.dumps(self.to_dict(), indent=2, ensure_ascii=False) + "\n"
+        with open(tmp, "w", encoding="utf-8") as stream:
+            stream.write(payload)
+            stream.flush()
+            # Rename-then-crash must not lose the record of what was renamed, so
+            # the journal reaches the disk before the folder does.  Per-file
+            # progress in the relocation path is frequent, so it keeps the write
+            # but skips the flush-to-platter cost.
+            if durable:
+                os.fsync(stream.fileno())
         os.replace(tmp, target)
         self.path = target
         return target
@@ -856,6 +1238,22 @@ def apply_plan(
     for item, record in zip(plan.items, journal.ops, strict=True):
         dst = item.dst
         _ensure_dir(dst.parent, created, plan.dest_root)
+        if dst.is_dir() and not item.replaces:
+            # An arrival since planning: shutil would bury the file inside it.
+            record["state"] = "skipped"
+            record["skipped"] = "a folder now occupies the target"
+            print(
+                f"warning: {item.entry.src.name}: a folder now occupies "
+                f"{dst}, left alone",
+                file=sys.stderr,
+            )
+            journal.write(journal_dir, durable=False)
+            continue
+        # Record the intent per file before touching anything, so a crash here
+        # cannot make undo mistake a pre-existing destination for a file this
+        # run created (and delete it).
+        record["state"] = "working"
+        journal.write(journal_dir, durable=False)
         if item.replaces and dst.is_file():
             # Park the old file beside the new one so undo can bring it back.
             backup = dst.with_name(f"{dst.name}.replaced-{journal.id}")
@@ -865,6 +1263,8 @@ def apply_plan(
             shutil.copy2(item.entry.src, dst)
         else:
             shutil.move(str(item.entry.src), str(dst))
+        record["state"] = "done"
+        journal.write(journal_dir, durable=False)
     journal.created_dirs = [str(p) for p in created]
     if prune:
         journal.pruned_dirs = [
@@ -894,6 +1294,73 @@ def apply_plan(
             file=sys.stderr,
         )
     journal.write(journal_dir)
+    return journal
+
+
+def dir_identity(path: Path) -> tuple[int, int] | None:
+    """(device, inode) of a directory, or None if the OS cannot tell us.
+
+    ``os.rename`` keeps a directory's inode, so this is how undo checks that the
+    folder sitting at the recorded destination is still the one we renamed and
+    not a later arrival wearing the same name.  Network filesystems may report
+    ``st_ino == 0``; then we simply cannot check and say so at undo time.
+    """
+    try:
+        stat = path.stat()
+    except OSError:
+        return None
+    inode = getattr(stat, "st_ino", 0)
+    if not inode:
+        return None
+    return (stat.st_dev, inode)
+
+
+def apply_rename(plan: RenamePlan, journal_dir: Path) -> Journal:
+    """Rename every folder in *plan*; no file is ever opened or moved.
+
+    The journal is rewritten before and after each rename, so a crash mid-run
+    still leaves a record that undo can work from.  Undo trusts the filesystem
+    over these flags, but the flags keep the record readable.
+    """
+    journal = Journal.new_rename(
+        plan,
+        {
+            "in_place": True,
+            "root": str(plan.root),
+        },
+    )
+    journal.status = "applying"
+    journal.path = journal.write(journal_dir)
+    problems: list[str] = []
+    for item, record in zip(plan.items, journal.ops, strict=True):
+        if item.dst.exists():  # appeared between planning and applying
+            record["state"] = "skipped"
+            record["skipped"] = "destination appeared after planning"
+            problems.append(f"{item.src.name}: {record['skipped']}")
+            journal.write(journal_dir)
+            continue
+        record["state"] = "renaming"
+        journal.write(journal_dir)  # durable intent before touching the disk
+        try:
+            os.rename(item.src, item.dst)
+        except OSError as exc:
+            record["state"] = "failed"
+            record["skipped"] = f"rename failed: {exc}"
+            problems.append(f"{item.src.name}: {exc}")
+            journal.write(journal_dir)
+            continue
+        record["state"] = "renamed"
+        record["identity"] = dir_identity(item.dst)
+        if not (item.dst.is_dir() and not item.src.exists()):
+            # Rename reported success but the folders do not agree.
+            record["state"] = "suspect"
+            record["skipped"] = "post-rename check failed"
+            problems.append(f"{item.src.name}: post-rename check failed")
+        journal.write(journal_dir)
+    journal.status = "incomplete" if problems else "applied"
+    journal.write(journal_dir)
+    for problem in problems:
+        print(f"warning: {problem}", file=sys.stderr)
     return journal
 
 
@@ -929,11 +1396,12 @@ def prune_empty_dirs(
 
 @dataclass
 class UndoAction:
-    op: str  # restore | delete | skip
+    op: str  # restore | delete | skip | blocked
     src: Path | None
     dst: Path | None
     note: str = ""
     backup: Path | None = None
+    record: dict | None = None  # the journal op this came from
 
 
 def _changed_since_run(path: Path, raw: dict) -> str | None:
@@ -951,51 +1419,327 @@ def _changed_since_run(path: Path, raw: dict) -> str | None:
     return None
 
 
-def plan_undo(journal: Journal) -> list[UndoAction]:
+def plan_undo(journal: Journal, *, force: bool = False) -> list[UndoAction]:
+    """Work out what reversing *journal* would do, from the filesystem now.
+
+    Three rules keep this safe:
+
+    * an op this run never performed is never inferred to have happened;
+    * an op that was already reversed stays reversed;
+    * anything ambiguous (names missing, locations unreachable) is *blocked*
+      rather than skipped, so the run stays reversible instead of quietly
+      retiring work it never did.
+    """
     actions: list[UndoAction] = []
+    # Journals written before per-operation states existed must still undo, so
+    # for those we fall back to guessing from the filesystem.
+    legacy_run = all("state" not in op for op in journal.ops)
     for raw in reversed(journal.ops):
         src = Path(raw["src"])
         dst = Path(raw["dst"])
         backup = Path(raw["backup"]) if raw.get("backup") else None
-        if journal.op == "copy":
-            if not dst.exists():
-                actions.append(UndoAction("skip", None, dst, "already gone", backup))
-                continue
-            changed = _changed_since_run(dst, raw)
-            if changed:
+        if raw.get("undo_done"):
+            actions.append(
+                UndoAction("skip", src, dst, "already reversed", backup, raw)
+            )
+            continue
+        if raw.get("undo_state") == "attempting":
+            actions.append(
+                UndoAction(
+                    "blocked",
+                    src,
+                    dst,
+                    "an earlier undo was interrupted here; check by hand",
+                    backup,
+                    raw,
+                )
+            )
+            continue
+        state = raw.get("state")
+        # Only work this run actually started may be inferred from the
+        # filesystem.  A "pending" op was never attempted, so a file sitting at
+        # dst is somebody else's and must never be deleted or renamed as ours.
+        touched = legacy_run or state in {
+            "renaming",
+            "renamed",
+            "suspect",
+            "working",
+            "done",
+        }
+        untouched_blocked = UndoAction(
+            "blocked",
+            src,
+            dst,
+            "this run never reached this item; left alone",
+            backup,
+            raw,
+        )
+        location_lost = not dst.parent.is_dir() and not src.parent.is_dir()
+        if journal.op == "rename":
+            if state in {"skipped", "failed"}:
+                # The rename never happened; the folder under dst is someone
+                # else's and must never be claimed, even if src vanishes later.
+                note = str(raw.get("skipped") or "was not renamed")
+                actions.append(UndoAction("skip", src, dst, note, backup, raw))
+            elif not touched and dst.exists() and not src.exists():
                 actions.append(
-                    UndoAction("skip", None, dst, f"copy {changed}; left alone", backup)
+                    UndoAction(
+                        "blocked",
+                        src,
+                        dst,
+                        "this run never reached this folder; left alone",
+                        backup,
+                        raw,
+                    )
+                )
+            elif location_lost:
+                actions.append(
+                    UndoAction(
+                        "blocked",
+                        src,
+                        dst,
+                        "recorded folder is not available",
+                        None,
+                        raw,
+                    )
+                )
+            elif dst.is_dir() and not src.exists():
+                recorded = raw.get("identity")
+                current = dir_identity(dst)
+                if recorded and current and tuple(recorded) != current and not force:
+                    actions.append(
+                        UndoAction(
+                            "blocked",
+                            src,
+                            dst,
+                            "a different folder now has this name "
+                            "(--force to rename it back anyway)",
+                            None,
+                            raw,
+                        )
+                    )
+                else:
+                    note = "rename back"
+                    if recorded and not current:
+                        note = "rename back (identity unavailable here)"
+                    actions.append(UndoAction("restore", src, dst, note, None, raw))
+            elif dst.exists() and src.exists():
+                actions.append(
+                    UndoAction("blocked", src, dst, "both names are in use", None, raw)
+                )
+            elif dst.exists():
+                actions.append(
+                    UndoAction(
+                        "blocked", src, dst, "destination is not a folder", None, raw
+                    )
+                )
+            elif not src.exists():
+                # Could be a failed rename or an unmounted share: do not guess.
+                actions.append(
+                    UndoAction("blocked", src, dst, "neither name exists", None, raw)
                 )
             else:
-                actions.append(
-                    UndoAction("delete", None, dst, "remove copied file", backup)
-                )
+                actions.append(UndoAction("skip", src, dst, "not renamed", backup, raw))
             continue
-        if dst.exists() and not src.exists():
+        if journal.op == "copy":
+            if state == "skipped":
+                actions.append(
+                    UndoAction(
+                        "skip",
+                        None,
+                        dst,
+                        str(raw.get("skipped") or "not copied"),
+                        backup,
+                        raw,
+                    )
+                )
+            elif not touched:
+                actions.append(untouched_blocked)
+            elif location_lost:
+                actions.append(
+                    UndoAction(
+                        "blocked",
+                        None,
+                        dst,
+                        "recorded folder is not available",
+                        backup,
+                        raw,
+                    )
+                )
+            elif not dst.exists():
+                actions.append(
+                    UndoAction("skip", None, dst, "already gone", backup, raw)
+                )
+            else:
+                changed = _changed_since_run(dst, raw)
+                if changed:
+                    actions.append(
+                        UndoAction(
+                            "skip",
+                            None,
+                            dst,
+                            f"copy {changed}; left alone",
+                            backup,
+                            raw,
+                        )
+                    )
+                else:
+                    actions.append(
+                        UndoAction(
+                            "delete", None, dst, "remove copied file", backup, raw
+                        )
+                    )
+            continue
+        # op == "move"
+        if state == "skipped":
+            actions.append(
+                UndoAction(
+                    "skip",
+                    src,
+                    dst,
+                    str(raw.get("skipped") or "not moved"),
+                    backup,
+                    raw,
+                )
+            )
+        elif not touched:
+            actions.append(untouched_blocked)
+        elif location_lost:
+            actions.append(
+                UndoAction(
+                    "blocked", src, dst, "recorded folder is not available", backup, raw
+                )
+            )
+        elif dst.exists() and not src.exists():
             changed = _changed_since_run(dst, raw)
             note = "move back" if changed is None else f"move back ({changed})"
-            actions.append(UndoAction("restore", src, dst, note, backup))
-        elif not dst.exists():
-            actions.append(UndoAction("skip", src, dst, "destination missing"))
+            actions.append(UndoAction("restore", src, dst, note, backup, raw))
+        elif dst.exists():
+            actions.append(
+                UndoAction("blocked", src, dst, "both names are in use", backup, raw)
+            )
+        elif not src.exists():
+            actions.append(
+                UndoAction("blocked", src, dst, "neither name exists", backup, raw)
+            )
         else:
-            actions.append(UndoAction("skip", src, dst, "source already exists"))
+            actions.append(
+                UndoAction("skip", src, dst, "destination missing", backup, raw)
+            )
     return actions
 
 
-def apply_undo(journal: Journal, actions: list[UndoAction], journal_dir: Path) -> int:
+def _begin_op_undo(action: UndoAction, journal: Journal, journal_dir: Path) -> bool:
+    """Record the intent to reverse this op before touching the disk.
+
+    Written *before* the delete/move, so a crash in the middle leaves an op
+    marked ``attempting`` -- blocked on retry for a human to look at -- instead
+    of looking untouched and being reversed destructively a second time.
+    """
+    if action.record is None:
+        return True
+    action.record["undo_state"] = "attempting"
+    try:
+        journal.write(journal_dir)
+    except OSError as exc:  # pragma: no cover - journal volume problem
+        print(f"warning: cannot record undo intent: {exc}", file=sys.stderr)
+        return False
+    return True
+
+
+def _mark_op_undone(action: UndoAction, journal: Journal, journal_dir: Path) -> None:
+    """Remember per operation that it has been reversed.
+
+    Without this, a retry cannot tell a finished overwrite-undo (both names now
+    occupied by design) from one that still needs doing, and a second pass could
+    delete the very file the first pass put back.
+    """
+    if action.record is None:
+        return
+    action.record["undo_state"] = "done"
+    action.record["undo_done"] = True
+    journal.write(journal_dir)
+
+
+def _restore_backup(action: UndoAction) -> str | None:
+    """Put a replaced file back beside its replacement, or say why we cannot.
+
+    Never ``shutil.move``: an arrival at the destination meanwhile would be
+    overwritten (if a file) or swallow the backup (if a folder).
+    """
+    if not action.backup or not action.backup.exists() or not action.dst:
+        return None
+    if action.dst.exists():
+        return (
+            f"{action.backup} left in place: {action.dst} is occupied, check it by hand"
+        )
+    try:
+        os.rename(action.backup, action.dst)
+    except OSError as exc:
+        return f"{action.backup} left in place: {exc}"
+    return None
+
+
+def apply_undo(
+    journal: Journal, actions: list[UndoAction], journal_dir: Path
+) -> tuple[int, list[str]]:
+    """Reverse *actions*; returns (restored, complaints).
+
+    Every restore re-checks the destination's original name immediately before
+    moving.  ``shutil.move`` would happily push a folder *inside* a folder that
+    took the name meanwhile, so we use ``os.rename`` first and refuse to move
+    anything into an occupied name.
+    """
     restored = 0
+    blocked: list[str] = []
     for action in actions:
+        if action.op == "blocked":
+            blocked.append(f"{action.dst}: {action.note}")
+            continue
         if action.op == "restore" and action.src and action.dst:
+            if action.src.exists():
+                blocked.append(f"{action.src}: name is taken, nothing moved")
+                continue
+            if not _begin_op_undo(action, journal, journal_dir):
+                blocked.append(f"{action.dst}: could not record the undo intent")
+                continue
             action.src.parent.mkdir(parents=True, exist_ok=True)
-            shutil.move(str(action.dst), str(action.src))
-            if action.backup and action.backup.exists():
-                shutil.move(str(action.backup), str(action.dst))
+            try:
+                os.rename(action.dst, action.src)
+            except OSError as exc:
+                if action.src.exists():
+                    blocked.append(f"{action.src}: name is taken, nothing moved")
+                    continue
+                # No shutil.move fallback: across volumes it can overwrite or
+                # nest an arrival, and refusing is always recoverable by hand.
+                note = (
+                    "cannot rename across volumes"
+                    if exc.errno == errno.EXDEV
+                    else str(exc)
+                )
+                blocked.append(f"{action.dst}: {note}")
+                continue
             restored += 1
+            trouble = _restore_backup(action)
+            if trouble:
+                blocked.append(trouble)
+                continue
+            _mark_op_undone(action, journal, journal_dir)
         elif action.op == "delete" and action.dst:
-            action.dst.unlink()
-            if action.backup and action.backup.exists():
-                shutil.move(str(action.backup), str(action.dst))
+            if not _begin_op_undo(action, journal, journal_dir):
+                blocked.append(f"{action.dst}: could not record the undo intent")
+                continue
+            try:
+                action.dst.unlink()
+            except OSError as exc:
+                blocked.append(f"{action.dst}: {exc}")
+                continue
             restored += 1
+            trouble = _restore_backup(action)
+            if trouble:
+                blocked.append(trouble)
+                continue
+            _mark_op_undone(action, journal, journal_dir)
     for raw in sorted(journal.created_dirs, key=len, reverse=True):
         directory = Path(raw)
         try:
@@ -1005,13 +1749,17 @@ def apply_undo(journal: Journal, actions: list[UndoAction], journal_dir: Path) -
             continue
     for raw in sorted(journal.pruned_dirs, key=len):
         Path(raw).mkdir(parents=True, exist_ok=True)
-    journal.status = "undone"
+    # Anything that could not be put back stays reversible: status "partial" is
+    # picked up by a later `undo --last` instead of pretending we finished.
+    journal.status = "partial" if blocked else "undone"
     journal.options = {
         **journal.options,
         "undone_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
+    if blocked:
+        journal.options["undo_blocked"] = blocked[:20]
     journal.write(journal_dir)
-    return restored
+    return restored, blocked
 
 
 # --------------------------------------------------------------------------
@@ -1086,13 +1834,119 @@ def parse_iso_date(text: str) -> date:
         raise argparse.ArgumentTypeError(f"expected YYYY-MM-DD, got {text!r}") from exc
 
 
+def journal_dir_for(args: argparse.Namespace) -> Path:
+    if args.journal_dir:
+        return Path(args.journal_dir).expanduser()
+    return default_journal_dir()
+
+
+def _is_inside(path: Path, folder: Path) -> bool:
+    """True when *path* is *folder* or lives somewhere below it."""
+    try:
+        resolved = path.expanduser().resolve()
+        target = folder.resolve()
+    except OSError:  # pragma: no cover - unresolvable path
+        resolved, target = path.expanduser().absolute(), folder.absolute()
+    return resolved == target or target in resolved.parents
+
+
 def cmd_adapt(args: argparse.Namespace) -> int:
     src = Path(args.src).expanduser()
     if not src.is_dir():
         print(f"error: source folder not found: {src}", file=sys.stderr)
         return 2
-    src = resolve_scan_root(src.resolve())
-    dest_root = Path(args.dest or os.environ.get(DEST_ENV) or DEFAULT_DEST).expanduser()
+    src = src.resolve()
+    # In place, a taken name must never cost a folder, so suffix it; the legacy
+    # relocation keeps its old skip-the-file default.
+    if args.on_conflict is None:
+        args.on_conflict = "skip" if args.dest else "rename"
+    if args.dest:
+        return cmd_adapt_relocate(args, src)
+    return cmd_adapt_in_place(args, src)
+
+
+def cmd_adapt_in_place(args: argparse.Namespace, src: Path) -> int:
+    """Default: rename the capture folders that are already here."""
+    if args.copy:
+        print(
+            "error: --copy does not apply to an in-place rename (nothing is "
+            "moved or copied); use --dest to relocate instead",
+            file=sys.stderr,
+        )
+        return 2
+    if args.on_conflict == "overwrite":
+        print(
+            "error: an in-place rename never overwrites a folder; use "
+            "--on-conflict rename (default) or skip",
+            file=sys.stderr,
+        )
+        return 2
+    if looks_like_capture(src.name) or is_dated_name(src.name):
+        print(
+            f"error: {src} is itself a capture folder; point at the folder that "
+            "contains it (its DCIM, or the month folder above that)",
+            file=sys.stderr,
+        )
+        return 2
+    lexicon_root = Path(
+        args.lexicon_from or os.environ.get(DEST_ENV) or DEFAULT_DEST
+    ).expanduser()
+    roots = [lexicon_root, src, src.parent]
+    roots.extend(child for child in scandir_dirs(src) if scan_container(child.name))
+    lexicon = Lexicon.from_archive(*roots)
+    if args.restyle:
+        lexicon.spellings.clear()  # ignore how TIM already spells these labels
+    if args.project:
+        project = format_label(args.project, style=args.style, lexicon=lexicon)
+        if not project:
+            print("error: --project is empty after sanitising", file=sys.stderr)
+            return 2
+    else:
+        project = None
+    plan = build_rename_plan(
+        src,
+        project_override=project,
+        style=args.style,
+        lexicon=lexicon,
+        date_override=args.date,
+        only_dates=set(args.only_date or []),
+        excludes=args.exclude or [],
+        on_conflict=args.on_conflict,
+    )
+    render_rename_plan(plan)
+    if not plan.items:
+        print("\nNothing to rename.")
+        return 0
+    # A journal inside a folder we are about to rename would be dragged along
+    # with it, and rewriting it afterwards would recreate the old name -- which
+    # leaves both names on disk and makes undo refuse the pair.
+    journal_dir = journal_dir_for(args)
+    for item in plan.items:
+        if _is_inside(journal_dir, item.src):
+            print(
+                f"error: journal folder {journal_dir} is inside "
+                f"{item.src.name}, which this run renames; pass a "
+                "--journal-dir outside the capture folders",
+                file=sys.stderr,
+            )
+            return 2
+    if not args.apply or args.dry_run:
+        print("\nDry run - no changes made. Re-run with --apply to execute.")
+        return 0
+    journal_dir = journal_dir_for(args)
+    with run_lock(journal_dir):
+        journal = apply_rename(plan, journal_dir)
+    renamed = sum(1 for record in journal.ops if record.get("state") == "renamed")
+    print(f"\nRenamed {renamed:,} folder(s) in place.")
+    print(f"Journal: {journal.path}")
+    print(f"Undo with: {TOOL_NAME} undo --run {journal.id} --apply")
+    return 0 if journal.status == "applied" else 1
+
+
+def cmd_adapt_relocate(args: argparse.Namespace, src: Path) -> int:
+    """Opt-in: move files under <dest>/<date>-<label>/, the old behaviour."""
+    src = resolve_scan_root(src)
+    dest_root = Path(args.dest).expanduser()
     if not dest_root.is_absolute():
         dest_root = Path.cwd() / dest_root
     try:  # compare real paths, but keep the given form for display
@@ -1135,11 +1989,7 @@ def cmd_adapt(args: argparse.Namespace) -> int:
         print("\nDry run - no changes made. Re-run with --apply to execute.")
         return 0
     op = "copy" if args.copy else "move"
-    journal_dir = (
-        Path(args.journal_dir).expanduser()
-        if args.journal_dir
-        else default_journal_dir()
-    )
+    journal_dir = journal_dir_for(args)
     with run_lock(journal_dir):
         journal = apply_plan(
             plan,
@@ -1158,11 +2008,7 @@ def cmd_adapt(args: argparse.Namespace) -> int:
 
 
 def cmd_runs(args: argparse.Namespace) -> int:
-    journal_dir = (
-        Path(args.journal_dir).expanduser()
-        if args.journal_dir
-        else default_journal_dir()
-    )
+    journal_dir = journal_dir_for(args)
     runs = load_journals(journal_dir)
     if args.json:
         print(json.dumps([r.to_dict() for r in runs], indent=2, ensure_ascii=False))
@@ -1172,24 +2018,46 @@ def cmd_runs(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_undo(args: argparse.Namespace) -> int:
-    journal_dir = (
-        Path(args.journal_dir).expanduser()
-        if args.journal_dir
-        else default_journal_dir()
+def render_undo(journal: Journal, actions: list[UndoAction]) -> None:
+    pending = [a for a in actions if a.op in {"restore", "delete"}]
+    blocked = [a for a in actions if a.op == "blocked"]
+    unit = "folder" if journal.op == "rename" else "file"
+    print(f"Run    : {journal.id}  ({journal.op}, {len(journal.ops):,} {unit}s)")
+    print(f"Source : {journal.src_root}")
+    print(f"Dest   : {journal.dest_root}")
+    print(
+        f"Action : {len(pending):,} {unit}(s) to reverse, "
+        f"{len(blocked):,} blocked, "
+        f"{len(actions) - len(pending) - len(blocked):,} nothing to do"
     )
+    for action in actions:
+        if action.op == "skip":
+            print(f"  skip    {action.dst}  ({action.note})")
+        elif action.op == "blocked":
+            print(f"  blocked {action.dst}  ({action.note})")
+        elif action.op == "restore" and action.dst:
+            print(f"  restore {action.dst} -> {action.src}")
+        elif action.dst:
+            print(f"  delete  {action.dst}")
+
+
+def cmd_undo(args: argparse.Namespace) -> int:
+    journal_dir = journal_dir_for(args)
     runs = load_journals(journal_dir)
     if args.list:
         print(f"Journal: {journal_dir}\n")
         render_runs(runs)
         return 0
+    # "pending"/"applying" are here because a run that died mid-way still moved
+    # folders, and "partial" because a half-done undo must stay reversible.
+    pending_status = {"applied", "incomplete", "pending", "applying", "partial"}
     if args.run:
         journal = find_run(journal_dir, args.run)
         if journal is None:
             print(f"error: no unique run matching {args.run!r}", file=sys.stderr)
             return 2
     else:
-        pending = [r for r in runs if r.status in {"applied", "incomplete"}]
+        pending = [r for r in runs if r.status in pending_status and r.ops]
         if not pending and args.force:
             pending = [r for r in runs if r.status == "undone"]
         if not pending:
@@ -1204,30 +2072,38 @@ def cmd_undo(args: argparse.Namespace) -> int:
         )
         return 2
 
-    actions = plan_undo(journal)
-    restorable = [a for a in actions if a.op != "skip"]
-    print(f"Run    : {journal.id}  ({journal.op}, {len(journal.ops):,} files)")
-    print(f"Source : {journal.src_root}")
-    print(f"Dest   : {journal.dest_root}")
-    print(
-        f"Action : {len(restorable):,} file(s) to reverse, {len(actions) - len(restorable):,} skipped"
-    )
-    for action in actions:
-        if action.op == "skip":
-            print(f"  skip    {action.dst}  ({action.note})")
-        elif action.op == "restore" and action.dst:
-            print(f"  restore {action.dst} -> {action.src}")
-        elif action.dst:
-            print(f"  delete  {action.dst}")
-    if not restorable:
-        print("\nNothing to reverse.")
-        return 0
+    unit = "folder" if journal.op == "rename" else "file"
     if not args.apply:
+        actions = plan_undo(journal, force=args.force)
+        render_undo(journal, actions)
+        if not [a for a in actions if a.op in {"restore", "delete"}]:
+            print("\nNothing to reverse.")
+            return 1 if any(a.op == "blocked" for a in actions) else 0
         print("\nDry run - nothing reversed. Re-run with --apply to execute.")
         return 0
+
+    # Plan inside the lock: the answer from a moment ago can be stale, and a
+    # stale plan is how a folder ends up nested inside another one.
     with run_lock(journal_dir):
-        count = apply_undo(journal, actions, journal_dir)
-    print(f"\nReversed {count:,} file(s). Journal updated: {journal.path}")
+        actions = plan_undo(journal, force=args.force)
+        render_undo(journal, actions)
+        if not [a for a in actions if a.op in {"restore", "delete"}]:
+            print("\nNothing to reverse.")
+            # Still record the outcome: blocked work must stay reversible, and a
+            # fully reversed run must not keep offering itself as pending.
+            _count, still_blocked = apply_undo(journal, actions, journal_dir)
+            return 1 if still_blocked else 0
+        count, blocked = apply_undo(journal, actions, journal_dir)
+    print(f"\nReversed {count:,} {unit}(s). Journal updated: {journal.path}")
+    if blocked:
+        print(
+            f"warning: {len(blocked)} {unit}(s) were not put back; the run stays "
+            "pending so a later undo can retry them:",
+            file=sys.stderr,
+        )
+        for item in blocked:
+            print(f"  {item}", file=sys.stderr)
+        return 1
     return 0
 
 
@@ -1250,22 +2126,28 @@ def build_parser() -> argparse.ArgumentParser:
 
     adapt = sub.add_parser(
         "adapt",
-        help="plan (and with --apply, perform) the move",
-        description="Re-home files into <dest>/<YYYY-MM-DD>-<Project-Name>/<relative path>. "
+        help="give capture folders the dated name in place (dry run by default)",
+        description="Rename each capture folder where it already sits: "
+        "DJI_202608051635_001_01ClearCreek1 -> 2026-08-05-01-Clear-Creek-1. "
+        "Nothing inside the folder is touched and no file is moved. "
+        "With --dest, relocate files into <dest>/<date>-<label>/ instead. "
         "Dry run unless --apply.",
     )
     adapt.add_argument(
-        "src", help="source folder, e.g. W:\\Incoming\\Drones\\ELC\\2026-Aug"
+        "src",
+        help="folder holding capture folders (or their DCIM), e.g. "
+        "W:\\Incoming\\Drones\\ELC\\2026-Aug",
     )
     adapt.add_argument(
         "-d",
         "--dest",
-        help=f"destination root (default: ${DEST_ENV} or {DEFAULT_DEST})",
+        help="relocate files into this root instead of renaming in place "
+        "(slower: reads the whole tree)",
     )
     adapt.add_argument(
         "-p",
         "--project",
-        help="project label for every file (overrides the pilot's flight name)",
+        help="project label for every folder (overrides the pilot's flight name)",
     )
     adapt.add_argument(
         "--restyle",
@@ -1281,36 +2163,38 @@ def build_parser() -> argparse.ArgumentParser:
         "verbatim=pilot's text exactly",
     )
     adapt.add_argument(
-        "--date", type=parse_iso_date, help="force YYYY-MM-DD for every file"
+        "--date", type=parse_iso_date, help="force YYYY-MM-DD for every folder"
     )
     adapt.add_argument(
         "--only-date",
         type=parse_iso_date,
         action="append",
         metavar="YYYY-MM-DD",
-        help="only move files for this date (repeatable)",
+        help="only rename folders for this date (repeatable)",
     )
     adapt.add_argument(
         "--include-misc",
         action="store_true",
-        help="also move MISC/ (thumbnails, DJI db)",
+        help="with --dest, also move MISC/ (thumbnails, DJI db)",
     )
     adapt.add_argument(
         "--exclude",
         action="append",
         metavar="GLOB",
-        help="skip matching files (repeatable)",
+        help="skip matching folder names (repeatable)",
     )
     adapt.add_argument(
         "--on-conflict",
-        choices=["skip", "rename", "overwrite"],
-        default="skip",
-        help="what to do when the destination file exists (default: skip)",
+        choices=["rename", "skip", "overwrite"],
+        default=None,
+        help="when the dated name is already taken: rename adds -2, -3 in flight "
+        "order (default in place), skip leaves the folder alone; overwrite only "
+        "applies to --dest",
     )
     adapt.add_argument(
         "--copy",
         action="store_true",
-        help="copy instead of move (undo deletes the copies)",
+        help="with --dest, copy instead of move (undo deletes the copies)",
     )
     adapt.add_argument("--apply", action="store_true", help="actually perform the plan")
     adapt.add_argument(
@@ -1328,6 +2212,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="explicitly do not perform the plan (default)",
     )
+    adapt.add_argument(
+        "--lexicon-from",
+        help="learn existing label spellings from this folder of dated folders "
+        f"(default: ${DEST_ENV} or {DEFAULT_DEST}); read once, no tree walk",
+    )
     adapt.add_argument("--journal-dir", help="where run journals live")
     adapt.set_defaults(func=cmd_adapt)
 
@@ -1344,7 +2233,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     undo.add_argument("--list", action="store_true", help="list runs instead")
     undo.add_argument(
-        "--force", action="store_true", help="reverse a run already marked undone"
+        "--force",
+        action="store_true",
+        help="reverse a run already marked undone, or move a folder back even "
+        "though it is not the one this run renamed",
     )
     undo.add_argument("--apply", action="store_true", help="actually reverse")
     undo.add_argument("--journal-dir", help="where run journals live")
