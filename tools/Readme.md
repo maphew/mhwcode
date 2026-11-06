@@ -140,11 +140,22 @@ run `uvs update tools/dji_incoming_renamer.py` after editing the script.
 ### checkpoint-vpn-service-toggle.ps1
 
 Manage the Check Point Endpoint VPN services (`TracSrvWrapper`, `EPWD`).
-With no argument shows current status.
+With no argument shows current status and prompts.
 
 ```powershell
-powershell -File checkpoint-vpn-service-toggle.ps1 [stop|start|restart]
+powershell -File checkpoint-vpn-service-toggle.ps1 [start|stop|restart|toggle]
+powershell -File checkpoint-vpn-service-toggle.ps1 -Install
+powershell -File checkpoint-vpn-service-toggle.ps1 -Uninstall
+powershell -File checkpoint-vpn-service-toggle.ps1 -Help
 ```
 
-Requires: Check Point Endpoint Connect installed; run as Administrator.
+`-Install` copies the script to `checkpoint-vpn.ps1` in the first writable
+directory already on PATH (preferring `%USERPROFILE%\.local\bin`, then
+`%LOCALAPPDATA%\Microsoft\WindowsApps`), so `checkpoint-vpn toggle` works from
+any PowerShell window. It also adds a "Check Point VPN Toggle" desktop
+shortcut that toggles the VPN on double-click, uses the Check Point icon, and
+shows a tray notification with the result. The shortcut requests elevation,
+which the services require. `-Uninstall` removes the shortcut, the PATH copy,
+and the cached icon.
 
+Requires: Check Point Endpoint Connect installed; run as Administrator.
