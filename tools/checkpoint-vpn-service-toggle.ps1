@@ -31,6 +31,7 @@ param(
     [switch]$Uninstall,
     [switch]$Help,
     [switch]$Notify,
+    [switch]$Gui,
 
     [string]$ShortcutPath
 )
@@ -50,6 +51,7 @@ Check Point VPN Service Manager
 
 Usage:
   checkpoint-vpn.ps1 [start|stop|restart|toggle]
+  checkpoint-vpn.ps1 -Gui
   checkpoint-vpn.ps1 -Install [-ShortcutPath <path>]
   checkpoint-vpn.ps1 -Uninstall
   checkpoint-vpn.ps1 -Help
@@ -63,6 +65,7 @@ Commands:
   help      Show this help
 
 Options:
+  -Gui                  Launch a simple GUI (Start/Stop/Toggle/Install/Remove)
   -Install              Copy the script to a directory already on PATH and
                         put a "Check Point VPN Toggle" shortcut on the desktop
   -Uninstall            Remove the PATH copy and the desktop shortcut
@@ -72,6 +75,7 @@ Options:
 
 Examples:
   checkpoint-vpn toggle
+  checkpoint-vpn -Gui
   checkpoint-vpn -Install
   checkpoint-vpn -Uninstall
 '@ | Write-Host
@@ -422,9 +426,216 @@ function Show-VpnNotification {
     }
 }
 
+function Show-VpnGui {
+    try {
+        Add-Type -AssemblyName System.Windows.Forms -ErrorAction Stop
+        Add-Type -AssemblyName System.Drawing -ErrorAction Stop
+    }
+    catch {
+        Write-Error "GUI requires Windows Forms assemblies. Run without -Gui in this environment."
+        exit 1
+    }
+
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = "Check Point VPN"
+    $form.Size = New-Object System.Drawing.Size(320, 220)
+    $form.StartPosition = "CenterScreen"
+    $form.FormBorderStyle = "FixedDialog"
+    $form.MaximizeBox = $false
+    $form.MinimizeBox = $false
+    $form.ShowInTaskbar = $true
+    $form.TopMost = $false
+
+    $iconPath = Get-VpnIconPath
+    if ($iconPath -and (Test-Path -LiteralPath $iconPath)) {
+        try { $form.Icon = New-Object System.Drawing.Icon($iconPath) } catch { }
+    }
+    elseif (Test-Path -LiteralPath $TrGUIPath) {
+        try { $form.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($TrGUIPath) } catch { }
+    }
+
+    $statusLabel = New-Object System.Windows.Forms.Label
+    $statusLabel.Location = New-Object System.Drawing.Point(12, 12)
+    $statusLabel.Size = New-Object System.Drawing.Size(280, 40)
+    $statusLabel.Text = "Checking status..."
+    $form.Controls.Add($statusLabel)
+
+    function Update-StatusLabel {
+        try {
+            $st = Get-VpnStatus
+            $t = if ($st.TracSrvWrapper -eq "Running") { "Running" } else { $st.TracSrvWrapper }
+            $e = if ($st.EPWD -eq "Running") { "Running" } else { $st.EPWD }
+            $statusLabel.Text = "TracSrvWrapper: $t`r`nEPWD:           $e"
+            $statusLabel.ForeColor = if ($st.BothRunning) { [System.Drawing.Color]::DarkGreen } else { [System.Drawing.Color]::DarkRed }
+        }
+        catch {
+            $statusLabel.Text = $_.Exception.Message
+            $statusLabel.ForeColor = [System.Drawing.Color]::DarkRed
+        }
+    }
+
+    $startBtn = New-Object System.Windows.Forms.Button
+    $startBtn.Location = New-Object System.Drawing.Point(12, 60)
+    $startBtn.Size = New-Object System.Drawing.Size(90, 28)
+    $startBtn.Text = "&Start"
+    $startBtn.Add_Click({
+        $startBtn.Enabled = $false
+        $stopBtn.Enabled = $false
+        $toggleBtn.Enabled = $false
+        try {
+            Assert-Services
+            $res = Invoke-Action -Action "start"
+            [System.Windows.Forms.MessageBox]::Show("Check Point VPN $res", "Check Point VPN", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        }
+        catch {
+            [System.Windows.Forms.MessageBox]::Show($_.Exception.Message, "Check Point VPN", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+        }
+        finally {
+            Update-StatusLabel
+            $startBtn.Enabled = $true
+            $stopBtn.Enabled = $true
+            $toggleBtn.Enabled = $true
+        }
+    })
+    $form.Controls.Add($startBtn)
+
+    $stopBtn = New-Object System.Windows.Forms.Button
+    $stopBtn.Location = New-Object System.Drawing.Point(108, 60)
+    $stopBtn.Size = New-Object System.Drawing.Size(90, 28)
+    $stopBtn.Text = "S&top"
+    $stopBtn.Add_Click({
+        $startBtn.Enabled = $false
+        $stopBtn.Enabled = $false
+        $toggleBtn.Enabled = $false
+        try {
+            Assert-Services
+            $res = Invoke-Action -Action "stop"
+            [System.Windows.Forms.MessageBox]::Show("Check Point VPN $res", "Check Point VPN", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        }
+        catch {
+            [System.Windows.Forms.MessageBox]::Show($_.Exception.Message, "Check Point VPN", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+        }
+        finally {
+            Update-StatusLabel
+            $startBtn.Enabled = $true
+            $stopBtn.Enabled = $true
+            $toggleBtn.Enabled = $true
+        }
+    })
+    $form.Controls.Add($stopBtn)
+
+    $toggleBtn = New-Object System.Windows.Forms.Button
+    $toggleBtn.Location = New-Object System.Drawing.Point(204, 60)
+    $toggleBtn.Size = New-Object System.Drawing.Size(90, 28)
+    $toggleBtn.Text = "&Toggle"
+    $toggleBtn.Add_Click({
+        $startBtn.Enabled = $false
+        $stopBtn.Enabled = $false
+        $toggleBtn.Enabled = $false
+        try {
+            Assert-Services
+            $res = Invoke-Action -Action "toggle"
+            [System.Windows.Forms.MessageBox]::Show("Check Point VPN $res", "Check Point VPN", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        }
+        catch {
+            [System.Windows.Forms.MessageBox]::Show($_.Exception.Message, "Check Point VPN", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+        }
+        finally {
+            Update-StatusLabel
+            $startBtn.Enabled = $true
+            $stopBtn.Enabled = $true
+            $toggleBtn.Enabled = $true
+        }
+    })
+    $form.Controls.Add($toggleBtn)
+
+    $installBtn = New-Object System.Windows.Forms.Button
+    $installBtn.Location = New-Object System.Drawing.Point(12, 98)
+    $installBtn.Size = New-Object System.Drawing.Size(138, 28)
+    $installBtn.Text = "&Install Shortcut"
+    $installBtn.Add_Click({
+        try {
+            Install-Shortcut
+            [System.Windows.Forms.MessageBox]::Show("Installed shortcut and PATH copy.", "Check Point VPN", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        }
+        catch {
+            [System.Windows.Forms.MessageBox]::Show($_.Exception.Message, "Check Point VPN", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+        }
+    })
+    $form.Controls.Add($installBtn)
+
+    $uninstallBtn = New-Object System.Windows.Forms.Button
+    $uninstallBtn.Location = New-Object System.Drawing.Point(156, 98)
+    $uninstallBtn.Size = New-Object System.Drawing.Size(138, 28)
+    $uninstallBtn.Text = "&Remove"
+    $uninstallBtn.Add_Click({
+        try {
+            Uninstall-Shortcut
+            [System.Windows.Forms.MessageBox]::Show("Removed shortcut and PATH copy.", "Check Point VPN", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information) | Out-Null
+        }
+        catch {
+            [System.Windows.Forms.MessageBox]::Show($_.Exception.Message, "Check Point VPN", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error) | Out-Null
+        }
+    })
+    $form.Controls.Add($uninstallBtn)
+
+    $refreshBtn = New-Object System.Windows.Forms.Button
+    $refreshBtn.Location = New-Object System.Drawing.Point(12, 136)
+    $refreshBtn.Size = New-Object System.Drawing.Size(282, 28)
+    $refreshBtn.Text = "&Refresh Status"
+    $refreshBtn.Add_Click({ Update-StatusLabel })
+    $form.Controls.Add($refreshBtn)
+
+    Update-StatusLabel
+    [void]$form.ShowDialog()
+}
+
+function Show-VpnNotification {
+    param([string]$Text)
+
+    if (-not $Text) { return }
+    try {
+        Add-Type -AssemblyName System.Windows.Forms -ErrorAction Stop
+        Add-Type -AssemblyName System.Drawing -ErrorAction Stop
+
+        $iconPath = Get-VpnIconPath
+        $icon = if ($iconPath) { New-Object System.Drawing.Icon($iconPath) } else { [System.Drawing.SystemIcons]::Shield }
+
+        $notify = New-Object System.Windows.Forms.NotifyIcon
+        try {
+            $notify.Icon = $icon
+            $notify.BalloonTipTitle = "Check Point VPN"
+            $notify.BalloonTipText = $Text
+            $notify.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Info
+            $notify.Visible = $true
+            $notify.ShowBalloonTip(4000)
+            Start-Sleep -Seconds 4
+        }
+        finally {
+            $notify.Visible = $false
+            $notify.Dispose()
+            if ($iconPath) { $icon.Dispose() }
+        }
+    }
+    catch {
+        # Notification is best-effort.
+    }
+}
+
 if ($Help -or $Command -eq "help") {
     Show-Usage
     exit 0
+}
+
+if ($Gui) {
+    try {
+        Show-VpnGui
+        exit 0
+    }
+    catch {
+        Write-Error "GUI failed: $($_.Exception.Message)"
+        exit 1
+    }
 }
 
 if ($Install -and $Uninstall) {
