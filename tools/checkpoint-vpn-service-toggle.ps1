@@ -20,7 +20,9 @@
 #   .\checkpoint-vpn-service-toggle.ps1 toggle
 #   .\checkpoint-vpn-service-toggle.ps1 -Install
 #   .\checkpoint-vpn-service-toggle.ps1 -Uninstall
-
+# 
+# License: X/MIT Copyright (c) 2026 Matt Wilkie, Yukon government
+#
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
