@@ -1,0 +1,10 @@
+type: '@swamp/git'
+typeVersion: 2026.09.28.1
+id: e5d72794-cec6-4ae6-8282-5e415cbd348e
+name: mhwcode-status
+version: 1
+tags: {}
+globalArguments:
+  repoPath: 'A:/dev/mhwcode'
+  remote: origin
+methods: {}

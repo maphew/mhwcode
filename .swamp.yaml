@@ -1,0 +1,9 @@
+swampVersion: 20261026.182207.0
+initializedAt: "2026-10-26T19:06:35.249Z"
+repoId: 7afaf9d6-7fff-40eb-91b7-5360705cc17e
+tools:
+  - pi
+  - codex
+defaultVault: default
+gitignoreManaged: true
+upgradedAt: "2026-10-26T19:21:19.150Z"
